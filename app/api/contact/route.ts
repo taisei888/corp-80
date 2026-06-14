@@ -6,12 +6,12 @@ export async function POST(req: NextRequest) {
   const { company, name, email, phone, message } = await req.json();
 
   const { error } = await resend.emails.send({
-    from: "合同会社80 お問い合わせ <onboarding@resend.dev>",
+    from: "I.RI.N.G Group お問い合わせ <onboarding@resend.dev>",
     to: "ito.t@80grp.com",
     replyTo: email,
     subject: `【お問い合わせ】${company} / ${name}`,
     html: `
-      <h2 style="color:#1e1b4b">お問い合わせが届きました</h2>
+      <h2 style="color:#1e1b4b">I.RI.N.G Group — お問い合わせが届きました</h2>
       <table style="border-collapse:collapse;width:100%;max-width:600px;font-size:14px">
         <tr><td style="padding:10px 14px;background:#f5f3ff;font-weight:bold;width:140px;border-bottom:1px solid #ede9fe">会社名</td><td style="padding:10px 14px;border-bottom:1px solid #ede9fe">${company}</td></tr>
         <tr><td style="padding:10px 14px;background:#f5f3ff;font-weight:bold;border-bottom:1px solid #ede9fe">お名前</td><td style="padding:10px 14px;border-bottom:1px solid #ede9fe">${name}</td></tr>

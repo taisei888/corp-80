@@ -1,9 +1,17 @@
 import type { Metadata } from "next";
+import { Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
 
+const noto = Noto_Sans_JP({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "700"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "合同会社80 | システム開発・人材紹介・AIソリューション",
-  description: "合同会社80はオーダーメイドのシステム開発（ホームページ・アプリ）、人材紹介業、LENDS AIを提供するテクノロジーカンパニーです。愛知県名古屋市拠点。",
+  title: "株式会社I.RI.N.G Group | 人の知覚を、ソフトウェアで拡張する。",
+  description:
+    "LENDS AIをはじめとする自社SaaS開発、AI受託開発、HP制作デザインを手がける株式会社I.RI.N.G Groupの公式サイトです。",
 };
 
 export default function RootLayout({
@@ -13,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body>{children}</body>
+      <body className={noto.className}>{children}</body>
     </html>
   );
 }
