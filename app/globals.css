@@ -5,16 +5,16 @@ html { scroll-behavior: smooth; }
 
 body {
   font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #f0eeeb;
-  color: #1a1a2e;
+  background: #04060f;
+  color: #fff;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
-::selection { background: rgba(99,102,241,0.15); }
+::selection { background: rgba(129,140,248,0.25); }
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 2px; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
 
 /* ─── Keyframes ──────────────────────────────── */
 @keyframes fade-up {
@@ -38,30 +38,10 @@ body {
   transition: opacity 0.85s cubic-bezier(0.16,1,0.3,1),
               transform 0.85s cubic-bezier(0.16,1,0.3,1);
 }
-.sr.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* ─── Glass Card ─────────────────────────────── */
-.glass-card {
-  background: rgba(255,255,255,0.68);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255,255,255,0.55);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.06);
-  border-radius: 20px;
-  padding: 40px 36px;
-  transition: box-shadow 0.28s ease, transform 0.28s ease, background 0.28s ease;
-}
-.glass-card:hover {
-  background: rgba(255,255,255,0.82);
-  box-shadow: 0 16px 48px rgba(0,0,0,0.10);
-  transform: translateY(-3px);
-}
+.sr.visible { opacity: 1; transform: translateY(0); }
 
 /* ─── Buttons ────────────────────────────────── */
-.btn-primary-light {
+.btn-primary-dark {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -72,19 +52,19 @@ body {
   letter-spacing: 0.01em;
   border: none;
   cursor: pointer;
-  background: #1a1a2e;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
   color: #fff;
   text-decoration: none;
   font-family: inherit;
-  transition: background 0.22s, transform 0.2s, box-shadow 0.22s;
+  transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
 }
-.btn-primary-light:hover {
-  background: #2d2d52;
+.btn-primary-dark:hover {
+  opacity: 0.88;
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(26,26,46,0.22);
+  box-shadow: 0 8px 24px rgba(99,102,241,0.4);
 }
 
-.btn-outline-light {
+.btn-ghost-dark {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -92,18 +72,16 @@ body {
   border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
-  border: 1.5px solid rgba(0,0,0,0.18);
-  background: rgba(255,255,255,0.5);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  color: #4a5568;
+  border: 1.5px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.7);
   text-decoration: none;
   cursor: pointer;
   font-family: inherit;
   transition: border-color 0.2s, color 0.2s, background 0.2s;
 }
-.btn-outline-light:hover {
-  border-color: #6366f1;
-  color: #6366f1;
-  background: rgba(238,242,255,0.7);
+.btn-ghost-dark:hover {
+  border-color: rgba(255,255,255,0.4);
+  color: #fff;
+  background: rgba(255,255,255,0.09);
 }
