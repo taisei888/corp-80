@@ -1,52 +1,66 @@
 @import "tailwindcss";
 
 *, *::before, *::after { box-sizing: border-box; }
-
 html { scroll-behavior: smooth; }
 
 body {
   font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #ffffff;
+  background: #f0eeeb;
   color: #1a1a2e;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
-::selection { background: rgba(99, 102, 241, 0.12); }
+::selection { background: rgba(99,102,241,0.15); }
 ::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: #f8fafc; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 2px; }
 
-/* ─── Keyframes ─────────────────────────────── */
+/* ─── Keyframes ──────────────────────────────── */
 @keyframes fade-up {
   from { opacity: 0; transform: translateY(24px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes fade-in {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
-
 @keyframes scroll-line {
   0%   { transform: scaleY(0); transform-origin: top; opacity: 1; }
   50%  { transform: scaleY(1); transform-origin: top; opacity: 1; }
   100% { transform: scaleY(1); transform-origin: bottom; opacity: 0; }
 }
 
-/* ─── Section Reveal ────────────────────────── */
-.section-reveal {
+/* ─── Scroll Reveal ──────────────────────────── */
+.sr {
   opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1),
-              transform 0.8s cubic-bezier(0.16,1,0.3,1);
+  transform: translateY(22px);
+  transition: opacity 0.85s cubic-bezier(0.16,1,0.3,1),
+              transform 0.85s cubic-bezier(0.16,1,0.3,1);
 }
-.section-reveal.visible {
+.sr.visible {
   opacity: 1;
   transform: translateY(0);
 }
 
-/* ─── Buttons ───────────────────────────────── */
+/* ─── Glass Card ─────────────────────────────── */
+.glass-card {
+  background: rgba(255,255,255,0.68);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.55);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+  border-radius: 20px;
+  padding: 40px 36px;
+  transition: box-shadow 0.28s ease, transform 0.28s ease, background 0.28s ease;
+}
+.glass-card:hover {
+  background: rgba(255,255,255,0.82);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.10);
+  transform: translateY(-3px);
+}
+
+/* ─── Buttons ────────────────────────────────── */
 .btn-primary-light {
   display: inline-flex;
   align-items: center;
@@ -61,13 +75,13 @@ body {
   background: #1a1a2e;
   color: #fff;
   text-decoration: none;
-  transition: background 0.22s ease, transform 0.2s ease, box-shadow 0.22s ease;
   font-family: inherit;
+  transition: background 0.22s, transform 0.2s, box-shadow 0.22s;
 }
 .btn-primary-light:hover {
   background: #2d2d52;
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(26,26,46,0.2);
+  box-shadow: 0 6px 20px rgba(26,26,46,0.22);
 }
 
 .btn-outline-light {
@@ -78,47 +92,18 @@ body {
   border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
-  border: 1.5px solid #d1d5db;
-  background: transparent;
+  border: 1.5px solid rgba(0,0,0,0.18);
+  background: rgba(255,255,255,0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: #4a5568;
   text-decoration: none;
   cursor: pointer;
-  transition: border-color 0.2s, color 0.2s, background 0.2s;
   font-family: inherit;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
 }
 .btn-outline-light:hover {
   border-color: #6366f1;
   color: #6366f1;
-  background: #f5f3ff;
-}
-
-/* ─── Business Cards ────────────────────────── */
-.business-card-light {
-  background: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 20px;
-  padding: 40px 36px;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
-}
-.business-card-light:hover {
-  border-color: #a5b4fc;
-  box-shadow: 0 16px 48px rgba(99,102,241,0.09);
-  transform: translateY(-4px);
-}
-
-/* ─── Contact Form ──────────────────────────── */
-.form-input {
-  width: 100%;
-  padding: 12px 16px;
-  border-radius: 10px;
-  border: 1.5px solid #e2e8f0;
-  background: #fff;
-  color: #1a1a2e;
-  font-size: 14px;
-  font-family: inherit;
-  outline: none;
-  transition: border-color 0.2s;
-}
-.form-input:focus {
-  border-color: #6366f1;
+  background: rgba(238,242,255,0.7);
 }

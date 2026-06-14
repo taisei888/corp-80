@@ -9,9 +9,9 @@ const noto = Noto_Sans_JP({
 });
 
 export const metadata: Metadata = {
-  title: "株式会社I.RI.N.G Group | 人の知覚を、ソフトウェアで拡張する。",
+  title: "合同会社80 | 人の知覚を、ソフトウェアで拡張する。",
   description:
-    "LENDS AIをはじめとする自社SaaS開発、AI受託開発、HP制作デザインを手がける株式会社I.RI.N.G Groupの公式サイトです。",
+    "LENDS AIをはじめとする自社SaaS開発、AI受託開発、HP制作デザインを手がける合同会社80の公式サイトです。",
 };
 
 export default function RootLayout({
