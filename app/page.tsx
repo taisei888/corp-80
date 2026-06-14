@@ -2,79 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 
-// ─── Cursor (DOM-direct, no state) ──────────────────────────────────────────
-function Cursor() {
-  const dotRef = useRef<HTMLDivElement>(null);
-  const ringRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const dot = dotRef.current;
-    const ring = ringRef.current;
-    if (!dot || !ring) return;
-
-    let mx = -1000, my = -1000;
-    let rx = -1000, ry = -1000;
-    let raf: number;
-
-    const onMove = (e: MouseEvent) => {
-      mx = e.clientX;
-      my = e.clientY;
-      dot.style.left = mx + "px";
-      dot.style.top = my + "px";
-      dot.style.opacity = "1";
-      ring.style.opacity = "1";
-    };
-
-    const tick = () => {
-      rx += (mx - rx) * 0.1;
-      ry += (my - ry) * 0.1;
-      ring.style.left = rx + "px";
-      ring.style.top = ry + "px";
-      raf = requestAnimationFrame(tick);
-    };
-
-    const onOver = (e: MouseEvent) => {
-      const el = (e.target as Element).closest("a,button,[data-hover]");
-      ring.classList.toggle("expanded", !!el);
-    };
-
-    window.addEventListener("mousemove", onMove);
-    document.addEventListener("mouseover", onOver);
-    raf = requestAnimationFrame(tick);
-
-    return () => {
-      window.removeEventListener("mousemove", onMove);
-      document.removeEventListener("mouseover", onOver);
-      cancelAnimationFrame(raf);
-    };
-  }, []);
-
-  return (
-    <>
-      <div ref={dotRef} className="cursor-dot" />
-      <div ref={ringRef} className="cursor-ring" />
-    </>
-  );
-}
-
 // ─── Main Page ──────────────────────────────────────────────────────────────
 export default function Home() {
   const [navScrolled, setNavScrolled] = useState(false);
-  const glowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Nav scroll
     const onScroll = () => setNavScrolled(window.scrollY > 60);
     window.addEventListener("scroll", onScroll, { passive: true });
-
-    // Mouse glow in hero
-    const onMove = (e: MouseEvent) => {
-      if (glowRef.current) {
-        glowRef.current.style.left = e.clientX + "px";
-        glowRef.current.style.top = e.clientY + "px";
-      }
-    };
-    window.addEventListener("mousemove", onMove, { passive: true });
 
     // Scroll reveal
     const observer = new IntersectionObserver(
@@ -88,7 +22,6 @@ export default function Home() {
 
     return () => {
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("mousemove", onMove);
       observer.disconnect();
     };
   }, []);
@@ -97,8 +30,7 @@ export default function Home() {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
   return (
-    <div style={{ background: "#fff" }}>
-      <Cursor />
+    <div style={{ background: "#fff", color: "#1a1a2e" }}>
 
       {/* ── Nav ──────────────────────────────── */}
       <nav
@@ -108,20 +40,19 @@ export default function Home() {
           left: 0,
           right: 0,
           zIndex: 100,
-          padding: navScrolled ? "0 48px" : "0 48px",
+          padding: "0 48px",
           height: navScrolled ? 64 : 72,
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          background: navScrolled ? "rgba(255,255,255,0.94)" : "transparent",
+          background: navScrolled ? "rgba(255,255,255,0.96)" : "rgba(255,255,255,0.0)",
           backdropFilter: navScrolled ? "blur(20px)" : "none",
-          borderBottom: navScrolled ? "1px solid #f1f5f9" : "none",
+          borderBottom: navScrolled ? "1px solid #e8edf2" : "none",
           transition: "all 0.35s cubic-bezier(0.16,1,0.3,1)",
         }}
       >
         {/* Logo */}
         <button
-          data-hover
           style={{
             background: "none",
             border: "none",
@@ -133,14 +64,13 @@ export default function Home() {
         >
           <span
             style={{
-              fontSize: 20,
+              fontSize: 22,
               fontWeight: 900,
-              letterSpacing: "-0.02em",
-              color: navScrolled ? "#0a0a1a" : "#fff",
-              transition: "color 0.3s",
+              letterSpacing: "-0.03em",
+              color: "#1a1a2e",
             }}
           >
-            I.RI.N.G
+            80
           </span>
         </button>
 
@@ -153,8 +83,20 @@ export default function Home() {
           ].map((item) => (
             <button
               key={item.id}
-              className={navScrolled ? "nav-link dark" : "nav-link"}
               onClick={() => scrollTo(item.id)}
+              style={{
+                background: "none",
+                border: "none",
+                padding: 0,
+                fontSize: 14,
+                fontWeight: 500,
+                color: "#4a5568",
+                cursor: "pointer",
+                transition: "color 0.2s",
+                letterSpacing: "0.01em",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#1a1a2e")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "#4a5568")}
             >
               {item.label}
             </button>
@@ -163,29 +105,26 @@ export default function Home() {
 
         {/* CTA */}
         <button
-          data-hover
           onClick={() => scrollTo("contact")}
           style={{
-            padding: "9px 22px",
-            borderRadius: 100,
-            border: navScrolled ? "1.5px solid #6366f1" : "1.5px solid rgba(255,255,255,0.35)",
+            padding: "9px 24px",
+            borderRadius: 6,
+            border: "1.5px solid #1a1a2e",
             background: "transparent",
-            color: navScrolled ? "#6366f1" : "rgba(255,255,255,0.85)",
+            color: "#1a1a2e",
             fontSize: 13,
             fontWeight: 600,
             cursor: "pointer",
-            transition: "all 0.25s",
+            transition: "all 0.22s",
             letterSpacing: "0.02em",
           }}
           onMouseEnter={(e) => {
-            const el = e.currentTarget;
-            el.style.background = navScrolled ? "#6366f1" : "rgba(255,255,255,0.12)";
-            el.style.color = navScrolled ? "#fff" : "#fff";
+            e.currentTarget.style.background = "#1a1a2e";
+            e.currentTarget.style.color = "#fff";
           }}
           onMouseLeave={(e) => {
-            const el = e.currentTarget;
-            el.style.background = "transparent";
-            el.style.color = navScrolled ? "#6366f1" : "rgba(255,255,255,0.85)";
+            e.currentTarget.style.background = "transparent";
+            e.currentTarget.style.color = "#1a1a2e";
           }}
         >
           お問い合わせ
@@ -202,84 +141,21 @@ export default function Home() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#06050f",
+          background: "#fff",
           overflow: "hidden",
         }}
       >
-        {/* Grid overlay */}
+        {/* Subtle background accent */}
         <div
           style={{
             position: "absolute",
-            inset: 0,
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.028) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.028) 1px, transparent 1px)",
-            backgroundSize: "64px 64px",
+            top: 0,
+            right: 0,
+            width: "45%",
+            height: "100%",
+            background: "linear-gradient(135deg, #f8f9ff 0%, #eef2ff 100%)",
+            clipPath: "polygon(15% 0, 100% 0, 100% 100%, 0% 100%)",
             pointerEvents: "none",
-            zIndex: 1,
-          }}
-        />
-
-        {/* Animated blobs */}
-        <div
-          style={{
-            position: "absolute",
-            width: 700,
-            height: 700,
-            borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(99,102,241,0.55) 0%, transparent 70%)",
-            filter: "blur(100px)",
-            top: "-15%",
-            right: "-10%",
-            pointerEvents: "none",
-            animation: "blob1 22s ease-in-out infinite",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            width: 550,
-            height: 550,
-            borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(139,92,246,0.45) 0%, transparent 70%)",
-            filter: "blur(90px)",
-            bottom: "-15%",
-            left: "-8%",
-            pointerEvents: "none",
-            animation: "blob2 28s ease-in-out infinite",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            width: 400,
-            height: 400,
-            borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(6,182,212,0.35) 0%, transparent 70%)",
-            filter: "blur(80px)",
-            top: "45%",
-            left: "42%",
-            pointerEvents: "none",
-            animation: "blob3 18s ease-in-out infinite",
-          }}
-        />
-
-        {/* Mouse glow */}
-        <div
-          ref={glowRef}
-          style={{
-            position: "absolute",
-            width: 360,
-            height: 360,
-            borderRadius: "50%",
-            background:
-              "radial-gradient(circle, rgba(99,102,241,0.18) 0%, transparent 70%)",
-            filter: "blur(40px)",
-            transform: "translate(-50%, -50%)",
-            pointerEvents: "none",
-            zIndex: 2,
-            transition: "left 0.4s ease, top 0.4s ease",
-            left: "50%",
-            top: "50%",
           }}
         />
 
@@ -288,76 +164,168 @@ export default function Home() {
           style={{
             position: "relative",
             zIndex: 10,
-            textAlign: "center",
-            padding: "0 24px",
-            maxWidth: 900,
+            maxWidth: 1160,
+            width: "100%",
+            padding: "0 48px",
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 80,
+            alignItems: "center",
           }}
         >
-          {/* Eyebrow */}
-          <p
-            style={{
-              fontSize: 12,
-              letterSpacing: "0.22em",
-              color: "rgba(255,255,255,0.4)",
-              textTransform: "uppercase",
-              marginBottom: 40,
-              animation: "fade-up 1s cubic-bezier(0.16,1,0.3,1) 0.1s both",
-            }}
-          >
-            株式会社 I.RI.N.G Group
-          </p>
+          <div>
+            {/* Eyebrow */}
+            <p
+              style={{
+                fontSize: 12,
+                letterSpacing: "0.2em",
+                color: "#6366f1",
+                textTransform: "uppercase",
+                fontWeight: 700,
+                marginBottom: 28,
+                animation: "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.1s both",
+              }}
+            >
+              合同会社80
+            </p>
 
-          {/* Mission */}
-          <h1
+            {/* Mission */}
+            <h1
+              style={{
+                fontSize: "clamp(40px, 5.5vw, 72px)",
+                fontWeight: 800,
+                color: "#1a1a2e",
+                lineHeight: 1.18,
+                letterSpacing: "-0.03em",
+                marginBottom: 28,
+                animation: "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.25s both",
+              }}
+            >
+              人の知覚を、<br />
+              ソフトウェアで<br />
+              <span style={{ color: "#6366f1" }}>拡張する。</span>
+            </h1>
+
+            {/* Sub */}
+            <p
+              style={{
+                fontSize: 16,
+                color: "#64748b",
+                lineHeight: 1.85,
+                marginBottom: 44,
+                animation: "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.4s both",
+              }}
+            >
+              テクノロジーの恩恵を、すべての現場へ。<br />
+              AI・SaaS・Webで、ビジネスの可能性を広げます。
+            </p>
+
+            {/* CTA buttons */}
+            <div
+              style={{
+                display: "flex",
+                gap: 14,
+                flexWrap: "wrap",
+                animation: "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.55s both",
+              }}
+            >
+              <button
+                className="btn-primary-light"
+                onClick={() => scrollTo("business")}
+              >
+                事業内容を見る
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </button>
+              <button
+                className="btn-outline-light"
+                onClick={() => scrollTo("contact")}
+              >
+                お問い合わせ
+              </button>
+            </div>
+          </div>
+
+          {/* Right side: visual */}
+          <div
             style={{
-              fontSize: "clamp(48px, 8vw, 96px)",
-              fontWeight: 700,
-              color: "#fff",
-              lineHeight: 1.15,
-              letterSpacing: "-0.025em",
-              marginBottom: 36,
               animation: "fade-up 1s cubic-bezier(0.16,1,0.3,1) 0.3s both",
             }}
           >
-            人の知覚を、
-            <br />
-            ソフトウェアで
-            <br />
-            <span className="gradient-text">拡張する。</span>
-          </h1>
+            <div
+              style={{
+                background: "#fff",
+                borderRadius: 20,
+                border: "1px solid #e2e8f0",
+                padding: 36,
+                boxShadow: "0 20px 60px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.04)",
+              }}
+            >
+              {/* Stats */}
+              <div style={{ display: "flex", gap: 16, marginBottom: 28 }}>
+                {[
+                  { val: "87", unit: "pt", label: "組織スコア", color: "#6366f1" },
+                  { val: "+12", unit: "", label: "先月比", color: "#10b981" },
+                  { val: "64", unit: "名", label: "回答者数", color: "#8b5cf6" },
+                ].map((s) => (
+                  <div key={s.label} style={{
+                    flex: 1,
+                    background: "#f8fafc",
+                    borderRadius: 12,
+                    padding: "16px",
+                    border: "1px solid #f1f5f9",
+                  }}>
+                    <div style={{ fontSize: 24, fontWeight: 800, color: s.color, letterSpacing: "-0.02em" }}>
+                      {s.val}<span style={{ fontSize: 13, fontWeight: 600 }}>{s.unit}</span>
+                    </div>
+                    <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 4, letterSpacing: "0.04em" }}>
+                      {s.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
 
-          {/* Sub */}
-          <p
-            style={{
-              fontSize: 15,
-              color: "rgba(255,255,255,0.35)",
-              letterSpacing: "0.12em",
-              animation: "fade-up 1s cubic-bezier(0.16,1,0.3,1) 0.55s both",
-            }}
-          >
-            Software that expands human perception.
-          </p>
+              {/* Bar chart */}
+              <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 12, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                月別コンディション推移
+              </div>
+              <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 90 }}>
+                {[52, 68, 60, 78, 72, 85, 87].map((h, i) => (
+                  <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6, height: "100%" }}>
+                    <div style={{
+                      width: "100%",
+                      height: `${h}%`,
+                      background: i === 6
+                        ? "linear-gradient(to top, #6366f1, #8b5cf6)"
+                        : "#e0e7ff",
+                      borderRadius: "4px 4px 0 0",
+                      marginTop: "auto",
+                    }} />
+                    <div style={{ fontSize: 9, color: "#cbd5e1" }}>
+                      {["7月", "8月", "9月", "10月", "11月", "12月", "1月"][i]}
+                    </div>
+                  </div>
+                ))}
+              </div>
 
-          {/* CTA buttons */}
-          <div
-            style={{
-              display: "flex",
-              gap: 14,
-              justifyContent: "center",
-              marginTop: 56,
-              flexWrap: "wrap",
-              animation: "fade-up 1s cubic-bezier(0.16,1,0.3,1) 0.75s both",
-            }}
-          >
-            <button data-hover className="btn-primary" onClick={() => scrollTo("business")}>
-              事業内容を見る
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-            </button>
-            <button data-hover className="btn-ghost" onClick={() => scrollTo("contact")}>
-              お問い合わせ
-            </button>
+              {/* Label */}
+              <div style={{
+                marginTop: 20,
+                padding: "12px 16px",
+                background: "#f0f4ff",
+                borderRadius: 10,
+                border: "1px solid #e0e7ff",
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+              }}>
+                <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#6366f1", flexShrink: 0 }} />
+                <div style={{ fontSize: 12, color: "#6366f1", fontWeight: 600 }}>
+                  LENDS AI — 組織ダッシュボード
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -372,19 +340,19 @@ export default function Home() {
             flexDirection: "column",
             alignItems: "center",
             gap: 10,
-            color: "rgba(255,255,255,0.25)",
+            color: "#cbd5e1",
             fontSize: 10,
             letterSpacing: "0.22em",
             textTransform: "uppercase",
-            animation: "fade-in 1s ease 1.2s both",
+            animation: "fade-in 1s ease 1s both",
           }}
         >
           <span>Scroll</span>
           <div
             style={{
               width: 1,
-              height: 56,
-              background: "linear-gradient(to bottom, rgba(255,255,255,0.3), transparent)",
+              height: 48,
+              background: "linear-gradient(to bottom, #cbd5e1, transparent)",
               animation: "scroll-line 2.2s ease-in-out infinite",
               transformOrigin: "top",
             }}
@@ -393,7 +361,7 @@ export default function Home() {
       </section>
 
       {/* ── Business ─────────────────────────── */}
-      <section id="business" style={{ padding: "120px 48px", background: "#fff" }}>
+      <section id="business" style={{ padding: "120px 48px", background: "#f8f9fc" }}>
         <div style={{ maxWidth: 1160, margin: "0 auto" }}>
           <div className="section-reveal" style={{ marginBottom: 72 }}>
             <div style={{
@@ -403,25 +371,24 @@ export default function Home() {
               Business
             </div>
             <h2 style={{
-              fontSize: "clamp(28px, 4vw, 48px)", fontWeight: 700,
-              letterSpacing: "-0.025em", lineHeight: 1.2, maxWidth: 480,
+              fontSize: "clamp(28px, 4vw, 48px)", fontWeight: 800,
+              letterSpacing: "-0.03em", lineHeight: 1.2, maxWidth: 480, color: "#1a1a2e",
             }}>
               3つの事業領域
             </h2>
             <p style={{ fontSize: 16, color: "#64748b", lineHeight: 1.9, marginTop: 16, maxWidth: 440 }}>
-              パッケージ製品・AI受託開発・Webデザインの3軸で、
+              パッケージ製品・AI受託開発・Webデザインの3軸で、<br />
               クライアントのデジタル変革を支援します。
             </p>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24 }}>
-
             {/* 01 Package */}
-            <div className="business-card section-reveal">
+            <div className="business-card-light section-reveal">
               <div style={{ fontSize: 11, fontWeight: 800, color: "#c7d2fe", marginBottom: 24, letterSpacing: "0.1em" }}>01</div>
               <div style={{
                 width: 48, height: 48, borderRadius: 12, marginBottom: 28,
-                background: "linear-gradient(135deg, #eef2ff, #e0e7ff)",
+                background: "#eef2ff",
                 display: "flex", alignItems: "center", justifyContent: "center",
               }}>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="1.8">
@@ -432,7 +399,7 @@ export default function Home() {
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.15em", color: "#6366f1", marginBottom: 10, textTransform: "uppercase" }}>
                 SaaS Package
               </div>
-              <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 14, lineHeight: 1.35, letterSpacing: "-0.01em" }}>
+              <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 14, lineHeight: 1.35, letterSpacing: "-0.01em", color: "#1a1a2e" }}>
                 パッケージ販売<br />
                 <span style={{ fontSize: 14, fontWeight: 400, color: "#94a3b8" }}>LENDS AI など</span>
               </h3>
@@ -442,23 +409,21 @@ export default function Home() {
             </div>
 
             {/* 02 AI Dev */}
-            <div className="business-card section-reveal" style={{ transitionDelay: "0.1s" }}>
+            <div className="business-card-light section-reveal" style={{ transitionDelay: "0.1s" }}>
               <div style={{ fontSize: 11, fontWeight: 800, color: "#c7d2fe", marginBottom: 24, letterSpacing: "0.1em" }}>02</div>
               <div style={{
                 width: 48, height: 48, borderRadius: 12, marginBottom: 28,
-                background: "linear-gradient(135deg, #fdf4ff, #f3e8ff)",
+                background: "#f5f3ff",
                 display: "flex", alignItems: "center", justifyContent: "center",
               }}>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" strokeWidth="1.8">
-                  <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/>
-                  <path d="M12 8v4l3 3"/>
-                  <circle cx="12" cy="12" r="2" fill="#8b5cf6"/>
+                  <path d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-2"/>
                 </svg>
               </div>
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.15em", color: "#8b5cf6", marginBottom: 10, textTransform: "uppercase" }}>
                 AI Development
               </div>
-              <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 14, lineHeight: 1.35, letterSpacing: "-0.01em" }}>
+              <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 14, lineHeight: 1.35, letterSpacing: "-0.01em", color: "#1a1a2e" }}>
                 AI受託開発
               </h3>
               <p style={{ fontSize: 14, lineHeight: 1.9, color: "#64748b" }}>
@@ -467,11 +432,11 @@ export default function Home() {
             </div>
 
             {/* 03 Web Design */}
-            <div className="business-card section-reveal" style={{ transitionDelay: "0.2s" }}>
+            <div className="business-card-light section-reveal" style={{ transitionDelay: "0.2s" }}>
               <div style={{ fontSize: 11, fontWeight: 800, color: "#c7d2fe", marginBottom: 24, letterSpacing: "0.1em" }}>03</div>
               <div style={{
                 width: 48, height: 48, borderRadius: 12, marginBottom: 28,
-                background: "linear-gradient(135deg, #ecfeff, #cffafe)",
+                background: "#ecfeff",
                 display: "flex", alignItems: "center", justifyContent: "center",
               }}>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0891b2" strokeWidth="1.8">
@@ -482,7 +447,7 @@ export default function Home() {
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.15em", color: "#0891b2", marginBottom: 10, textTransform: "uppercase" }}>
                 Web Design
               </div>
-              <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 14, lineHeight: 1.35, letterSpacing: "-0.01em" }}>
+              <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 14, lineHeight: 1.35, letterSpacing: "-0.01em", color: "#1a1a2e" }}>
                 HP制作デザイン
               </h3>
               <p style={{ fontSize: 14, lineHeight: 1.9, color: "#64748b" }}>
@@ -494,7 +459,7 @@ export default function Home() {
       </section>
 
       {/* ── Featured Product: LENDS AI ───────── */}
-      <section id="product" style={{ padding: "120px 48px", background: "#fafafa" }}>
+      <section id="product" style={{ padding: "120px 48px", background: "#fff" }}>
         <div style={{ maxWidth: 1160, margin: "0 auto" }}>
           <div className="section-reveal" style={{ marginBottom: 72 }}>
             <div style={{
@@ -504,8 +469,8 @@ export default function Home() {
               Featured Product
             </div>
             <h2 style={{
-              fontSize: "clamp(28px, 4vw, 48px)", fontWeight: 700,
-              letterSpacing: "-0.025em", lineHeight: 1.2,
+              fontSize: "clamp(28px, 4vw, 48px)", fontWeight: 800,
+              letterSpacing: "-0.03em", lineHeight: 1.2, color: "#1a1a2e",
             }}>
               LENDS AI
             </h2>
@@ -519,7 +484,7 @@ export default function Home() {
             <div className="section-reveal">
               <h3 style={{
                 fontSize: "clamp(22px, 3vw, 32px)", fontWeight: 700,
-                lineHeight: 1.55, marginBottom: 24, letterSpacing: "-0.02em",
+                lineHeight: 1.55, marginBottom: 24, letterSpacing: "-0.02em", color: "#1a1a2e",
               }}>
                 スマホアンケート × AI分析で、<br />
                 従業員の「今」を見える化する。
@@ -540,12 +505,12 @@ export default function Home() {
                   <li key={f} style={{ display: "flex", gap: 12, alignItems: "center", fontSize: 14, color: "#475569" }}>
                     <span style={{
                       width: 20, height: 20, borderRadius: 6,
-                      background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+                      background: "#eef2ff",
                       display: "flex", alignItems: "center", justifyContent: "center",
                       flexShrink: 0,
                     }}>
                       <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
-                        <path d="M2 6l3 3 5-5" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M2 6l3 3 5-5" stroke="#6366f1" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     </span>
                     {f}
@@ -554,12 +519,11 @@ export default function Home() {
               </ul>
 
               <a
-                data-hover
                 href="https://www.lens-ai.jp"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-primary"
-                style={{ marginTop: 40, display: "inline-flex" }}
+                className="btn-primary-light"
+                style={{ marginTop: 40, display: "inline-flex", textDecoration: "none" }}
               >
                 LENDS AI サイトへ
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -572,23 +536,24 @@ export default function Home() {
             {/* Mock visual */}
             <div className="section-reveal" style={{ transitionDelay: "0.15s" }}>
               <div style={{
-                background: "#06050f",
+                background: "#fff",
                 borderRadius: 20,
                 overflow: "hidden",
-                boxShadow: "0 40px 80px rgba(0,0,0,0.18), 0 0 0 1px rgba(255,255,255,0.04)",
+                boxShadow: "0 24px 64px rgba(0,0,0,0.09), 0 0 0 1px #e2e8f0",
               }}>
                 {/* Window bar */}
                 <div style={{
-                  background: "#0f0e1e",
+                  background: "#f8fafc",
                   padding: "14px 20px",
                   display: "flex",
                   gap: 7,
                   alignItems: "center",
+                  borderBottom: "1px solid #e2e8f0",
                 }}>
                   {["#f87171", "#fbbf24", "#34d399"].map((c) => (
                     <div key={c} style={{ width: 10, height: 10, borderRadius: "50%", background: c, opacity: 0.7 }} />
                   ))}
-                  <div style={{ marginLeft: 12, fontSize: 11, color: "rgba(255,255,255,0.3)", letterSpacing: "0.05em" }}>
+                  <div style={{ marginLeft: 12, fontSize: 11, color: "#94a3b8", letterSpacing: "0.05em" }}>
                     LENDS AI — 組織ダッシュボード
                   </div>
                 </div>
@@ -596,21 +561,21 @@ export default function Home() {
                 {/* Body */}
                 <div style={{ padding: 28 }}>
                   {/* Stats row */}
-                  <div style={{ display: "flex", gap: 16, marginBottom: 28 }}>
+                  <div style={{ display: "flex", gap: 12, marginBottom: 28 }}>
                     {[
                       { val: "87", unit: "pt", label: "組織スコア", color: "#6366f1" },
-                      { val: "+12", unit: "", label: "先月比", color: "#34d399" },
+                      { val: "+12", unit: "", label: "先月比", color: "#10b981" },
                       { val: "64", unit: "名", label: "回答者数", color: "#8b5cf6" },
                     ].map((s) => (
                       <div key={s.label} style={{
-                        flex: 1, background: "rgba(255,255,255,0.04)",
+                        flex: 1, background: "#f8fafc",
                         borderRadius: 12, padding: "14px 16px",
-                        border: "1px solid rgba(255,255,255,0.05)",
+                        border: "1px solid #f1f5f9",
                       }}>
-                        <div style={{ fontSize: 22, fontWeight: 700, color: s.color, letterSpacing: "-0.02em" }}>
-                          {s.val}<span style={{ fontSize: 13 }}>{s.unit}</span>
+                        <div style={{ fontSize: 22, fontWeight: 800, color: s.color, letterSpacing: "-0.02em" }}>
+                          {s.val}<span style={{ fontSize: 13, fontWeight: 600 }}>{s.unit}</span>
                         </div>
-                        <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", marginTop: 4, letterSpacing: "0.05em" }}>
+                        <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 4, letterSpacing: "0.05em" }}>
                           {s.label}
                         </div>
                       </div>
@@ -618,15 +583,10 @@ export default function Home() {
                   </div>
 
                   {/* Bar chart */}
-                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", marginBottom: 10, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                  <div style={{ fontSize: 10, color: "#94a3b8", marginBottom: 10, letterSpacing: "0.1em", textTransform: "uppercase" }}>
                     月別コンディション推移
                   </div>
-                  <div style={{
-                    display: "flex",
-                    alignItems: "flex-end",
-                    gap: 6,
-                    height: 100,
-                  }}>
+                  <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 90 }}>
                     {[52, 68, 60, 78, 72, 85, 87].map((h, i) => (
                       <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6, height: "100%" }}>
                         <div style={{
@@ -634,12 +594,11 @@ export default function Home() {
                           height: `${h}%`,
                           background: i === 6
                             ? "linear-gradient(to top, #6366f1, #8b5cf6)"
-                            : "rgba(99,102,241,0.3)",
+                            : "#e0e7ff",
                           borderRadius: "4px 4px 0 0",
                           marginTop: "auto",
-                          transition: "height 1s ease",
                         }} />
-                        <div style={{ fontSize: 9, color: "rgba(255,255,255,0.2)" }}>
+                        <div style={{ fontSize: 9, color: "#cbd5e1" }}>
                           {["7月", "8月", "9月", "10月", "11月", "12月", "1月"][i]}
                         </div>
                       </div>
@@ -649,13 +608,13 @@ export default function Home() {
                   {/* Alert row */}
                   <div style={{
                     marginTop: 20, padding: "12px 16px",
-                    background: "rgba(239,68,68,0.08)", borderRadius: 10,
-                    border: "1px solid rgba(239,68,68,0.15)",
+                    background: "#fef2f2", borderRadius: 10,
+                    border: "1px solid #fecaca",
                     display: "flex", alignItems: "center", gap: 10,
                   }}>
                     <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#ef4444", flexShrink: 0 }} />
-                    <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>
-                      要面談候補者 <span style={{ color: "#f87171", fontWeight: 700 }}>3名</span> — 今週アラート送信済み
+                    <div style={{ fontSize: 12, color: "#64748b" }}>
+                      要面談候補者 <span style={{ color: "#ef4444", fontWeight: 700 }}>3名</span> — 今週アラート送信済み
                     </div>
                   </div>
                 </div>
@@ -666,7 +625,7 @@ export default function Home() {
       </section>
 
       {/* ── About / Philosophy ───────────────── */}
-      <section id="about" style={{ padding: "120px 48px", background: "#fff" }}>
+      <section id="about" style={{ padding: "120px 48px", background: "#f8f9fc" }}>
         <div style={{ maxWidth: 1160, margin: "0 auto" }}>
           <div className="section-reveal" style={{ marginBottom: 72 }}>
             <div style={{
@@ -676,8 +635,8 @@ export default function Home() {
               Philosophy
             </div>
             <h2 style={{
-              fontSize: "clamp(28px, 4vw, 48px)", fontWeight: 700,
-              letterSpacing: "-0.025em", lineHeight: 1.2, maxWidth: 440,
+              fontSize: "clamp(28px, 4vw, 48px)", fontWeight: 800,
+              letterSpacing: "-0.03em", lineHeight: 1.2, maxWidth: 440, color: "#1a1a2e",
             }}>
               私たちが大切に<br />していること
             </h2>
@@ -704,9 +663,9 @@ export default function Home() {
                 className="section-reveal"
                 style={{
                   padding: "48px 44px",
-                  background: "linear-gradient(135deg, #fafafe, #f3f2ff)",
+                  background: "#fff",
                   borderRadius: 20,
-                  border: "1px solid rgba(99,102,241,0.1)",
+                  border: "1px solid #e2e8f0",
                   transitionDelay: v.delay,
                 }}
               >
@@ -718,7 +677,7 @@ export default function Home() {
                 </div>
                 <p style={{
                   fontSize: "clamp(18px, 2.2vw, 24px)", fontWeight: 700,
-                  lineHeight: 1.55, color: "#0a0a1a", marginBottom: 18,
+                  lineHeight: 1.55, color: "#1a1a2e", marginBottom: 18,
                   letterSpacing: "-0.01em",
                 }}>
                   {v.title}
@@ -744,7 +703,8 @@ export default function Home() {
                 style={{
                   padding: "36px 32px",
                   borderTop: "2px solid #6366f1",
-                  borderRight: i < 3 ? "1px solid #f1f5f9" : "none",
+                  borderRight: i < 3 ? "1px solid #e2e8f0" : "none",
+                  background: "#fff",
                   transitionDelay: `${i * 0.08}s`,
                 }}
               >
@@ -755,7 +715,7 @@ export default function Home() {
                   {v.en}
                 </div>
                 <div style={{
-                  fontSize: 18, fontWeight: 700, color: "#0a0a1a",
+                  fontSize: 18, fontWeight: 700, color: "#1a1a2e",
                   marginBottom: 12, letterSpacing: "-0.01em",
                 }}>
                   {v.jp}
@@ -770,47 +730,33 @@ export default function Home() {
       </section>
 
       {/* ── Contact ──────────────────────────── */}
-      <section id="contact" style={{ padding: "120px 48px 140px", background: "#06050f", position: "relative", overflow: "hidden" }}>
-        {/* Background blobs */}
-        <div style={{
-          position: "absolute", width: 600, height: 600, borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(99,102,241,0.2) 0%, transparent 70%)",
-          filter: "blur(80px)", top: "-20%", right: "-10%", pointerEvents: "none",
-          animation: "blob1 20s ease-in-out infinite",
-        }} />
-        <div style={{
-          position: "absolute", width: 400, height: 400, borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(139,92,246,0.15) 0%, transparent 70%)",
-          filter: "blur(60px)", bottom: "-15%", left: "-5%", pointerEvents: "none",
-          animation: "blob2 26s ease-in-out infinite",
-        }} />
-
-        <div style={{ maxWidth: 640, margin: "0 auto", position: "relative", zIndex: 10 }}>
+      <section id="contact" style={{ padding: "120px 48px 140px", background: "#fff" }}>
+        <div style={{ maxWidth: 640, margin: "0 auto" }}>
           <div className="section-reveal" style={{ textAlign: "center", marginBottom: 60 }}>
             <div style={{
               fontSize: 11, fontWeight: 700, letterSpacing: "0.2em",
-              color: "rgba(99,102,241,0.7)", marginBottom: 20, textTransform: "uppercase",
+              color: "#6366f1", marginBottom: 20, textTransform: "uppercase",
             }}>
               Contact
             </div>
             <h2 style={{
-              fontSize: "clamp(36px, 5.5vw, 64px)", fontWeight: 700,
-              color: "#fff", lineHeight: 1.2, letterSpacing: "-0.025em", marginBottom: 20,
+              fontSize: "clamp(32px, 5vw, 56px)", fontWeight: 800,
+              color: "#1a1a2e", lineHeight: 1.2, letterSpacing: "-0.03em", marginBottom: 20,
             }}>
               一緒に、未来を<br />作りませんか。
             </h2>
-            <p style={{ fontSize: 15, color: "rgba(255,255,255,0.45)", lineHeight: 1.9 }}>
+            <p style={{ fontSize: 15, color: "#64748b", lineHeight: 1.9 }}>
               テクノロジーで現場を変えたい企業様、<br />
               まずはお気軽にご相談ください。
             </p>
           </div>
 
           <div className="section-reveal" style={{
-            background: "rgba(255,255,255,0.04)",
-            borderRadius: 24,
-            border: "1px solid rgba(255,255,255,0.08)",
+            background: "#fff",
+            borderRadius: 20,
+            border: "1px solid #e2e8f0",
             padding: "44px 40px",
-            backdropFilter: "blur(10px)",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.06)",
           }}>
             <ContactForm />
           </div>
@@ -819,8 +765,7 @@ export default function Home() {
 
       {/* ── Footer ───────────────────────────── */}
       <footer style={{
-        background: "#02010a",
-        borderTop: "1px solid rgba(255,255,255,0.04)",
+        background: "#1a1a2e",
         padding: "40px 48px",
         display: "flex",
         alignItems: "center",
@@ -829,11 +774,11 @@ export default function Home() {
         gap: 20,
       }}>
         <div>
-          <div style={{ fontSize: 16, fontWeight: 900, color: "rgba(255,255,255,0.5)", letterSpacing: "0.02em" }}>
-            I.RI.N.G Group
+          <div style={{ fontSize: 20, fontWeight: 900, color: "#fff", letterSpacing: "-0.02em" }}>
+            80
           </div>
-          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.2)", marginTop: 4, letterSpacing: "0.05em" }}>
-            株式会社I.RI.N.G Group
+          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 4, letterSpacing: "0.05em" }}>
+            合同会社80
           </div>
         </div>
 
@@ -848,21 +793,21 @@ export default function Home() {
               key={item.id}
               onClick={() => scrollTo(item.id)}
               style={{
-                fontSize: 12, color: "rgba(255,255,255,0.3)",
+                fontSize: 12, color: "rgba(255,255,255,0.45)",
                 background: "none", border: "none", cursor: "pointer",
                 padding: 0, transition: "color 0.2s",
                 letterSpacing: "0.02em",
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.65)")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.3)")}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.45)")}
             >
               {item.label}
             </button>
           ))}
         </div>
 
-        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.18)", letterSpacing: "0.05em" }}>
-          © 2025 株式会社I.RI.N.G Group. All rights reserved.
+        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.25)", letterSpacing: "0.05em" }}>
+          © 2025 合同会社80. All rights reserved.
         </div>
       </footer>
     </div>
@@ -897,21 +842,21 @@ function ContactForm() {
 
   const inputStyle: React.CSSProperties = {
     width: "100%",
-    padding: "13px 16px",
-    borderRadius: 12,
-    border: "1px solid rgba(255,255,255,0.1)",
-    background: "rgba(255,255,255,0.05)",
-    color: "#fff",
+    padding: "12px 16px",
+    borderRadius: 10,
+    border: "1.5px solid #e2e8f0",
+    background: "#fff",
+    color: "#1a1a2e",
     fontSize: 14,
     fontFamily: "inherit",
     outline: "none",
-    transition: "border-color 0.2s, background 0.2s",
+    transition: "border-color 0.2s",
   };
 
   const labelStyle: React.CSSProperties = {
     fontSize: 12,
     fontWeight: 700,
-    color: "rgba(255,255,255,0.45)",
+    color: "#4a5568",
     display: "block",
     marginBottom: 8,
     letterSpacing: "0.04em",
@@ -922,14 +867,18 @@ function ContactForm() {
       <div style={{ textAlign: "center", padding: "32px 0" }}>
         <div style={{
           width: 56, height: 56, borderRadius: "50%",
-          background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+          background: "#eef2ff",
           display: "flex", alignItems: "center", justifyContent: "center",
-          margin: "0 auto 20px", fontSize: 22, color: "#fff",
-        }}>✓</div>
-        <div style={{ fontSize: 17, fontWeight: 700, color: "#fff", marginBottom: 8 }}>
+          margin: "0 auto 20px",
+        }}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20 6L9 17l-5-5"/>
+          </svg>
+        </div>
+        <div style={{ fontSize: 17, fontWeight: 700, color: "#1a1a2e", marginBottom: 8 }}>
           送信完了しました
         </div>
-        <div style={{ fontSize: 14, color: "rgba(255,255,255,0.4)" }}>
+        <div style={{ fontSize: 14, color: "#64748b" }}>
           担当者より折り返しご連絡いたします。
         </div>
       </div>
@@ -946,7 +895,7 @@ function ContactForm() {
           <div key={key}>
             <label style={labelStyle}>
               {label}
-              {req && <span style={{ color: "#f87171", marginLeft: 4 }}>*</span>}
+              {req && <span style={{ color: "#ef4444", marginLeft: 4 }}>*</span>}
             </label>
             <input
               required={req}
@@ -955,14 +904,8 @@ function ContactForm() {
               value={form[key as keyof typeof form]}
               onChange={(e) => setForm({ ...form, [key]: e.target.value })}
               style={inputStyle}
-              onFocus={(e) => {
-                e.target.style.borderColor = "rgba(99,102,241,0.6)";
-                e.target.style.background = "rgba(255,255,255,0.07)";
-              }}
-              onBlur={(e) => {
-                e.target.style.borderColor = "rgba(255,255,255,0.1)";
-                e.target.style.background = "rgba(255,255,255,0.05)";
-              }}
+              onFocus={(e) => (e.target.style.borderColor = "#6366f1")}
+              onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")}
             />
           </div>
         ))}
@@ -976,7 +919,7 @@ function ContactForm() {
           <div key={key}>
             <label style={labelStyle}>
               {label}
-              {req && <span style={{ color: "#f87171", marginLeft: 4 }}>*</span>}
+              {req && <span style={{ color: "#ef4444", marginLeft: 4 }}>*</span>}
             </label>
             <input
               required={req}
@@ -985,14 +928,8 @@ function ContactForm() {
               value={form[key as keyof typeof form]}
               onChange={(e) => setForm({ ...form, [key]: e.target.value })}
               style={inputStyle}
-              onFocus={(e) => {
-                e.target.style.borderColor = "rgba(99,102,241,0.6)";
-                e.target.style.background = "rgba(255,255,255,0.07)";
-              }}
-              onBlur={(e) => {
-                e.target.style.borderColor = "rgba(255,255,255,0.1)";
-                e.target.style.background = "rgba(255,255,255,0.05)";
-              }}
+              onFocus={(e) => (e.target.style.borderColor = "#6366f1")}
+              onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")}
             />
           </div>
         ))}
@@ -1006,22 +943,15 @@ function ContactForm() {
           value={form.message}
           onChange={(e) => setForm({ ...form, message: e.target.value })}
           style={{ ...inputStyle, resize: "vertical", lineHeight: 1.75 }}
-          onFocus={(e) => {
-            e.target.style.borderColor = "rgba(99,102,241,0.6)";
-            e.target.style.background = "rgba(255,255,255,0.07)";
-          }}
-          onBlur={(e) => {
-            e.target.style.borderColor = "rgba(255,255,255,0.1)";
-            e.target.style.background = "rgba(255,255,255,0.05)";
-          }}
+          onFocus={(e) => (e.target.style.borderColor = "#6366f1")}
+          onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")}
         />
       </div>
 
       <button
-        data-hover
         type="submit"
         disabled={status === "sending"}
-        className="btn-primary"
+        className="btn-primary-light"
         style={{
           width: "100%",
           justifyContent: "center",
@@ -1033,7 +963,7 @@ function ContactForm() {
       </button>
 
       {status === "error" && (
-        <div style={{ fontSize: 13, color: "#f87171", textAlign: "center" }}>
+        <div style={{ fontSize: 13, color: "#ef4444", textAlign: "center" }}>
           送信に失敗しました。時間をおいて再度お試しください。
         </div>
       )}
