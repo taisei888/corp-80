@@ -183,7 +183,7 @@ export default function Home() {
     window.addEventListener("scroll", onScroll, { passive: true });
     const io = new IntersectionObserver(
       (e) => e.forEach((en) => { if (en.isIntersecting) en.target.classList.add("visible"); }),
-      { threshold: 0.1 }
+      { threshold: 0.15, rootMargin: "0px 0px -60px 0px" }
     );
     document.querySelectorAll(".sr").forEach((el) => io.observe(el));
     return () => { window.removeEventListener("scroll", onScroll); io.disconnect(); };
