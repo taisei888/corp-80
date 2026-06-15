@@ -444,81 +444,70 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── Product ── */}
-        <section id="product" style={{ padding: "120px 48px" }}>
+        {/* ── AI Capabilities ── */}
+        <section id="product" style={{ background: "#fff", padding: "120px 64px 140px" }}>
           <div style={{ maxWidth: 1160, margin: "0 auto" }}>
-            <div className="sr" style={{ marginBottom: 64 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", color: "#6366f1", marginBottom: 16, textTransform: "uppercase" }}>Featured Product</div>
-              <h2 style={{ fontSize: "clamp(28px, 4vw, 48px)", fontWeight: 800, letterSpacing: "-0.03em", color: "#0f172a" }}>LENDS AI</h2>
-              <p style={{ fontSize: 16, color: "#64748b", marginTop: 10 }}>組織コンディション可視化プラットフォーム</p>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 72, alignItems: "center" }}>
-              <div className="sr">
-                <h3 style={{ fontSize: "clamp(20px, 2.8vw, 30px)", fontWeight: 700, lineHeight: 1.6, marginBottom: 20, color: "#0f172a" }}>
-                  スマホアンケート × AI分析で、<br />従業員の「今」を見える化する。
-                </h3>
-                <p style={{ fontSize: 15, color: "#64748b", lineHeight: 1.9, marginBottom: 32 }}>
-                  LENDS AIは毎月のアンケートをAIが分析し、組織コンディションを8タイプで可視化するSaaSです。人事課題の早期発見から採用・育成まで一気通貫で支援します。
-                </p>
-                <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: 10, marginBottom: 36 }}>
-                  {["月次スマホアンケート × AI組織診断","8タイプ組織コンディション可視化","1on1面談記録・アシスト機能","採用AI・採用KPI管理","採用アセスメント（心理・論理・コミュ・敬語）","要面談候補者アラートメール通知"].map(f => (
-                    <li key={f} style={{ display: "flex", gap: 10, alignItems: "center", fontSize: 14, color: "#475569" }}>
-                      <span style={{ width: 20, height: 20, borderRadius: 6, background: "#eef2ff",
-                        display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                        <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
-                          <path d="M2 6l3 3 5-5" stroke="#6366f1" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                      </span>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <a href="https://www.lens-ai.jp" target="_blank" rel="noopener noreferrer"
-                  className="btn-primary-light" style={{ display: "inline-flex", textDecoration: "none" }}>
-                  LENDS AI サイトへ
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6M10 14L21 3"/>
-                  </svg>
-                </a>
+
+            {/* Header */}
+            <div className="sr" style={{ marginBottom: 80 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 20 }}>
+                <div style={{ width: 24, height: 1, background: "#6366f1" }} />
+                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.22em", color: "#6366f1", textTransform: "uppercase" }}>AI CAPABILITIES</div>
               </div>
-              <div className="sr" style={{ transitionDelay: "0.15s" }}>
-                <div style={{ ...card, padding: 0, overflow: "hidden" }}>
-                  <div style={{ background: "rgba(248,250,252,0.9)", padding: "14px 20px",
-                    display: "flex", gap: 7, alignItems: "center", borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
-                    {["#f87171","#fbbf24","#34d399"].map(c => (
-                      <div key={c} style={{ width: 10, height: 10, borderRadius: "50%", background: c, opacity: 0.7 }} />
-                    ))}
-                    <div style={{ marginLeft: 10, fontSize: 11, color: "#94a3b8" }}>LENDS AI — 組織ダッシュボード</div>
-                  </div>
-                  <div style={{ padding: 28 }}>
-                    <div style={{ display: "flex", gap: 12, marginBottom: 24 }}>
-                      {[{val:"87",unit:"pt",label:"組織スコア",color:"#6366f1"},{val:"+12",unit:"",label:"先月比",color:"#10b981"},{val:"64",unit:"名",label:"回答者数",color:"#7c3aed"}].map(s => (
-                        <div key={s.label} style={{ flex:1, background:"#f8fafc", borderRadius:12, padding:"14px 16px", border:"1px solid #f1f5f9" }}>
-                          <div style={{ fontSize:22, fontWeight:800, color:s.color }}>{s.val}<span style={{ fontSize:12 }}>{s.unit}</span></div>
-                          <div style={{ fontSize:10, color:"#94a3b8", marginTop:4 }}>{s.label}</div>
-                        </div>
-                      ))}
-                    </div>
-                    <div style={{ fontSize:10, color:"#94a3b8", marginBottom:10, letterSpacing:"0.08em", textTransform:"uppercase" }}>月別コンディション推移</div>
-                    <div style={{ display:"flex", alignItems:"flex-end", gap:5, height:80 }}>
-                      {[52,68,60,78,72,85,87].map((h,i) => (
-                        <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:5, height:"100%" }}>
-                          <div style={{ width:"100%", height:`${h}%`,
-                            background: i===6 ? "linear-gradient(to top, #6366f1, #7c3aed)" : "#e0e7ff",
-                            borderRadius:"4px 4px 0 0", marginTop:"auto" }} />
-                          <div style={{ fontSize:9, color:"#cbd5e1" }}>{["7月","8月","9月","10月","11月","12月","1月"][i]}</div>
-                        </div>
-                      ))}
-                    </div>
-                    <div style={{ marginTop:18, padding:"11px 14px", background:"#fef2f2", borderRadius:10,
-                      border:"1px solid #fecaca", display:"flex", alignItems:"center", gap:10 }}>
-                      <div style={{ width:6, height:6, borderRadius:"50%", background:"#ef4444", flexShrink:0 }} />
-                      <div style={{ fontSize:12, color:"#64748b" }}>
-                        要面談候補者 <span style={{ color:"#ef4444", fontWeight:700 }}>3名</span> — 今週アラート送信済み
-                      </div>
-                    </div>
+              <h2 style={{ fontSize: "clamp(28px, 3.5vw, 48px)", fontWeight: 800, lineHeight: 1.5, color: "#0f172a", maxWidth: 560 }}>
+                AIは今、ビジネスの<br />何を変えられるのか。
+              </h2>
+            </div>
+
+            {/* FOLIO-style: left text + right 2 cards */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "start" }}>
+
+              {/* Left: description */}
+              <div className="sr">
+                <p style={{ fontSize: "clamp(18px, 2vw, 24px)", fontWeight: 700, lineHeight: 1.7, color: "#0f172a", marginBottom: 32 }}>
+                  私たちは、AIを使って<br />できることを増やし続けている。
+                </p>
+                <p style={{ fontSize: 15, color: "#64748b", lineHeight: 2.0, marginBottom: 24 }}>
+                  LLM・RAG・機械学習を組み合わせれば、これまで人手に頼っていた業務の多くを、より速く・より正確に処理できます。
+                </p>
+                <p style={{ fontSize: 15, color: "#64748b", lineHeight: 2.0 }}>
+                  業種や規模を問わず、AIの力を現場に届けること。それが合同会社80の使命です。
+                </p>
+
+                {/* capability tags */}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 36 }}>
+                  {["LLM活用","RAG構築","業務自動化","チャットボット","データ分析","組織診断AI","採用AI","文書生成"].map(t => (
+                    <span key={t} style={{ fontSize: 12, fontWeight: 600, padding: "6px 14px", borderRadius: 100,
+                      border: "1.5px solid #e2e8f0", color: "#475569", letterSpacing: "0.02em" }}>{t}</span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right: 2 cards stacked */}
+              <div className="sr" style={{ display: "flex", flexDirection: "column", gap: 16, transitionDelay: "0.12s" }}>
+
+                {/* Card 1 */}
+                <div style={{ borderRadius: 20, overflow: "hidden", background: "linear-gradient(135deg, #0f172a, #1e1b4b)", padding: "40px 36px", position: "relative" }}>
+                  <div style={{ position: "absolute", top: -20, right: -20, width: 160, height: 160, borderRadius: "50%", border: "1px solid rgba(99,102,241,0.2)" }} />
+                  <div style={{ position: "absolute", top: 10, right: 60, fontSize: 9, fontWeight: 700, letterSpacing: "0.15em", color: "rgba(165,180,252,0.5)", textTransform: "uppercase" }}>LANGUAGE MODEL</div>
+                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", color: "rgba(165,180,252,0.6)", textTransform: "uppercase", marginBottom: 16 }}>自動化 & 生成</div>
+                  <div style={{ fontSize: 22, fontWeight: 800, color: "#fff", marginBottom: 14, lineHeight: 1.4 }}>ドキュメント・<br />コミュニケーションをAIで。</div>
+                  <div style={{ fontSize: 13, color: "rgba(203,213,225,0.8)", lineHeight: 1.8 }}>
+                    報告書・提案書・メールの自動生成。社内FAQへの即答。AIが"書く・答える"を肩代わりします。
                   </div>
                 </div>
+
+                {/* Card 2 */}
+                <div style={{ borderRadius: 20, overflow: "hidden", background: "linear-gradient(135deg, #1a1025, #312e81)", padding: "40px 36px", position: "relative" }}>
+                  <div style={{ position: "absolute", bottom: -30, right: -30, width: 180, height: 180, borderRadius: "50%", border: "1px solid rgba(124,58,237,0.2)" }} />
+                  <div style={{ position: "absolute", bottom: 40, right: 36, fontSize: 9, fontWeight: 700, letterSpacing: "0.15em", color: "rgba(196,181,253,0.5)", textTransform: "uppercase" }}>DATA SCIENCE</div>
+                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", color: "rgba(196,181,253,0.6)", textTransform: "uppercase", marginBottom: 16 }}>分析 & 洞察</div>
+                  <div style={{ fontSize: 22, fontWeight: 800, color: "#fff", marginBottom: 14, lineHeight: 1.4 }}>データから、<br />意思決定を変える。</div>
+                  <div style={{ fontSize: 13, color: "rgba(203,213,225,0.8)", lineHeight: 1.8 }}>
+                    売上予測・異常検知・顧客分析。膨大なデータを即座に解釈し、ビジネスの判断を支えます。
+                  </div>
+                </div>
+
               </div>
             </div>
           </div>
