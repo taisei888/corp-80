@@ -300,47 +300,54 @@ export default function Home() {
           <div style={{ height: 160, background: "linear-gradient(to bottom, transparent, #fff)", pointerEvents: "none" }} />
 
         {/* ── Vision ── */}
-        <section id="vision" style={{ padding: "120px 48px 140px" }}>
+        <section id="vision" style={{ background: "#fff", padding: "120px 64px 140px" }}>
           <div style={{ maxWidth: 1160, margin: "0 auto" }}>
-            <div className="sr" style={{ marginBottom: 72 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", color: "#6366f1", marginBottom: 20, textTransform: "uppercase" }}>Our Vision</div>
-              <h2 style={{ fontSize: "clamp(36px, 5.5vw, 72px)", fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1.1, color: "#0f172a" }}>
-                テクノロジーの恩恵を、<br />すべての現場へ。
-              </h2>
-              <p style={{ fontSize: 17, color: "#64748b", lineHeight: 1.9, marginTop: 28, maxWidth: 540 }}>
-                大企業だけでなく、中小企業や現場の第一線でも<br />最先端のテクノロジーが活きる世界を目指して。
-              </p>
+
+            {/* Editorial split layout */}
+            <div className="sr" style={{ display: "grid", gridTemplateColumns: "1fr 1.8fr", gap: 80, alignItems: "flex-start", marginBottom: 100 }}>
+              {/* Left: label + big English */}
+              <div style={{ position: "sticky", top: 120 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.22em", color: "#6366f1", textTransform: "uppercase", marginBottom: 24 }}>
+                  私たちのビジョン
+                </div>
+                <div style={{ fontSize: "clamp(56px, 7vw, 96px)", fontWeight: 900, lineHeight: 1.0, letterSpacing: "-0.04em", color: "#0f172a" }}>
+                  Our<br />Vision
+                </div>
+              </div>
+
+              {/* Right: Japanese headline + body */}
+              <div className="sr" style={{ transitionDelay: "0.1s" }}>
+                <h2 style={{ fontSize: "clamp(26px, 3.2vw, 44px)", fontWeight: 800, lineHeight: 1.45, letterSpacing: "-0.02em", color: "#0f172a", marginBottom: 40 }}>
+                  合同会社80は、AIとソフトウェアで<br />人の知覚を拡張する会社です。
+                </h2>
+                <p style={{ fontSize: 16, color: "#475569", lineHeight: 2.0, marginBottom: 28 }}>
+                  私たちのミッションは「人の知覚を、ソフトウェアで拡張する」こと。人が本来持つ力を引き出し、テクノロジーで可能性を広げる。そのためのソフトウェアを、真摯に作り続けます。
+                </p>
+                <p style={{ fontSize: 16, color: "#475569", lineHeight: 2.0 }}>
+                  大企業だけでなく、中小企業や現場の第一線でも最先端のテクノロジーが活きる世界を目指して。AIとソフトウェアの力で、あらゆる現場の「できない」を「できる」に変えていきます。
+                </p>
+              </div>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 20 }}>
-              {[
-                { label:"Mission", title:"人の知覚を、ソフトウェアで拡張する。",
-                  desc:"人が本来持つ力を引き出し、テクノロジーで可能性を広げる。私たちはそのためのソフトウェアを、真摯に作り続けます。", delay:"0s" },
-                { label:"Vision", title:"テクノロジーの恩恵を、すべての現場へ。",
-                  desc:"大企業だけでなく、中小企業や現場の第一線でも最先端のテクノロジーが活きる世界を目指します。", delay:"0.1s" },
-              ].map(v => (
-                <div key={v.label} className="sr" style={{ ...card, transitionDelay: v.delay }}>
-                  <div style={{ fontSize:10, fontWeight:800, letterSpacing:"0.22em", color:"#6366f1", textTransform:"uppercase", marginBottom:18 }}>{v.label}</div>
-                  <p style={{ fontSize:"clamp(18px, 2.2vw, 24px)", fontWeight:700, lineHeight:1.55, color:"#0f172a", marginBottom:16 }}>{v.title}</p>
-                  <p style={{ fontSize:14, color:"#64748b", lineHeight:1.9 }}>{v.desc}</p>
-                </div>
-              ))}
+            {/* Values */}
+            <div style={{ borderTop: "1px solid #e2e8f0", paddingTop: 72 }}>
+              <div className="sr" style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.22em", color: "#6366f1", textTransform: "uppercase", marginBottom: 40 }}>Values</div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 0 }}>
+                {[
+                  { en:"Integrity", jp:"誠実さ",       desc:"顧客・パートナー・社会に対して、常に誠実に向き合う" },
+                  { en:"Curiosity", jp:"先端への好奇心", desc:"最新技術への探求を止めず、革新を追求し続ける" },
+                  { en:"Respect",   jp:"人への敬意",    desc:"関わるすべての人を尊重し、共に成長することを喜びとする" },
+                  { en:"Speed",     jp:"圧倒的な速さ",  desc:"機会を逃さず、スピードを最大の競争優位にする" },
+                ].map((v, i) => (
+                  <div key={v.en} className="sr" style={{ padding: "32px 28px", borderLeft: i === 0 ? "none" : "1px solid #e2e8f0", transitionDelay:`${i*0.08}s` }}>
+                    <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.18em", color: "#6366f1", textTransform: "uppercase", marginBottom: 14 }}>{v.en}</div>
+                    <div style={{ fontSize: 20, fontWeight: 700, color: "#0f172a", marginBottom: 12 }}>{v.jp}</div>
+                    <div style={{ fontSize: 13, color: "#64748b", lineHeight: 1.85 }}>{v.desc}</div>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 4 }}>
-              {[
-                { en:"Integrity", jp:"誠実さ",       desc:"顧客・パートナー・社会に対して、常に誠実に向き合う" },
-                { en:"Curiosity", jp:"先端への好奇心", desc:"最新技術への探求を止めず、革新を追求し続ける" },
-                { en:"Respect",   jp:"人への敬意",    desc:"関わるすべての人を尊重し、共に成長することを喜びとする" },
-                { en:"Speed",     jp:"圧倒的な速さ",  desc:"機会を逃さず、スピードを最大の競争優位にする" },
-              ].map((v, i) => (
-                <div key={v.en} className="sr" style={{ ...card, transitionDelay:`${i*0.08}s`, borderTop:"2px solid #6366f1", borderRadius:"0 0 16px 16px" }}>
-                  <div style={{ fontSize:10, fontWeight:800, letterSpacing:"0.2em", color:"#6366f1", textTransform:"uppercase", marginBottom:10 }}>{v.en}</div>
-                  <div style={{ fontSize:18, fontWeight:700, color:"#0f172a", marginBottom:10 }}>{v.jp}</div>
-                  <div style={{ fontSize:13, color:"#64748b", lineHeight:1.85 }}>{v.desc}</div>
-                </div>
-              ))}
-            </div>
           </div>
         </section>
 
