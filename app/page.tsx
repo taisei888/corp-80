@@ -192,10 +192,8 @@ export default function Home() {
   const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
   const card: React.CSSProperties = {
-    background: "rgba(255,255,255,0.78)",
-    backdropFilter: "blur(24px)",
-    WebkitBackdropFilter: "blur(24px)",
-    border: "1px solid rgba(255,255,255,0.7)",
+    background: "#fff",
+    border: "1px solid #e2e8f0",
     boxShadow: "0 4px 24px rgba(0,0,0,0.06)",
     borderRadius: 20,
     padding: "40px 36px",
@@ -294,8 +292,14 @@ export default function Home() {
           </div>
         </section>
 
+        {/* ── White overlay sections ── */}
+        <div style={{ position: "relative" }}>
+          {/* Gradient fade from transparent to white */}
+          <div style={{ height: 160, background: "linear-gradient(to bottom, transparent, #fff)", pointerEvents: "none" }} />
+
         {/* ── Business ── */}
-        <section id="business" style={{ padding: "120px 48px" }}>
+        <div style={{ background: "#fff" }}>
+        <section id="business" style={{ padding: "80px 48px 120px" }}>
           <div style={{ maxWidth: 1160, margin: "0 auto" }}>
             <div className="sr" style={{ marginBottom: 64 }}>
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em",
@@ -498,6 +502,8 @@ export default function Home() {
           </div>
           <div style={{ fontSize:11, color:"rgba(255,255,255,0.18)" }}>© 2025 合同会社80. All rights reserved.</div>
         </footer>
+          </div>{/* /white bg */}
+        </div>{/* /gradient wrapper */}
       </div>
     </>
   );
