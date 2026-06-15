@@ -256,8 +256,9 @@ export default function Home() {
               fontStyle: "italic" }}>
               Build what&apos;s next.
             </p>
-            <h1 style={{ fontSize: "clamp(48px, 6.5vw, 88px)", fontWeight: 800,
+            <h1 style={{ fontSize: "clamp(28px, 5vw, 72px)", fontWeight: 800,
               color: "#0f172a", lineHeight: 1.1, letterSpacing: "-0.04em", marginBottom: 40,
+              whiteSpace: "nowrap",
               animation: "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.3s both" }}>
               未来は、待つものじゃない。
             </h1>
