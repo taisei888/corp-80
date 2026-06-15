@@ -514,6 +514,69 @@ export default function Home() {
         </section>
 
 
+        {/* ── Case Studies ── */}
+        <section style={{ background: "#fff", padding: "100px 0 120px", overflow: "hidden" }}>
+          <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 64px", marginBottom: 52 }}>
+            <div className="sr" style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 16 }}>
+              <div style={{ width: 24, height: 1, background: "#6366f1" }} />
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.22em", color: "#6366f1", textTransform: "uppercase" }}>Case Studies</div>
+            </div>
+            <h2 className="sr" style={{ fontSize: "clamp(24px, 3vw, 36px)", fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em" }}>
+              AIを、現場に届けてきた。
+            </h2>
+          </div>
+
+          {/* Ticker */}
+          <div style={{ overflow: "hidden", cursor: "default" }}>
+            <div className="ticker-track" style={{ display: "flex", gap: 16, width: "max-content" }}>
+              {[
+                { tag: "予約管理", title: "予約システムのAI化", desc: "空き状況の自動最適化と予約対応をAIが代行。対応工数を大幅削減。" },
+                { tag: "採用・HR", title: "入社時テストのAI化", desc: "適性・論理・コミュ力をAIがスコアリング。一次評価を自動化。" },
+                { tag: "業務効率", title: "日報管理のAI化", desc: "音声・テキスト入力からAIが日報を自動生成。提出率が劇的改善。" },
+                { tag: "バックオフィス", title: "会計ソフトのAI化", desc: "レシート読み取り・仕訳提案をAIが自動処理。経理負荷を半減。" },
+                { tag: "DX推進", title: "生成AIツールの社内導入", desc: "ChatGPTベースの社内AIアシスタントを構築し全社展開。" },
+                { tag: "Web", title: "ホームページへのAI実装", desc: "サイト訪問者の質問にAIが即答。問い合わせ転換率が向上。" },
+                { tag: "マーケ", title: "SEO対策のAI化", desc: "キーワード分析から記事構成・タイトル最適化までAIが自動提案。" },
+                { tag: "コンテンツ", title: "自動ブログ更新AI", desc: "トレンド検知からAIが記事を生成し自動投稿。運用コストゼロへ。" },
+                /* duplicate for seamless loop */
+                { tag: "予約管理", title: "予約システムのAI化", desc: "空き状況の自動最適化と予約対応をAIが代行。対応工数を大幅削減。" },
+                { tag: "採用・HR", title: "入社時テストのAI化", desc: "適性・論理・コミュ力をAIがスコアリング。一次評価を自動化。" },
+                { tag: "業務効率", title: "日報管理のAI化", desc: "音声・テキスト入力からAIが日報を自動生成。提出率が劇的改善。" },
+                { tag: "バックオフィス", title: "会計ソフトのAI化", desc: "レシート読み取り・仕訳提案をAIが自動処理。経理負荷を半減。" },
+                { tag: "DX推進", title: "生成AIツールの社内導入", desc: "ChatGPTベースの社内AIアシスタントを構築し全社展開。" },
+                { tag: "Web", title: "ホームページへのAI実装", desc: "サイト訪問者の質問にAIが即答。問い合わせ転換率が向上。" },
+                { tag: "マーケ", title: "SEO対策のAI化", desc: "キーワード分析から記事構成・タイトル最適化までAIが自動提案。" },
+                { tag: "コンテンツ", title: "自動ブログ更新AI", desc: "トレンド検知からAIが記事を生成し自動投稿。運用コストゼロへ。" },
+              ].map((c, i) => (
+                <div key={i} style={{
+                  width: 280, flexShrink: 0, borderRadius: 18, padding: "32px 28px",
+                  background: "#fff", border: "1.5px solid #e2e8f0",
+                  backgroundImage: "radial-gradient(circle, #d1d5db 1px, transparent 1px)",
+                  backgroundSize: "18px 18px",
+                  boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
+                  transition: "transform 0.3s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s ease",
+                  cursor: "pointer",
+                }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.transform = "translateY(-6px)";
+                    e.currentTarget.style.boxShadow = "0 16px 40px rgba(0,0,0,0.1)";
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.transform = "";
+                    e.currentTarget.style.boxShadow = "0 2px 12px rgba(0,0,0,0.04)";
+                  }}
+                >
+                  <span style={{ display: "inline-block", fontSize: 11, fontWeight: 700, padding: "4px 10px",
+                    borderRadius: 100, background: "#eef2ff", color: "#6366f1", marginBottom: 18,
+                    letterSpacing: "0.04em" }}>{c.tag}</span>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: "#0f172a", lineHeight: 1.45, marginBottom: 12 }}>{c.title}</div>
+                  <div style={{ fontSize: 13, color: "#64748b", lineHeight: 1.75 }}>{c.desc}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* ── Contact ── */}
         <section id="contact" style={{ padding: "120px 48px 140px" }}>
           <div style={{ maxWidth: 600, margin: "0 auto" }}>
