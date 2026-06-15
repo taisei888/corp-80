@@ -515,64 +515,175 @@ export default function Home() {
 
 
         {/* ── Case Studies ── */}
-        <section style={{ background: "#fff", padding: "100px 0 120px", overflow: "hidden" }}>
-          <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 64px", marginBottom: 52 }}>
-            <div className="sr" style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 16 }}>
-              <div style={{ width: 24, height: 1, background: "#6366f1" }} />
-              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.22em", color: "#6366f1", textTransform: "uppercase" }}>Case Studies</div>
-            </div>
-            <h2 className="sr" style={{ fontSize: "clamp(24px, 3vw, 36px)", fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em" }}>
-              AIを、現場に届けてきた。
-            </h2>
-          </div>
+        <section style={{ background: "#0f172a", padding: "100px 0 120px", position: "relative", overflow: "hidden" }}>
+          {/* Animated dot grid background */}
+          <div style={{
+            position: "absolute", inset: 0, pointerEvents: "none",
+            backgroundImage: "radial-gradient(circle, rgba(99,102,241,0.28) 1.5px, transparent 1.5px)",
+            backgroundSize: "36px 36px",
+            animation: "dot-drift 10s linear infinite",
+          }} />
 
-          {/* Ticker */}
-          <div style={{ overflow: "hidden", cursor: "default" }}>
-            <div className="ticker-track" style={{ display: "flex", gap: 16, width: "max-content" }}>
-              {[
-                { tag: "予約管理", title: "予約システムのAI化", desc: "空き状況の自動最適化と予約対応をAIが代行。対応工数を大幅削減。" },
-                { tag: "採用・HR", title: "入社時テストのAI化", desc: "適性・論理・コミュ力をAIがスコアリング。一次評価を自動化。" },
-                { tag: "業務効率", title: "日報管理のAI化", desc: "音声・テキスト入力からAIが日報を自動生成。提出率が劇的改善。" },
-                { tag: "バックオフィス", title: "会計ソフトのAI化", desc: "レシート読み取り・仕訳提案をAIが自動処理。経理負荷を半減。" },
-                { tag: "DX推進", title: "生成AIツールの社内導入", desc: "ChatGPTベースの社内AIアシスタントを構築し全社展開。" },
-                { tag: "Web", title: "ホームページへのAI実装", desc: "サイト訪問者の質問にAIが即答。問い合わせ転換率が向上。" },
-                { tag: "マーケ", title: "SEO対策のAI化", desc: "キーワード分析から記事構成・タイトル最適化までAIが自動提案。" },
-                { tag: "コンテンツ", title: "自動ブログ更新AI", desc: "トレンド検知からAIが記事を生成し自動投稿。運用コストゼロへ。" },
-                /* duplicate for seamless loop */
-                { tag: "予約管理", title: "予約システムのAI化", desc: "空き状況の自動最適化と予約対応をAIが代行。対応工数を大幅削減。" },
-                { tag: "採用・HR", title: "入社時テストのAI化", desc: "適性・論理・コミュ力をAIがスコアリング。一次評価を自動化。" },
-                { tag: "業務効率", title: "日報管理のAI化", desc: "音声・テキスト入力からAIが日報を自動生成。提出率が劇的改善。" },
-                { tag: "バックオフィス", title: "会計ソフトのAI化", desc: "レシート読み取り・仕訳提案をAIが自動処理。経理負荷を半減。" },
-                { tag: "DX推進", title: "生成AIツールの社内導入", desc: "ChatGPTベースの社内AIアシスタントを構築し全社展開。" },
-                { tag: "Web", title: "ホームページへのAI実装", desc: "サイト訪問者の質問にAIが即答。問い合わせ転換率が向上。" },
-                { tag: "マーケ", title: "SEO対策のAI化", desc: "キーワード分析から記事構成・タイトル最適化までAIが自動提案。" },
-                { tag: "コンテンツ", title: "自動ブログ更新AI", desc: "トレンド検知からAIが記事を生成し自動投稿。運用コストゼロへ。" },
-              ].map((c, i) => (
-                <div key={i} style={{
-                  width: 280, flexShrink: 0, borderRadius: 18, padding: "32px 28px",
-                  background: "#fff", border: "1.5px solid #e2e8f0",
-                  backgroundImage: "radial-gradient(circle, #d1d5db 1px, transparent 1px)",
-                  backgroundSize: "18px 18px",
-                  boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
-                  transition: "transform 0.3s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s ease",
-                  cursor: "pointer",
-                }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.transform = "translateY(-6px)";
-                    e.currentTarget.style.boxShadow = "0 16px 40px rgba(0,0,0,0.1)";
+          <div style={{ position: "relative", zIndex: 1 }}>
+            {/* Header */}
+            <div style={{ maxWidth: 1160, margin: "0 auto 56px", padding: "0 64px" }}>
+              <div className="sr" style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 18 }}>
+                <div style={{ width: 24, height: 1, background: "#6366f1" }} />
+                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.22em", color: "#6366f1", textTransform: "uppercase" }}>Case Studies</div>
+              </div>
+              <h2 className="sr" style={{ fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 800, color: "#fff", letterSpacing: "-0.03em" }}>
+                AIを、現場に届けてきた。
+              </h2>
+            </div>
+
+            {/* Ticker */}
+            <div style={{ overflow: "hidden", paddingBottom: 8 }}>
+              <div className="ticker-track" style={{ display: "flex", gap: 20, width: "max-content", padding: "12px 20px" }}>
+                {([
+                  { tag: "予約管理", title: "予約システムのAI化", desc: "空き状況の自動最適化と予約対応をAIが代行。対応工数を大幅削減。",
+                    accent: "#6366f1", visual: (
+                      <svg viewBox="0 0 200 120" width="100%" height="100%">
+                        <rect x="20" y="10" width="160" height="100" rx="10" fill="rgba(99,102,241,0.12)" stroke="rgba(99,102,241,0.3)" strokeWidth="1"/>
+                        <rect x="20" y="10" width="160" height="24" rx="10" fill="rgba(99,102,241,0.2)"/>
+                        {[0,1,2,3,4].map(col => [0,1,2,3].map(row => (
+                          <rect key={`${col}-${row}`} x={32+col*30} y={44+row*18} width="20" height="10" rx="3"
+                            fill={col===2&&row===1?"#6366f1":"rgba(99,102,241,0.15)"} />
+                        )))}
+                        <circle cx="160" cy="90" r="14" fill="#6366f1" opacity="0.9"/>
+                        <text x="160" y="94" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold">AI</text>
+                      </svg>
+                    )},
+                  { tag: "採用・HR", title: "入社時テストのAI化", desc: "適性・論理・コミュ力をAIがスコアリング。一次評価を自動化。",
+                    accent: "#7c3aed", visual: (
+                      <svg viewBox="0 0 200 120" width="100%" height="100%">
+                        {[{l:"論理力",v:88,c:"#7c3aed"},{l:"コミュ",v:74,c:"#a78bfa"},{l:"適性",v:92,c:"#6366f1"},{l:"語彙力",v:65,c:"#8b5cf6"}].map((b,i)=>(
+                          <g key={b.l}>
+                            <text x="20" y={26+i*24} fill="rgba(255,255,255,0.5)" fontSize="9">{b.l}</text>
+                            <rect x="60" y={16+i*24} width="110" height="10" rx="5" fill="rgba(255,255,255,0.06)"/>
+                            <rect x="60" y={16+i*24} width={110*b.v/100} height="10" rx="5" fill={b.c}/>
+                            <text x="178" y={26+i*24} fill="rgba(255,255,255,0.7)" fontSize="9" textAnchor="end">{b.v}</text>
+                          </g>
+                        ))}
+                      </svg>
+                    )},
+                  { tag: "業務効率", title: "日報管理のAI化", desc: "音声・テキスト入力からAIが日報を自動生成。提出率が劇的改善。",
+                    accent: "#0891b2", visual: (
+                      <svg viewBox="0 0 200 120" width="100%" height="100%">
+                        <rect x="16" y="8" width="100" height="104" rx="8" fill="rgba(8,145,178,0.1)" stroke="rgba(8,145,178,0.25)" strokeWidth="1"/>
+                        {[0,1,2,3,4,5].map(i=><rect key={i} x="26" y={20+i*14} width={i===0?70:i===1?55:i===2?65:i===3?48:i===4?60:40} height="6" rx="3" fill={`rgba(8,145,178,${0.15+i*0.05})`}/>)}
+                        <rect x="126" y="30" width="60" height="60" rx="10" fill="rgba(8,145,178,0.2)" stroke="rgba(8,145,178,0.4)" strokeWidth="1"/>
+                        <text x="156" y="65" textAnchor="middle" fill="#0891b2" fontSize="11" fontWeight="bold">AI</text>
+                        <path d="M116 60 L126 60" stroke="#0891b2" strokeWidth="1.5" strokeDasharray="3,2" markerEnd="url(#arrow)"/>
+                      </svg>
+                    )},
+                  { tag: "バックオフィス", title: "会計ソフトのAI化", desc: "レシート読み取り・仕訳提案をAIが自動処理。経理負荷を半減。",
+                    accent: "#059669", visual: (
+                      <svg viewBox="0 0 200 120" width="100%" height="100%">
+                        {[40,65,50,80,70,90,85].map((h,i)=>(
+                          <g key={i}>
+                            <rect x={18+i*26} y={105-h} width="18" height={h} rx="4"
+                              fill={i===6?"#059669":`rgba(5,150,105,${0.2+i*0.06})`}/>
+                            <text x={27+i*26} y="114" textAnchor="middle" fill="rgba(255,255,255,0.3)" fontSize="7">
+                              {["4月","5月","6月","7月","8月","9月","10月"][i]}
+                            </text>
+                          </g>
+                        ))}
+                        <text x="100" y="15" textAnchor="middle" fill="rgba(5,150,105,0.8)" fontSize="9" fontWeight="bold">経費処理 自動化率 94%</text>
+                      </svg>
+                    )},
+                  { tag: "DX推進", title: "生成AIの社内導入", desc: "ChatGPTベースの社内AIアシスタントを構築し全社展開。",
+                    accent: "#d97706", visual: (
+                      <svg viewBox="0 0 200 120" width="100%" height="100%">
+                        {[{x:16,y:10,w:120,h:28,r:14,c:"rgba(217,119,6,0.2)",s:"rgba(217,119,6,0.4)",txt:"営業資料を作って",tx:76,ty:29},{x:64,y:50,w:120,h:28,r:14,c:"rgba(217,119,6,0.35)",s:"rgba(217,119,6,0.6)",txt:"はい、作成しました！",tx:124,ty:69},{x:16,y:88,w:100,h:24,r:12,c:"rgba(217,119,6,0.15)",s:"rgba(217,119,6,0.3)",txt:"ありがとう",tx:66,ty:104}].map((b,i)=>(
+                          <g key={i}>
+                            <rect x={b.x} y={b.y} width={b.w} height={b.h} rx={b.r} fill={b.c} stroke={b.s} strokeWidth="1"/>
+                            <text x={b.tx} y={b.ty} textAnchor="middle" fill="rgba(255,255,255,0.75)" fontSize="8">{b.txt}</text>
+                          </g>
+                        ))}
+                        <circle cx="176" cy="64" r="16" fill="rgba(217,119,6,0.25)" stroke="rgba(217,119,6,0.5)" strokeWidth="1.5"/>
+                        <text x="176" y="68" textAnchor="middle" fill="#d97706" fontSize="9" fontWeight="bold">AI</text>
+                      </svg>
+                    )},
+                  { tag: "Web", title: "ホームページへのAI実装", desc: "サイト訪問者の質問にAIが即答。問い合わせ転換率が向上。",
+                    accent: "#0ea5e9", visual: (
+                      <svg viewBox="0 0 200 120" width="100%" height="100%">
+                        <rect x="12" y="8" width="140" height="90" rx="8" fill="rgba(14,165,233,0.08)" stroke="rgba(14,165,233,0.2)" strokeWidth="1"/>
+                        <rect x="12" y="8" width="140" height="18" rx="8" fill="rgba(14,165,233,0.15)"/>
+                        {[0,1,2].map(i=><circle key={i} cx={22+i*12} cy="17" r="3" fill={`rgba(14,165,233,${0.3+i*0.1})`}/>)}
+                        {[0,1,2].map(i=><rect key={i} x="22" y={36+i*18} width={80-i*15} height="7" rx="3" fill="rgba(14,165,233,0.12)"/>)}
+                        <rect x="118" y="52" width="56" height="56" rx="12" fill="rgba(14,165,233,0.2)" stroke="rgba(14,165,233,0.5)" strokeWidth="1.5"/>
+                        <text x="146" y="82" textAnchor="middle" fill="#0ea5e9" fontSize="9" fontWeight="bold">Chat</text>
+                        <text x="146" y="96" textAnchor="middle" fill="#0ea5e9" fontSize="8">AI</text>
+                      </svg>
+                    )},
+                  { tag: "マーケ", title: "SEO対策のAI化", desc: "キーワード分析から記事構成・タイトル最適化までAIが自動提案。",
+                    accent: "#ec4899", visual: (
+                      <svg viewBox="0 0 200 120" width="100%" height="100%">
+                        <polyline points="20,100 50,82 80,70 110,52 140,38 170,20" stroke="rgba(236,72,153,0.3)" strokeWidth="1.5" fill="none"/>
+                        <polyline points="20,100 50,82 80,70 110,52 140,38 170,20" stroke="#ec4899" strokeWidth="2" fill="none" strokeDasharray="200" strokeDashoffset="0"/>
+                        {[[50,82],[80,70],[110,52],[140,38],[170,20]].map(([x,y],i)=>(
+                          <circle key={i} cx={x} cy={y} r="4" fill="#ec4899" opacity={0.6+i*0.08}/>
+                        ))}
+                        {[["1位","#6366f1"],["3位","#7c3aed"],["8位","#a78bfa"]].map(([r,c],i)=>(
+                          <g key={i}>
+                            <rect x="16" y={10+i*28} width="36" height="18" rx="4" fill={`${c}22`}/>
+                            <text x="34" y="22" textAnchor="middle" fill={c as string} fontSize="9" fontWeight="bold">{r}</text>
+                          </g>
+                        ))}
+                      </svg>
+                    )},
+                  { tag: "コンテンツ", title: "自動ブログ更新AI", desc: "トレンド検知からAIが記事を生成し自動投稿。運用コストゼロへ。",
+                    accent: "#8b5cf6", visual: (
+                      <svg viewBox="0 0 200 120" width="100%" height="100%">
+                        <rect x="14" y="10" width="110" height="100" rx="8" fill="rgba(139,92,246,0.08)" stroke="rgba(139,92,246,0.2)" strokeWidth="1"/>
+                        {[{y:24,w:80},{y:38,w:65},{y:52,w:75},{y:66,w:55},{y:80,w:70},{y:94,w:45}].map((l,i)=>(
+                          <rect key={i} x="24" y={l.y} width={l.w} height="7" rx="3" fill={`rgba(139,92,246,${0.1+i*0.04})`}/>
+                        ))}
+                        <circle cx="158" cy="40" r="26" fill="rgba(139,92,246,0.15)" stroke="rgba(139,92,246,0.4)" strokeWidth="1.5"/>
+                        <text x="158" y="36" textAnchor="middle" fill="#8b5cf6" fontSize="8" fontWeight="bold">AUTO</text>
+                        <text x="158" y="48" textAnchor="middle" fill="#8b5cf6" fontSize="8">POST</text>
+                        <path d="M132 60 Q145 80 158 70" stroke="rgba(139,92,246,0.5)" strokeWidth="1.5" fill="none" markerEnd="url(#a)"/>
+                        {[0,1,2].map(i=>(
+                          <circle key={i} cx={138+i*6} cy={88+i*6} r="3" fill={`rgba(139,92,246,${0.4-i*0.1})`}/>
+                        ))}
+                      </svg>
+                    )},
+                ] as const).flatMap(c => [c, {...c, _dup: true}]).map((c, i) => (
+                  <div key={i} style={{
+                    width: 300, flexShrink: 0, borderRadius: 20, overflow: "hidden",
+                    background: "rgba(255,255,255,0.04)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    backdropFilter: "blur(16px)",
+                    transition: "transform 0.35s cubic-bezier(0.16,1,0.3,1), background 0.35s ease, border-color 0.35s ease",
+                    cursor: "pointer",
                   }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.transform = "";
-                    e.currentTarget.style.boxShadow = "0 2px 12px rgba(0,0,0,0.04)";
-                  }}
-                >
-                  <span style={{ display: "inline-block", fontSize: 11, fontWeight: 700, padding: "4px 10px",
-                    borderRadius: 100, background: "#eef2ff", color: "#6366f1", marginBottom: 18,
-                    letterSpacing: "0.04em" }}>{c.tag}</span>
-                  <div style={{ fontSize: 16, fontWeight: 800, color: "#0f172a", lineHeight: 1.45, marginBottom: 12 }}>{c.title}</div>
-                  <div style={{ fontSize: 13, color: "#64748b", lineHeight: 1.75 }}>{c.desc}</div>
-                </div>
-              ))}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.transform = "translateY(-8px) scale(1.02)";
+                      e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+                      e.currentTarget.style.borderColor = `${c.accent}55`;
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.transform = "";
+                      e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+                      e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)";
+                    }}
+                  >
+                    {/* Visual area */}
+                    <div style={{ height: 140, background: `linear-gradient(135deg, ${c.accent}18, ${c.accent}08)`,
+                      borderBottom: `1px solid ${c.accent}22`, overflow: "hidden", padding: "8px 0 0" }}>
+                      {c.visual}
+                    </div>
+                    {/* Text */}
+                    <div style={{ padding: "22px 24px 26px" }}>
+                      <span style={{ display: "inline-block", fontSize: 10, fontWeight: 700, padding: "3px 10px",
+                        borderRadius: 100, background: `${c.accent}22`, color: c.accent, marginBottom: 12,
+                        letterSpacing: "0.06em" }}>{c.tag}</span>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: "#fff", lineHeight: 1.45, marginBottom: 10 }}>{c.title}</div>
+                      <div style={{ fontSize: 12, color: "rgba(148,163,184,0.85)", lineHeight: 1.75 }}>{c.desc}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
