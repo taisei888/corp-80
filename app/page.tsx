@@ -245,7 +245,7 @@ export default function Home() {
             <p style={{ fontSize: 12, letterSpacing: "0.28em", color: "#6366f1",
               fontWeight: 700, textTransform: "uppercase", marginBottom: 24,
               animation: "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.1s both" }}>
-              合同会社80 — Osaka, Japan
+              合同会社80 — Japan, Nagoya
             </p>
             <p style={{ fontSize: "clamp(18px, 2.5vw, 26px)", fontWeight: 800,
               color: "#6366f1", letterSpacing: "0.02em", marginBottom: 16,
