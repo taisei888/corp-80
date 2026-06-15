@@ -352,48 +352,94 @@ export default function Home() {
         </section>
 
         {/* ── Business ── */}
-        <div style={{ background: "#fff" }}>
-        <section id="business" style={{ padding: "80px 48px 120px" }}>
+        <section id="business" style={{ background: "#fff", padding: "120px 64px 140px" }}>
           <div style={{ maxWidth: 1160, margin: "0 auto" }}>
-            <div className="sr" style={{ marginBottom: 64 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em",
-                color: "#6366f1", marginBottom: 16, textTransform: "uppercase" }}>Business</div>
-              <h2 style={{ fontSize: "clamp(28px, 4vw, 48px)", fontWeight: 800,
-                letterSpacing: "-0.03em", lineHeight: 1.2, color: "#0f172a" }}>3つの事業領域</h2>
-              <p style={{ fontSize: 16, color: "#64748b", lineHeight: 1.9, marginTop: 14, maxWidth: 420 }}>
-                パッケージ製品・AI受託開発・Webデザインの3軸で、<br />クライアントのデジタル変革を支援します。
-              </p>
+            <div className="sr" style={{ textAlign: "center", marginBottom: 72 }}>
+              <h2 style={{ fontSize: "clamp(64px, 10vw, 130px)", fontWeight: 900, letterSpacing: "-0.05em", color: "#0f172a", lineHeight: 1 }}>Business</h2>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
-              {[
-                { n:"01", color:"#6366f1", bg:"#eef2ff", label:"SaaS Package",
-                  icon:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>,
-                  title:"パッケージ販売", sub:"LENDS AI など",
-                  desc:"自社開発のSaaSプロダクトを提供。LENDS AIは組織コンディションをスマホアンケート×AIで可視化し、人事課題の早期発見を支援します。", delay:"0s" },
-                { n:"02", color:"#7c3aed", bg:"#f5f3ff", label:"AI Development",
-                  icon:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="1.8"><path d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-2"/></svg>,
-                  title:"AI受託開発", sub:"",
-                  desc:"ChatGPT・LLM・RAGを活用した業務効率化ツール、データ分析システム、AIチャットボットなどをオーダーメイドで開発します。", delay:"0.1s" },
-                { n:"03", color:"#0891b2", bg:"#ecfeff", label:"Web Design",
-                  icon:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0891b2" strokeWidth="1.8"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M7 8h2M7 12h2M13 8h4M13 12h4"/></svg>,
-                  title:"HP制作デザイン", sub:"",
-                  desc:"ブランドの価値を最大化するWebサイト制作。戦略的なUI/UXデザインと高品質な実装で、ビジネスの成果につながるサイトを届けます。", delay:"0.2s" },
-              ].map((item) => (
-                <div key={item.n} className="sr" style={{ ...card, transitionDelay: item.delay, transition: "transform 0.28s ease, box-shadow 0.28s ease" }}
-                  onMouseEnter={e => { e.currentTarget.style.transform="translateY(-4px)"; e.currentTarget.style.boxShadow="0 12px 40px rgba(0,0,0,0.1)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.transform=""; e.currentTarget.style.boxShadow="0 4px 24px rgba(0,0,0,0.06)"; }}>
-                  <div style={{ fontSize: 11, fontWeight: 800, color: "#c7d2fe", marginBottom: 20, letterSpacing: "0.1em" }}>{item.n}</div>
-                  <div style={{ width: 48, height: 48, borderRadius: 12, marginBottom: 24,
-                    background: item.bg, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    {item.icon}
+            {/* 2×2 grid */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+
+              {/* 01 — LENDS AI */}
+              <div className="sr" style={{ borderRadius: 20, overflow: "hidden", cursor: "pointer" }}
+                onMouseEnter={e => { (e.currentTarget.querySelector(".biz-img") as HTMLElement).style.transform = "scale(1.03)"; }}
+                onMouseLeave={e => { (e.currentTarget.querySelector(".biz-img") as HTMLElement).style.transform = "scale(1)"; }}>
+                <div className="biz-img" style={{ height: 380, background: "linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #312e81 100%)",
+                  display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden",
+                  transition: "transform 0.6s cubic-bezier(0.16,1,0.3,1)" }}>
+                  <div style={{ position: "absolute", fontSize: 96, fontWeight: 900, color: "rgba(99,102,241,0.1)", letterSpacing: "-0.05em", whiteSpace: "nowrap", userSelect: "none" }}>LENDS AI</div>
+                  <div style={{ position: "relative", textAlign: "center" }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.2em", color: "rgba(165,180,252,0.7)", textTransform: "uppercase", marginBottom: 16 }}>AI SaaS Platform</div>
+                    <div style={{ fontSize: 42, fontWeight: 900, color: "#fff", letterSpacing: "-0.03em" }}>LENDS AI</div>
                   </div>
-                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.15em", color: item.color, marginBottom: 10, textTransform: "uppercase" }}>{item.label}</div>
-                  <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 12, lineHeight: 1.35, color: "#0f172a" }}>
-                    {item.title}{item.sub && <><br /><span style={{ fontSize: 13, fontWeight: 400, color: "#94a3b8" }}>{item.sub}</span></>}
-                  </h3>
-                  <p style={{ fontSize: 14, lineHeight: 1.9, color: "#64748b" }}>{item.desc}</p>
                 </div>
-              ))}
+                <div style={{ padding: "22px 4px" }}>
+                  <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 8, fontWeight: 600 }}>01</div>
+                  <div style={{ fontSize: 22, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em" }}>Organisation Intelligence</div>
+                  <div style={{ fontSize: 14, color: "#64748b", marginTop: 6, lineHeight: 1.7 }}>組織の状態をAIで可視化するSaaSプロダクト。人事課題の早期発見から採用・育成まで一気通貫で支援します。</div>
+                </div>
+              </div>
+
+              {/* 02 — AI Build */}
+              <div className="sr" style={{ borderRadius: 20, overflow: "hidden", cursor: "pointer", transitionDelay: "0.08s" }}
+                onMouseEnter={e => { (e.currentTarget.querySelector(".biz-img") as HTMLElement).style.transform = "scale(1.03)"; }}
+                onMouseLeave={e => { (e.currentTarget.querySelector(".biz-img") as HTMLElement).style.transform = "scale(1)"; }}>
+                <div className="biz-img" style={{ height: 380, background: "linear-gradient(135deg, #0c0a1e 0%, #1e1b4b 50%, #0f172a 100%)",
+                  display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden",
+                  transition: "transform 0.6s cubic-bezier(0.16,1,0.3,1)" }}>
+                  <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle, rgba(99,102,241,0.08) 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
+                  <div style={{ position: "relative", textAlign: "center" }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.2em", color: "rgba(165,180,252,0.7)", textTransform: "uppercase", marginBottom: 16 }}>Custom AI Development</div>
+                    <div style={{ fontSize: 42, fontWeight: 900, color: "#fff", letterSpacing: "-0.03em" }}>AI Build</div>
+                  </div>
+                </div>
+                <div style={{ padding: "22px 4px" }}>
+                  <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 8, fontWeight: 600 }}>02</div>
+                  <div style={{ fontSize: 22, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em" }}>AI Build</div>
+                  <div style={{ fontSize: 14, color: "#64748b", marginTop: 6, lineHeight: 1.7 }}>ChatGPT・LLM・RAGを活用した業務AI・自動化ツール・データ分析システムをオーダーメイドで開発します。</div>
+                </div>
+              </div>
+
+              {/* 03 — Craft */}
+              <div className="sr" style={{ borderRadius: 20, overflow: "hidden", cursor: "pointer", transitionDelay: "0.16s" }}
+                onMouseEnter={e => { (e.currentTarget.querySelector(".biz-img") as HTMLElement).style.transform = "scale(1.03)"; }}
+                onMouseLeave={e => { (e.currentTarget.querySelector(".biz-img") as HTMLElement).style.transform = "scale(1)"; }}>
+                <div className="biz-img" style={{ height: 380, background: "linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)",
+                  display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden",
+                  transition: "transform 0.6s cubic-bezier(0.16,1,0.3,1)" }}>
+                  <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
+                  <div style={{ position: "relative", textAlign: "center" }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.2em", color: "#94a3b8", textTransform: "uppercase", marginBottom: 16 }}>Web & Brand Design</div>
+                    <div style={{ fontSize: 42, fontWeight: 900, color: "#0f172a", letterSpacing: "-0.03em" }}>Craft</div>
+                  </div>
+                </div>
+                <div style={{ padding: "22px 4px" }}>
+                  <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 8, fontWeight: 600 }}>03</div>
+                  <div style={{ fontSize: 22, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em" }}>Craft</div>
+                  <div style={{ fontSize: 14, color: "#64748b", marginTop: 6, lineHeight: 1.7 }}>ブランドの価値をデジタルで表現するWeb制作。戦略的なUI/UXデザインから実装まで、事業の成果につながるサイトを届けます。</div>
+                </div>
+              </div>
+
+              {/* 04 — Talent Match */}
+              <div className="sr" style={{ borderRadius: 20, overflow: "hidden", cursor: "pointer", transitionDelay: "0.24s" }}
+                onMouseEnter={e => { (e.currentTarget.querySelector(".biz-img") as HTMLElement).style.transform = "scale(1.03)"; }}
+                onMouseLeave={e => { (e.currentTarget.querySelector(".biz-img") as HTMLElement).style.transform = "scale(1)"; }}>
+                <div className="biz-img" style={{ height: 380, background: "linear-gradient(135deg, #0f172a 0%, #1a1025 50%, #0f172a 100%)",
+                  display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden",
+                  transition: "transform 0.6s cubic-bezier(0.16,1,0.3,1)" }}>
+                  <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(ellipse at 30% 50%, rgba(124,58,237,0.14) 0%, transparent 60%), radial-gradient(ellipse at 70% 50%, rgba(99,102,241,0.1) 0%, transparent 60%)" }} />
+                  <div style={{ position: "relative", textAlign: "center" }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.2em", color: "rgba(196,181,253,0.7)", textTransform: "uppercase", marginBottom: 16 }}>Talent Placement</div>
+                    <div style={{ fontSize: 42, fontWeight: 900, color: "#fff", letterSpacing: "-0.03em" }}>Talent Match</div>
+                  </div>
+                </div>
+                <div style={{ padding: "22px 4px" }}>
+                  <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 8, fontWeight: 600 }}>04</div>
+                  <div style={{ fontSize: 22, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em" }}>Talent Match</div>
+                  <div style={{ fontSize: 14, color: "#64748b", marginTop: 6, lineHeight: 1.7 }}>テクノロジーと人の知見を組み合わせた次世代型の人材紹介。企業と人材の最適なマッチングを実現します。（有料職業紹介事業）</div>
+                </div>
+              </div>
+
             </div>
           </div>
         </section>
