@@ -221,7 +221,7 @@ export default function Home() {
             80
           </button>
           <div style={{ display: "flex", gap: 36 }}>
-            {([["事業内容","business"],["プロダクト","product"],["会社について","about"]] as const).map(([l, id]) => (
+            {([["ビジョン","vision"],["事業内容","business"],["プロダクト","product"]] as const).map(([l, id]) => (
               <button key={id} onClick={() => scrollTo(id)}
                 style={{ background: "none", border: "none", cursor: "pointer",
                   fontSize: 14, fontWeight: 500, color: "#475569", transition: "color 0.2s", fontFamily: "inherit" }}
@@ -242,34 +242,34 @@ export default function Home() {
         </nav>
 
         {/* ── Hero ── */}
-        <section style={{ minHeight: "100vh", display: "flex", alignItems: "center",
-          justifyContent: "center", padding: "80px 48px 0" }}>
-          <div style={{ textAlign: "center", maxWidth: 820 }}>
-            <p style={{ fontSize: 12, letterSpacing: "0.28em", color: "#6366f1",
-              fontWeight: 700, textTransform: "uppercase", marginBottom: 24,
+        <section style={{ minHeight: "100vh", display: "flex", flexDirection: "column",
+          alignItems: "center", justifyContent: "center", padding: "120px 48px 100px" }}>
+          <div style={{ textAlign: "center", maxWidth: 960, width: "100%" }}>
+            <p style={{ fontSize: 12, letterSpacing: "0.32em", color: "#6366f1",
+              fontWeight: 700, textTransform: "uppercase", marginBottom: 32,
               animation: "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.1s both" }}>
               合同会社80 — Japan, Nagoya
             </p>
-            <p style={{ fontSize: "clamp(18px, 2.5vw, 26px)", fontWeight: 800,
-              color: "#6366f1", letterSpacing: "0.02em", marginBottom: 16,
+            <p style={{ fontSize: "clamp(20px, 3vw, 34px)", fontWeight: 800,
+              color: "#6366f1", letterSpacing: "0.02em", marginBottom: 20,
               animation: "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.2s both",
               fontStyle: "italic" }}>
               Build what&apos;s next.
             </p>
-            <h1 style={{ fontSize: "clamp(40px, 5.5vw, 76px)", fontWeight: 800,
-              color: "#0f172a", lineHeight: 1.15, letterSpacing: "-0.03em", marginBottom: 32,
+            <h1 style={{ fontSize: "clamp(52px, 7.5vw, 104px)", fontWeight: 800,
+              color: "#0f172a", lineHeight: 1.1, letterSpacing: "-0.04em", marginBottom: 40,
               whiteSpace: "nowrap",
               animation: "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.3s both" }}>
               未来は、待つものじゃない。
             </h1>
-            <p style={{ fontSize: 17, color: "#64748b", lineHeight: 1.85, marginBottom: 52,
+            <p style={{ fontSize: 19, color: "#64748b", lineHeight: 1.9, marginBottom: 56,
               animation: "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.45s both" }}>
               合同会社80は、AIとソフトウェアで<br />現場を根本から変える。
             </p>
-            <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap",
+            <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap",
               animation: "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.55s both" }}>
-              <button className="btn-primary-light" onClick={() => scrollTo("business")}>
-                事業内容を見る
+              <button className="btn-primary-light" onClick={() => scrollTo("vision")}>
+                私たちのビジョン
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
@@ -278,16 +278,16 @@ export default function Home() {
                 お問い合わせ
               </button>
             </div>
-            <div style={{ marginTop: 80, display: "flex", flexDirection: "column",
-              alignItems: "center", gap: 14, animation: "fade-in 1s ease 1.4s both" }}>
-              <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.35em",
-                color: "#6366f1", textTransform: "uppercase" }}>Scroll</span>
-              <div style={{ position: "relative", width: 2, height: 72, overflow: "hidden",
-                background: "rgba(99,102,241,0.15)", borderRadius: 2 }}>
-                <div style={{ position: "absolute", top: 0, left: 0, width: "100%",
-                  background: "linear-gradient(to bottom, #6366f1, #a78bfa)",
-                  borderRadius: 2, animation: "scroll-bar 1.6s cubic-bezier(0.4,0,0.2,1) infinite" }} />
-              </div>
+          </div>
+          <div style={{ marginTop: "auto", paddingTop: 60, display: "flex", flexDirection: "column",
+            alignItems: "center", gap: 14, animation: "fade-in 1s ease 1.4s both" }}>
+            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.35em",
+              color: "#6366f1", textTransform: "uppercase" }}>Scroll</span>
+            <div style={{ position: "relative", width: 2, height: 72, overflow: "hidden",
+              background: "rgba(99,102,241,0.15)", borderRadius: 2 }}>
+              <div style={{ position: "absolute", top: 0, left: 0, width: "100%",
+                background: "linear-gradient(to bottom, #6366f1, #a78bfa)",
+                borderRadius: 2, animation: "scroll-bar 1.6s cubic-bezier(0.4,0,0.2,1) infinite" }} />
             </div>
           </div>
         </section>
@@ -296,6 +296,51 @@ export default function Home() {
         <div style={{ position: "relative" }}>
           {/* Gradient fade from transparent to white */}
           <div style={{ height: 160, background: "linear-gradient(to bottom, transparent, #fff)", pointerEvents: "none" }} />
+
+        {/* ── Vision ── */}
+        <section id="vision" style={{ padding: "120px 48px 140px" }}>
+          <div style={{ maxWidth: 1160, margin: "0 auto" }}>
+            <div className="sr" style={{ marginBottom: 72 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", color: "#6366f1", marginBottom: 20, textTransform: "uppercase" }}>Our Vision</div>
+              <h2 style={{ fontSize: "clamp(36px, 5.5vw, 72px)", fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1.1, color: "#0f172a" }}>
+                テクノロジーの恩恵を、<br />すべての現場へ。
+              </h2>
+              <p style={{ fontSize: 17, color: "#64748b", lineHeight: 1.9, marginTop: 28, maxWidth: 540 }}>
+                大企業だけでなく、中小企業や現場の第一線でも<br />最先端のテクノロジーが活きる世界を目指して。
+              </p>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 20 }}>
+              {[
+                { label:"Mission", title:"人の知覚を、ソフトウェアで拡張する。",
+                  desc:"人が本来持つ力を引き出し、テクノロジーで可能性を広げる。私たちはそのためのソフトウェアを、真摯に作り続けます。", delay:"0s" },
+                { label:"Vision", title:"テクノロジーの恩恵を、すべての現場へ。",
+                  desc:"大企業だけでなく、中小企業や現場の第一線でも最先端のテクノロジーが活きる世界を目指します。", delay:"0.1s" },
+              ].map(v => (
+                <div key={v.label} className="sr" style={{ ...card, transitionDelay: v.delay }}>
+                  <div style={{ fontSize:10, fontWeight:800, letterSpacing:"0.22em", color:"#6366f1", textTransform:"uppercase", marginBottom:18 }}>{v.label}</div>
+                  <p style={{ fontSize:"clamp(18px, 2.2vw, 24px)", fontWeight:700, lineHeight:1.55, color:"#0f172a", marginBottom:16 }}>{v.title}</p>
+                  <p style={{ fontSize:14, color:"#64748b", lineHeight:1.9 }}>{v.desc}</p>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 4 }}>
+              {[
+                { en:"Integrity", jp:"誠実さ",       desc:"顧客・パートナー・社会に対して、常に誠実に向き合う" },
+                { en:"Curiosity", jp:"先端への好奇心", desc:"最新技術への探求を止めず、革新を追求し続ける" },
+                { en:"Respect",   jp:"人への敬意",    desc:"関わるすべての人を尊重し、共に成長することを喜びとする" },
+                { en:"Speed",     jp:"圧倒的な速さ",  desc:"機会を逃さず、スピードを最大の競争優位にする" },
+              ].map((v, i) => (
+                <div key={v.en} className="sr" style={{ ...card, transitionDelay:`${i*0.08}s`, borderTop:"2px solid #6366f1", borderRadius:"0 0 16px 16px" }}>
+                  <div style={{ fontSize:10, fontWeight:800, letterSpacing:"0.2em", color:"#6366f1", textTransform:"uppercase", marginBottom:10 }}>{v.en}</div>
+                  <div style={{ fontSize:18, fontWeight:700, color:"#0f172a", marginBottom:10 }}>{v.jp}</div>
+                  <div style={{ fontSize:13, color:"#64748b", lineHeight:1.85 }}>{v.desc}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
 
         {/* ── Business ── */}
         <div style={{ background: "#fff" }}>
@@ -424,45 +469,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── About ── */}
-        <section id="about" style={{ padding: "120px 48px" }}>
-          <div style={{ maxWidth: 1160, margin: "0 auto" }}>
-            <div className="sr" style={{ marginBottom: 64 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", color: "#6366f1", marginBottom: 16, textTransform: "uppercase" }}>Philosophy</div>
-              <h2 style={{ fontSize: "clamp(28px, 4vw, 48px)", fontWeight: 800, letterSpacing: "-0.03em", lineHeight: 1.2, color: "#0f172a" }}>
-                私たちが大切に<br />していること
-              </h2>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 20 }}>
-              {[
-                { label:"Mission", title:"人の知覚を、ソフトウェアで拡張する。",
-                  desc:"人が本来持つ力を引き出し、テクノロジーで可能性を広げる。私たちはそのためのソフトウェアを、真摯に作り続けます。", delay:"0s" },
-                { label:"Vision", title:"テクノロジーの恩恵を、すべての現場へ。",
-                  desc:"大企業だけでなく、中小企業や現場の第一線でも最先端のテクノロジーが活きる世界を目指します。", delay:"0.1s" },
-              ].map(v => (
-                <div key={v.label} className="sr" style={{ ...card, transitionDelay: v.delay }}>
-                  <div style={{ fontSize:10, fontWeight:800, letterSpacing:"0.22em", color:"#6366f1", textTransform:"uppercase", marginBottom:18 }}>{v.label}</div>
-                  <p style={{ fontSize:"clamp(17px, 2vw, 22px)", fontWeight:700, lineHeight:1.55, color:"#0f172a", marginBottom:16 }}>{v.title}</p>
-                  <p style={{ fontSize:14, color:"#64748b", lineHeight:1.9 }}>{v.desc}</p>
-                </div>
-              ))}
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 4 }}>
-              {[
-                { en:"Integrity", jp:"誠実さ",       desc:"顧客・パートナー・社会に対して、常に誠実に向き合う" },
-                { en:"Curiosity", jp:"先端への好奇心", desc:"最新技術への探求を止めず、革新を追求し続ける" },
-                { en:"Respect",   jp:"人への敬意",    desc:"関わるすべての人を尊重し、共に成長することを喜びとする" },
-                { en:"Speed",     jp:"圧倒的な速さ",  desc:"機会を逃さず、スピードを最大の競争優位にする" },
-              ].map((v, i) => (
-                <div key={v.en} className="sr" style={{ ...card, transitionDelay:`${i*0.08}s`, borderTop:"2px solid #6366f1", borderRadius:"0 0 16px 16px" }}>
-                  <div style={{ fontSize:10, fontWeight:800, letterSpacing:"0.2em", color:"#6366f1", textTransform:"uppercase", marginBottom:10 }}>{v.en}</div>
-                  <div style={{ fontSize:18, fontWeight:700, color:"#0f172a", marginBottom:10 }}>{v.jp}</div>
-                  <div style={{ fontSize:13, color:"#64748b", lineHeight:1.85 }}>{v.desc}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
 
         {/* ── Contact ── */}
         <section id="contact" style={{ padding: "120px 48px 140px" }}>
@@ -490,7 +496,7 @@ export default function Home() {
             <div style={{ fontSize:11, color:"rgba(255,255,255,0.3)", marginTop:4 }}>合同会社80</div>
           </div>
           <div style={{ display: "flex", gap: 28 }}>
-            {([["事業内容","business"],["プロダクト","product"],["会社について","about"],["お問い合わせ","contact"]] as const).map(([l, id]) => (
+            {([["ビジョン","vision"],["事業内容","business"],["プロダクト","product"],["お問い合わせ","contact"]] as const).map(([l, id]) => (
               <button key={id} onClick={() => document.getElementById(id)?.scrollIntoView({ behavior:"smooth" })}
                 style={{ fontSize:12, color:"rgba(255,255,255,0.35)", background:"none", border:"none",
                   cursor:"pointer", padding:0, transition:"color 0.2s", fontFamily:"inherit" }}
