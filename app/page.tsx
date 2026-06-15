@@ -30,6 +30,7 @@ function NeuralCanvas() {
     const mouse = { x: -9999, y: -9999 };
     let nodes: NNode[] = [];
     let pulses: Pulse[] = [];
+    const connGlow = new Map<string, number>(); // "i-j" → glow 0-1
     let raf = 0, lastPulse = 0;
 
     const init = () => {
@@ -76,15 +77,37 @@ function NeuralCanvas() {
         }
       }
 
+      // Fade connection glows
+      connGlow.forEach((v, k) => {
+        const nv = v * 0.88;
+        if (nv < 0.01) connGlow.delete(k); else connGlow.set(k, nv);
+      });
+
+      // Set glow for active pulse connections
+      for (const p of pulses) {
+        const intensity = 0.6 + Math.sin(p.t * Math.PI) * 0.4;
+        connGlow.set(`${p.from}-${p.to}`, intensity);
+      }
+
       // Connections
-      ctx.lineWidth = 0.7;
       for (let i = 0; i < nodes.length; i++) {
         for (let j = i+1; j < nodes.length; j++) {
           const d = Math.hypot(nodes[i].x - nodes[j].x, nodes[i].y - nodes[j].y);
           if (d < CONN_DIST) {
-            const a = (1 - d/CONN_DIST) * 0.22;
-            ctx.strokeStyle = `rgba(79,70,229,${a})`;
+            const base = (1 - d/CONN_DIST) * 0.22;
+            const g = (connGlow.get(`${i}-${j}`) || 0) + (connGlow.get(`${j}-${i}`) || 0);
+            if (g > 0.01) {
+              ctx.shadowBlur = 6 * g;
+              ctx.shadowColor = nodes[i].color;
+              ctx.lineWidth = 0.7 + g * 1.6;
+              ctx.strokeStyle = `rgba(99,102,241,${Math.min(base + g * 0.55, 0.9)})`;
+            } else {
+              ctx.shadowBlur = 0;
+              ctx.lineWidth = 0.7;
+              ctx.strokeStyle = `rgba(79,70,229,${base})`;
+            }
             ctx.beginPath(); ctx.moveTo(nodes[i].x, nodes[i].y); ctx.lineTo(nodes[j].x, nodes[j].y); ctx.stroke();
+            ctx.shadowBlur = 0;
           }
         }
       }
@@ -219,21 +242,25 @@ export default function Home() {
         <section style={{ minHeight: "100vh", display: "flex", alignItems: "center",
           justifyContent: "center", padding: "80px 48px 0" }}>
           <div style={{ textAlign: "center", maxWidth: 820 }}>
-            <p style={{ fontSize: 12, letterSpacing: "0.22em", color: "#6366f1",
-              fontWeight: 700, textTransform: "uppercase", marginBottom: 28,
+            <p style={{ fontSize: 12, letterSpacing: "0.28em", color: "#6366f1",
+              fontWeight: 700, textTransform: "uppercase", marginBottom: 24,
               animation: "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.1s both" }}>
-              合同会社80
+              合同会社80 — Osaka, Japan
             </p>
-            <h1 style={{ fontSize: "clamp(52px, 8.5vw, 100px)", fontWeight: 800,
+            <p style={{ fontSize: "clamp(18px, 2.5vw, 26px)", fontWeight: 800,
+              color: "#6366f1", letterSpacing: "0.02em", marginBottom: 16,
+              animation: "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.2s both",
+              fontStyle: "italic" }}>
+              Build what&apos;s next.
+            </p>
+            <h1 style={{ fontSize: "clamp(52px, 8.5vw, 96px)", fontWeight: 800,
               color: "#0f172a", lineHeight: 1.12, letterSpacing: "-0.04em", marginBottom: 32,
-              animation: "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.25s both" }}>
-              人の知覚を、<br />
-              <span style={{ color: "#6366f1" }}>ソフトウェアで</span><br />
-              拡張する。
+              animation: "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.3s both" }}>
+              未来は、<br />待つものじゃない。
             </h1>
             <p style={{ fontSize: 17, color: "#64748b", lineHeight: 1.85, marginBottom: 52,
-              animation: "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.4s both" }}>
-              テクノロジーの恩恵を、すべての現場へ。
+              animation: "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.45s both" }}>
+              合同会社80は、AIとソフトウェアで<br />現場を根本から変える。
             </p>
             <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap",
               animation: "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.55s both" }}>
