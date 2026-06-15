@@ -253,10 +253,11 @@ export default function Home() {
               fontStyle: "italic" }}>
               Build what&apos;s next.
             </p>
-            <h1 style={{ fontSize: "clamp(52px, 8.5vw, 96px)", fontWeight: 800,
-              color: "#0f172a", lineHeight: 1.12, letterSpacing: "-0.04em", marginBottom: 32,
+            <h1 style={{ fontSize: "clamp(40px, 5.5vw, 76px)", fontWeight: 800,
+              color: "#0f172a", lineHeight: 1.15, letterSpacing: "-0.03em", marginBottom: 32,
+              whiteSpace: "nowrap",
               animation: "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.3s both" }}>
-              未来は、<br />待つものじゃない。
+              未来は、待つものじゃない。
             </h1>
             <p style={{ fontSize: 17, color: "#64748b", lineHeight: 1.85, marginBottom: 52,
               animation: "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.45s both" }}>
