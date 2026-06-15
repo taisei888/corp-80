@@ -242,23 +242,22 @@ export default function Home() {
         </nav>
 
         {/* ── Hero ── */}
-        <section style={{ minHeight: "100vh", display: "flex", flexDirection: "column",
-          alignItems: "center", justifyContent: "center", padding: "120px 48px 100px" }}>
-          <div style={{ textAlign: "center", maxWidth: 960, width: "100%" }}>
+        <section style={{ minHeight: "100vh", display: "flex", alignItems: "center",
+          justifyContent: "center", padding: "120px 48px 140px", position: "relative" }}>
+          <div style={{ textAlign: "center", maxWidth: 900, width: "100%" }}>
             <p style={{ fontSize: 12, letterSpacing: "0.32em", color: "#6366f1",
               fontWeight: 700, textTransform: "uppercase", marginBottom: 32,
               animation: "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.1s both" }}>
               合同会社80 — Japan, Nagoya
             </p>
-            <p style={{ fontSize: "clamp(20px, 3vw, 34px)", fontWeight: 800,
+            <p style={{ fontSize: "clamp(20px, 2.8vw, 32px)", fontWeight: 800,
               color: "#6366f1", letterSpacing: "0.02em", marginBottom: 20,
               animation: "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.2s both",
               fontStyle: "italic" }}>
               Build what&apos;s next.
             </p>
-            <h1 style={{ fontSize: "clamp(52px, 7.5vw, 104px)", fontWeight: 800,
+            <h1 style={{ fontSize: "clamp(48px, 6.5vw, 88px)", fontWeight: 800,
               color: "#0f172a", lineHeight: 1.1, letterSpacing: "-0.04em", marginBottom: 40,
-              whiteSpace: "nowrap",
               animation: "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.3s both" }}>
               未来は、待つものじゃない。
             </h1>
@@ -279,8 +278,10 @@ export default function Home() {
               </button>
             </div>
           </div>
-          <div style={{ marginTop: "auto", paddingTop: 60, display: "flex", flexDirection: "column",
-            alignItems: "center", gap: 14, animation: "fade-in 1s ease 1.4s both" }}>
+          {/* SCROLL — 画面下端に固定 */}
+          <div style={{ position: "absolute", bottom: 40, left: "50%", transform: "translateX(-50%)",
+            display: "flex", flexDirection: "column", alignItems: "center", gap: 14,
+            animation: "fade-in 1s ease 1.4s both" }}>
             <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.35em",
               color: "#6366f1", textTransform: "uppercase" }}>Scroll</span>
             <div style={{ position: "relative", width: 2, height: 72, overflow: "hidden",
