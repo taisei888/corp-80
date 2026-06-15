@@ -7,10 +7,13 @@ const NODE_COLORS = ["#4f46e5", "#7c3aed", "#0891b2", "#6d28d9"];
 const CONN_DIST   = 170;
 const NODE_COUNT  = 85;
 
+const KEYWORDS = ["AI", "LLM", "SaaS", "ML", "API", "GPT", "RAG", "Data", "Cloud", "Python", "React", "Vector"];
+
 interface NNode {
   x: number; y: number;
   vx: number; vy: number;
   r: number; color: string; glow: number;
+  label?: string; labelGlow: number;
 }
 interface Pulse {
   from: number; to: number;
@@ -30,7 +33,6 @@ function NeuralCanvas() {
     const mouse = { x: -9999, y: -9999 };
     let nodes: NNode[] = [];
     let pulses: Pulse[] = [];
-    const connGlow = new Map<string, number>(); // "i-j" → glow 0-1
     let raf = 0, lastPulse = 0;
 
     const init = () => {
@@ -39,12 +41,15 @@ function NeuralCanvas() {
       canvas.width = W * dpr; canvas.height = H * dpr;
       canvas.style.width = W + "px"; canvas.style.height = H + "px";
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      nodes = Array.from({ length: NODE_COUNT }, () => ({
+      // Shuffle keyword indices so labels are spread randomly
+      const labelIdx = Array.from({ length: NODE_COUNT }, (_, i) => i).sort(() => Math.random() - 0.5);
+      nodes = Array.from({ length: NODE_COUNT }, (_, i) => ({
         x: Math.random() * W, y: Math.random() * H,
         vx: (Math.random() - 0.5) * 0.45, vy: (Math.random() - 0.5) * 0.45,
         r: Math.random() * 1.8 + 1.2,
         color: NODE_COLORS[Math.floor(Math.random() * NODE_COLORS.length)],
-        glow: 0,
+        glow: 0, labelGlow: 0,
+        label: labelIdx[i] < KEYWORDS.length ? KEYWORDS[labelIdx[i]] : undefined,
       }));
     };
     init();
@@ -77,37 +82,15 @@ function NeuralCanvas() {
         }
       }
 
-      // Fade connection glows
-      connGlow.forEach((v, k) => {
-        const nv = v * 0.88;
-        if (nv < 0.01) connGlow.delete(k); else connGlow.set(k, nv);
-      });
-
-      // Set glow for active pulse connections
-      for (const p of pulses) {
-        const intensity = 0.6 + Math.sin(p.t * Math.PI) * 0.4;
-        connGlow.set(`${p.from}-${p.to}`, intensity);
-      }
-
       // Connections
+      ctx.lineWidth = 0.7;
       for (let i = 0; i < nodes.length; i++) {
         for (let j = i+1; j < nodes.length; j++) {
           const d = Math.hypot(nodes[i].x - nodes[j].x, nodes[i].y - nodes[j].y);
           if (d < CONN_DIST) {
-            const base = (1 - d/CONN_DIST) * 0.22;
-            const g = (connGlow.get(`${i}-${j}`) || 0) + (connGlow.get(`${j}-${i}`) || 0);
-            if (g > 0.01) {
-              ctx.shadowBlur = 6 * g;
-              ctx.shadowColor = nodes[i].color;
-              ctx.lineWidth = 0.7 + g * 1.6;
-              ctx.strokeStyle = `rgba(99,102,241,${Math.min(base + g * 0.55, 0.9)})`;
-            } else {
-              ctx.shadowBlur = 0;
-              ctx.lineWidth = 0.7;
-              ctx.strokeStyle = `rgba(79,70,229,${base})`;
-            }
+            const a = (1 - d/CONN_DIST) * 0.22;
+            ctx.strokeStyle = `rgba(79,70,229,${a})`;
             ctx.beginPath(); ctx.moveTo(nodes[i].x, nodes[i].y); ctx.lineTo(nodes[j].x, nodes[j].y); ctx.stroke();
-            ctx.shadowBlur = 0;
           }
         }
       }
@@ -134,7 +117,11 @@ function NeuralCanvas() {
       // Pulses
       pulses = pulses.filter(p => {
         p.t += p.speed;
-        if (p.t >= 1) { nodes[p.to].glow = 1; return false; }
+        if (p.t >= 1) {
+          nodes[p.to].glow = 1;
+          if (nodes[p.to].label) nodes[p.to].labelGlow = 1;
+          return false;
+        }
         const ni = nodes[p.from], nj = nodes[p.to];
         for (let k = 0; k < 5; k++) {
           const tt = Math.max(0, p.t - k*0.025);
@@ -147,6 +134,24 @@ function NeuralCanvas() {
         }
         return true;
       });
+
+      // IT word labels
+      ctx.font = "bold 10px 'Courier New', 'SF Mono', monospace";
+      ctx.textAlign = "left";
+      for (const n of nodes) {
+        if (!n.label) continue;
+        n.labelGlow = Math.max(0, n.labelGlow - 0.014);
+        const alpha = 0.18 + n.labelGlow * 0.78;
+        ctx.globalAlpha = alpha;
+        if (n.labelGlow > 0.05) {
+          ctx.shadowBlur = 10 * n.labelGlow;
+          ctx.shadowColor = n.color;
+        }
+        ctx.fillStyle = n.color;
+        ctx.fillText(n.label, n.x + n.r + 5, n.y - n.r - 2);
+        ctx.shadowBlur = 0;
+        ctx.globalAlpha = 1;
+      }
 
       // Mouse dot
       if (mouse.x > 0) {
