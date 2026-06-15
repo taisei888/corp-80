@@ -29,6 +29,11 @@ body {
   50%  { transform: scaleY(1); transform-origin: top; opacity: 1; }
   100% { transform: scaleY(1); transform-origin: bottom; opacity: 0; }
 }
+@keyframes scroll-bar {
+  0%   { height: 0%; top: 0%; opacity: 1; }
+  50%  { height: 60%; top: 0%; opacity: 1; }
+  100% { height: 0%; top: 100%; opacity: 0; }
+}
 
 .sr {
   opacity: 0;
