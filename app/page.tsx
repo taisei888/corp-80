@@ -563,7 +563,6 @@ export default function Home() {
           </div>
           <div style={{ fontSize:11, color:"rgba(255,255,255,0.18)" }}>© 2025 合同会社80. All rights reserved.</div>
         </footer>
-          </div>{/* /white bg */}
         </div>{/* /gradient wrapper */}
       </div>
     </>
