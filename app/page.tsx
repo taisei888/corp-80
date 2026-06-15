@@ -515,11 +515,11 @@ export default function Home() {
 
 
         {/* ── Case Studies ── */}
-        <section style={{ background: "#0f172a", padding: "100px 0 120px", position: "relative", overflow: "hidden" }}>
+        <section style={{ background: "#f8fafc", padding: "100px 0 120px", position: "relative", overflow: "hidden" }}>
           {/* Animated dot grid background */}
           <div style={{
             position: "absolute", inset: 0, pointerEvents: "none",
-            backgroundImage: "radial-gradient(circle, rgba(99,102,241,0.28) 1.5px, transparent 1.5px)",
+            backgroundImage: "radial-gradient(circle, rgba(99,102,241,0.18) 1.5px, transparent 1.5px)",
             backgroundSize: "36px 36px",
             animation: "dot-drift 10s linear infinite",
           }} />
@@ -531,7 +531,7 @@ export default function Home() {
                 <div style={{ width: 24, height: 1, background: "#6366f1" }} />
                 <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.22em", color: "#6366f1", textTransform: "uppercase" }}>Case Studies</div>
               </div>
-              <h2 className="sr" style={{ fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 800, color: "#fff", letterSpacing: "-0.03em" }}>
+              <h2 className="sr" style={{ fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 800, color: "#0f172a", letterSpacing: "-0.03em" }}>
                 AIを、現場に届けてきた。
               </h2>
             </div>
@@ -651,7 +651,7 @@ export default function Home() {
                 ] as const).flatMap(c => [c, {...c, _dup: true}]).map((c, i) => (
                   <div key={i} style={{
                     width: 300, flexShrink: 0, borderRadius: 20, overflow: "hidden",
-                    background: "rgba(255,255,255,0.04)",
+                    background: "#0f172a",
                     border: "1px solid rgba(255,255,255,0.08)",
                     backdropFilter: "blur(16px)",
                     transition: "transform 0.35s cubic-bezier(0.16,1,0.3,1), background 0.35s ease, border-color 0.35s ease",
@@ -659,12 +659,12 @@ export default function Home() {
                   }}
                     onMouseEnter={e => {
                       e.currentTarget.style.transform = "translateY(-8px) scale(1.02)";
-                      e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+                      e.currentTarget.style.background = "#1e293b";
                       e.currentTarget.style.borderColor = `${c.accent}55`;
                     }}
                     onMouseLeave={e => {
                       e.currentTarget.style.transform = "";
-                      e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+                      e.currentTarget.style.background = "#0f172a";
                       e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)";
                     }}
                   >
