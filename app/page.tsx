@@ -519,9 +519,9 @@ export default function Home() {
           {/* Animated dot grid background */}
           <div style={{
             position: "absolute", inset: 0, pointerEvents: "none",
-            backgroundImage: "radial-gradient(circle, rgba(99,102,241,0.18) 1.5px, transparent 1.5px)",
+            backgroundImage: "radial-gradient(circle, rgba(99,102,241,0.35) 2px, transparent 2px)",
             backgroundSize: "36px 36px",
-            animation: "dot-drift 10s linear infinite",
+            animation: "dot-drift 6s linear infinite",
           }} />
 
           <div style={{ position: "relative", zIndex: 1 }}>
@@ -539,7 +539,7 @@ export default function Home() {
             {/* Ticker */}
             <div style={{ overflow: "hidden", paddingBottom: 8 }}>
               <div className="ticker-track" style={{ display: "flex", gap: 20, width: "max-content", padding: "12px 20px" }}>
-                {([
+                {((cards) => [...cards, ...cards])([
                   { tag: "予約管理", title: "予約システムのAI化", desc: "空き状況の自動最適化と予約対応をAIが代行。対応工数を大幅削減。",
                     accent: "#6366f1", visual: (
                       <svg viewBox="0 0 200 120" width="100%" height="100%">
@@ -648,7 +648,7 @@ export default function Home() {
                         ))}
                       </svg>
                     )},
-                ] as const).flatMap(c => [c, {...c, _dup: true}]).map((c, i) => (
+                ]).map((c, i) => (
                   <div key={i} style={{
                     width: 300, flexShrink: 0, borderRadius: 20, overflow: "hidden",
                     background: "#0f172a",
