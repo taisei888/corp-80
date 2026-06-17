@@ -71,9 +71,6 @@ body {
 .ticker-track {
   animation: ticker 38s linear infinite;
 }
-.ticker-track:hover {
-  animation-play-state: paused;
-}
 @keyframes dot-drift {
   0%   { background-position: 0 0; }
   100% { background-position: 36px 36px; }
