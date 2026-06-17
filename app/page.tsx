@@ -280,35 +280,10 @@ export default function Home() {
         <section style={{ minHeight: "100vh", display: "flex", alignItems: "flex-end",
           justifyContent: "center", padding: "0 48px 80px", position: "relative" }}>
           <div style={{ textAlign: "center", maxWidth: 900, width: "100%" }}>
-            <p style={{ fontSize: 19, color: "#64748b", lineHeight: 1.9, marginBottom: 56,
+            <p style={{ fontSize: 19, color: "#64748b", lineHeight: 1.9,
               animation: "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.45s both" }}>
               合同会社80は、AIとソフトウェアで<br />現場を根本から変える。
             </p>
-            <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap",
-              animation: "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.55s both" }}>
-              <button className="btn-primary-light" onClick={() => scrollTo("vision")}>
-                私たちのビジョン
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
-              </button>
-              <button className="btn-outline-light" onClick={() => scrollTo("contact")}>
-                お問い合わせ
-              </button>
-            </div>
-          </div>
-          {/* SCROLL — 画面下端に固定 */}
-          <div style={{ position: "absolute", bottom: 40, left: "50%", transform: "translateX(-50%)",
-            display: "flex", flexDirection: "column", alignItems: "center", gap: 14,
-            animation: "fade-in 1s ease 1.4s both" }}>
-            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.35em",
-              color: "#6366f1", textTransform: "uppercase" }}>Scroll</span>
-            <div style={{ position: "relative", width: 2, height: 72, overflow: "hidden",
-              background: "rgba(99,102,241,0.15)", borderRadius: 2 }}>
-              <div style={{ position: "absolute", top: 0, left: 0, width: "100%",
-                background: "linear-gradient(to bottom, #6366f1, #a78bfa)",
-                borderRadius: 2, animation: "scroll-bar 1.6s cubic-bezier(0.4,0,0.2,1) infinite" }} />
-            </div>
           </div>
         </section>
 
