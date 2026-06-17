@@ -367,83 +367,128 @@ export default function Home() {
             {/* 2×2 grid */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
 
-              {/* 01 — LENDS AI */}
+              {/* 01 — quix */}
               <div className="sr" style={{ borderRadius: 20, overflow: "hidden", cursor: "pointer" }}
                 onMouseEnter={e => { (e.currentTarget.querySelector(".biz-img") as HTMLElement).style.transform = "scale(1.03)"; }}
                 onMouseLeave={e => { (e.currentTarget.querySelector(".biz-img") as HTMLElement).style.transform = "scale(1)"; }}>
-                <div className="biz-img" style={{ height: 380, background: "linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #312e81 100%)",
+                <div className="biz-img" style={{ height: 380, background: "linear-gradient(135deg, #5b21b6 0%, #6d28d9 40%, #7c3aed 100%)",
                   display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden",
                   transition: "transform 0.6s cubic-bezier(0.16,1,0.3,1)" }}>
-                  <div style={{ position: "absolute", fontSize: 96, fontWeight: 900, color: "rgba(99,102,241,0.1)", letterSpacing: "-0.05em", whiteSpace: "nowrap", userSelect: "none" }}>LENDS AI</div>
+                  {/* subtle dot pattern */}
+                  <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
+                  {/* glow */}
+                  <div style={{ position: "absolute", width: 300, height: 300, borderRadius: "50%", background: "radial-gradient(circle, rgba(167,139,250,0.25) 0%, transparent 70%)", top: "50%", left: "50%", transform: "translate(-50%,-50%)" }} />
                   <div style={{ position: "relative", textAlign: "center" }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.2em", color: "rgba(165,180,252,0.7)", textTransform: "uppercase", marginBottom: 16 }}>AI SaaS Platform</div>
-                    <div style={{ fontSize: 42, fontWeight: 900, color: "#fff", letterSpacing: "-0.03em" }}>LENDS AI</div>
+                    {/* chat bubble icon */}
+                    <div style={{ marginBottom: 20, display: "flex", justifyContent: "center" }}>
+                      <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+                        <rect width="56" height="56" rx="16" fill="rgba(255,255,255,0.15)"/>
+                        <path d="M14 20a4 4 0 014-4h20a4 4 0 014 4v12a4 4 0 01-4 4H26l-6 4v-4h-2a4 4 0 01-4-4V20z" fill="rgba(255,255,255,0.9)"/>
+                        <circle cx="22" cy="26" r="2" fill="#7c3aed"/>
+                        <circle cx="28" cy="26" r="2" fill="#7c3aed"/>
+                        <circle cx="34" cy="26" r="2" fill="#7c3aed"/>
+                      </svg>
+                    </div>
+                    <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.2em", color: "rgba(221,214,254,0.8)", textTransform: "uppercase", marginBottom: 12 }}>Social FAQ SaaS</div>
+                    <div style={{ fontSize: 48, fontWeight: 900, color: "#fff", letterSpacing: "-0.04em", fontStyle: "italic" }}>quix</div>
                   </div>
                 </div>
                 <div style={{ padding: "22px 4px" }}>
                   <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 8, fontWeight: 600 }}>01</div>
-                  <div style={{ fontSize: 22, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em" }}>Organisation Intelligence</div>
-                  <div style={{ fontSize: 14, color: "#64748b", marginTop: 6, lineHeight: 1.7 }}>組織の状態をAIで可視化するSaaSプロダクト。人事課題の早期発見から採用・育成まで一気通貫で支援します。</div>
+                  <div style={{ fontSize: 22, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em" }}>quix — 社内AIナレッジ検索</div>
+                  <div style={{ fontSize: 14, color: "#64748b", marginTop: 6, lineHeight: 1.7 }}>チャット形式で社内のFAQ・規程・マニュアルを瞬時に回答。AIが蓄積された知識を自動整理し、問い合わせ工数を大幅削減します。</div>
                 </div>
               </div>
 
-              {/* 02 — AI Build */}
+              {/* 02 — LENDS AI */}
               <div className="sr" style={{ borderRadius: 20, overflow: "hidden", cursor: "pointer", transitionDelay: "0.08s" }}
                 onMouseEnter={e => { (e.currentTarget.querySelector(".biz-img") as HTMLElement).style.transform = "scale(1.03)"; }}
                 onMouseLeave={e => { (e.currentTarget.querySelector(".biz-img") as HTMLElement).style.transform = "scale(1)"; }}>
-                <div className="biz-img" style={{ height: 380, background: "linear-gradient(135deg, #0c0a1e 0%, #1e1b4b 50%, #0f172a 100%)",
+                <div className="biz-img" style={{ height: 380, background: "linear-gradient(120deg, #f8fafc 0%, #f8fafc 45%, #1a3a8f 45%, #1e40af 100%)",
                   display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden",
                   transition: "transform 0.6s cubic-bezier(0.16,1,0.3,1)" }}>
-                  <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle, rgba(99,102,241,0.08) 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
-                  <div style={{ position: "relative", textAlign: "center" }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.2em", color: "rgba(165,180,252,0.7)", textTransform: "uppercase", marginBottom: 16 }}>Custom AI Development</div>
-                    <div style={{ fontSize: 42, fontWeight: 900, color: "#fff", letterSpacing: "-0.03em" }}>AI Build</div>
+                  {/* right side circle like the brand image */}
+                  <div style={{ position: "absolute", right: -60, top: "50%", transform: "translateY(-50%)", width: 380, height: 380, borderRadius: "50%", background: "linear-gradient(135deg, #1d4ed8, #1e3a8a)", opacity: 0.95 }} />
+                  <div style={{ position: "relative", textAlign: "left", paddingLeft: 32, paddingRight: 32, width: "100%" }}>
+                    {/* LENDS AI logo text */}
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                      <div style={{ width: 36, height: 36, borderRadius: 10, background: "#1d4ed8", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
+                          <circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>
+                        </svg>
+                      </div>
+                      <div style={{ fontSize: 28, fontWeight: 900, color: "#0f172a", letterSpacing: "-0.03em" }}>LENDS AI</div>
+                    </div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: "#64748b", letterSpacing: "0.05em" }}>Organisation Intelligence</div>
                   </div>
                 </div>
                 <div style={{ padding: "22px 4px" }}>
                   <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 8, fontWeight: 600 }}>02</div>
-                  <div style={{ fontSize: 22, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em" }}>AI Build</div>
-                  <div style={{ fontSize: 14, color: "#64748b", marginTop: 6, lineHeight: 1.7 }}>ChatGPT・LLM・RAGを活用した業務AI・自動化ツール・データ分析システムをオーダーメイドで開発します。</div>
+                  <div style={{ fontSize: 22, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em" }}>LENDS AI — 組織診断AI</div>
+                  <div style={{ fontSize: 14, color: "#64748b", marginTop: 6, lineHeight: 1.7 }}>組織の状態をAIで可視化するSaaSプロダクト。人事課題の早期発見から採用・育成まで一気通貫で支援します。</div>
                 </div>
               </div>
 
-              {/* 03 — Craft */}
+              {/* 03 — AI Labs */}
               <div className="sr" style={{ borderRadius: 20, overflow: "hidden", cursor: "pointer", transitionDelay: "0.16s" }}
                 onMouseEnter={e => { (e.currentTarget.querySelector(".biz-img") as HTMLElement).style.transform = "scale(1.03)"; }}
                 onMouseLeave={e => { (e.currentTarget.querySelector(".biz-img") as HTMLElement).style.transform = "scale(1)"; }}>
-                <div className="biz-img" style={{ height: 380, background: "linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)",
+                <div className="biz-img" style={{ height: 380, background: "linear-gradient(160deg, #e8ecf5 0%, #dde3f0 100%)",
                   display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden",
                   transition: "transform 0.6s cubic-bezier(0.16,1,0.3,1)" }}>
-                  <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
+                  {/* grid lines */}
+                  <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(15,23,42,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(15,23,42,0.04) 1px, transparent 1px)", backgroundSize: "48px 48px" }} />
                   <div style={{ position: "relative", textAlign: "center" }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.2em", color: "#94a3b8", textTransform: "uppercase", marginBottom: 16 }}>Web & Brand Design</div>
-                    <div style={{ fontSize: 42, fontWeight: 900, color: "#0f172a", letterSpacing: "-0.03em" }}>Craft</div>
+                    {/* AI Labs logo */}
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 4, marginBottom: 16 }}>
+                      {/* A shape */}
+                      <svg width="52" height="56" viewBox="0 0 52 56" fill="none">
+                        <path d="M26 4L4 52h12l4-10h12l4 10h12L26 4z" fill="#0f172a"/>
+                        <path d="M18 36l8-20 8 20" fill="none" stroke="#0f172a" strokeWidth="2"/>
+                        {/* blue I */}
+                        <path d="M38 4h14v8h-3v32h3v8H38v-8h3V12h-3V4z" fill="#2563eb"/>
+                      </svg>
+                      <div style={{ fontSize: 44, fontWeight: 900, color: "#0f172a", letterSpacing: "-0.03em", lineHeight: 1 }}>Labs</div>
+                    </div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: "#64748b", letterSpacing: "0.08em", textTransform: "uppercase" }}>AI System Development</div>
                   </div>
                 </div>
                 <div style={{ padding: "22px 4px" }}>
                   <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 8, fontWeight: 600 }}>03</div>
-                  <div style={{ fontSize: 22, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em" }}>Craft</div>
-                  <div style={{ fontSize: 14, color: "#64748b", marginTop: 6, lineHeight: 1.7 }}>ブランドの価値をデジタルで表現するWeb制作。戦略的なUI/UXデザインから実装まで、事業の成果につながるサイトを届けます。</div>
+                  <div style={{ fontSize: 22, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em" }}>AI Labs — 業務AI受託開発</div>
+                  <div style={{ fontSize: 14, color: "#64748b", marginTop: 6, lineHeight: 1.7 }}>LLM・RAG・業務自動化を軸としたAIシステムをオーダーメイドで開発。現場課題を技術で根本から解決します。</div>
                 </div>
               </div>
 
-              {/* 04 — Talent Match */}
+              {/* 04 — jGO */}
               <div className="sr" style={{ borderRadius: 20, overflow: "hidden", cursor: "pointer", transitionDelay: "0.24s" }}
                 onMouseEnter={e => { (e.currentTarget.querySelector(".biz-img") as HTMLElement).style.transform = "scale(1.03)"; }}
                 onMouseLeave={e => { (e.currentTarget.querySelector(".biz-img") as HTMLElement).style.transform = "scale(1)"; }}>
-                <div className="biz-img" style={{ height: 380, background: "linear-gradient(135deg, #0f172a 0%, #1a1025 50%, #0f172a 100%)",
+                <div className="biz-img" style={{ height: 380, background: "#fff",
                   display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden",
                   transition: "transform 0.6s cubic-bezier(0.16,1,0.3,1)" }}>
-                  <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(ellipse at 30% 50%, rgba(124,58,237,0.14) 0%, transparent 60%), radial-gradient(ellipse at 70% 50%, rgba(99,102,241,0.1) 0%, transparent 60%)" }} />
+                  {/* decorative blobs — yellow */}
+                  <div style={{ position: "absolute", top: -40, left: -30, width: 180, height: 80, borderRadius: 40, background: "#facc15", opacity: 0.55, transform: "rotate(-30deg)" }} />
+                  <div style={{ position: "absolute", bottom: -30, right: -20, width: 140, height: 60, borderRadius: 30, background: "#fbbf24", opacity: 0.45, transform: "rotate(20deg)" }} />
+                  <div style={{ position: "absolute", top: 20, right: 30, width: 50, height: 50, borderRadius: "50%", background: "#facc15", opacity: 0.6 }} />
+                  <div style={{ position: "absolute", bottom: 40, left: 24, width: 30, height: 30, borderRadius: "50%", background: "#86efac", opacity: 0.5 }} />
                   <div style={{ position: "relative", textAlign: "center" }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.2em", color: "rgba(196,181,253,0.7)", textTransform: "uppercase", marginBottom: 16 }}>Talent Placement</div>
-                    <div style={{ fontSize: 42, fontWeight: 900, color: "#fff", letterSpacing: "-0.03em" }}>Talent Match</div>
+                    {/* jGO logo */}
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 0, marginBottom: 12 }}>
+                      {/* chevrons */}
+                      <svg width="44" height="44" viewBox="0 0 44 44" fill="none" style={{ marginRight: 6 }}>
+                        <path d="M8 10l12 12-12 12" stroke="#facc15" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M20 10l12 12-12 12" stroke="#1e3a8a" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      <div style={{ fontSize: 46, fontWeight: 900, color: "#1e3a8a", letterSpacing: "-0.03em", lineHeight: 1 }}>jGO</div>
+                    </div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "#475569", letterSpacing: "0.04em" }}>グローバルキャリア支援サービス</div>
                   </div>
                 </div>
                 <div style={{ padding: "22px 4px" }}>
                   <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 8, fontWeight: 600 }}>04</div>
-                  <div style={{ fontSize: 22, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em" }}>Talent Match</div>
-                  <div style={{ fontSize: 14, color: "#64748b", marginTop: 6, lineHeight: 1.7 }}>テクノロジーと人の知見を組み合わせた次世代型の人材紹介。企業と人材の最適なマッチングを実現します。（有料職業紹介事業）</div>
+                  <div style={{ fontSize: 22, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em" }}>jGO — 人材紹介</div>
+                  <div style={{ fontSize: 14, color: "#64748b", marginTop: 6, lineHeight: 1.7 }}>グローバル視点で人材と企業をつなぐキャリア支援サービス。テクノロジーと人の知見で最適なマッチングを実現します。（有料職業紹介事業）</div>
                 </div>
               </div>
 
