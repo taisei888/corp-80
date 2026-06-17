@@ -744,24 +744,111 @@ export default function Home() {
         </section>
 
         {/* ── Footer ── */}
-        <footer style={{ background: "#0f172a", padding: "36px 48px",
-          display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 20 }}>
-          <div>
-            <div style={{ fontSize:20, fontWeight:900, color:"#fff", letterSpacing:"-0.02em" }}>80</div>
-            <div style={{ fontSize:11, color:"rgba(255,255,255,0.3)", marginTop:4 }}>合同会社80</div>
+        <footer style={{ background: "#13151f", padding: "80px 64px 0" }}>
+          <div style={{ maxWidth: 1160, margin: "0 auto" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "220px 1fr 200px", gap: 64, paddingBottom: 80, borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+
+              {/* Left — logo + tagline */}
+              <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                <div>
+                  <div style={{ fontSize: 28, fontWeight: 900, color: "#fff", letterSpacing: "-0.04em", marginBottom: 12 }}>80</div>
+                  <div style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", lineHeight: 1.8 }}>
+                    人の知覚を、<br />ソフトウェアで拡張する。
+                  </div>
+                </div>
+              </div>
+
+              {/* Center — nav columns */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 48px" }}>
+
+                {/* Column 1 — 事業内容 */}
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24 }}>
+                    <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.2em", color: "rgba(255,255,255,0.4)", textTransform: "uppercase" }}>事業内容</span>
+                    <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.1)" }} />
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                    {[["quix","business"],["LENDS AI","business"],["AI Labs","business"],["jGO","business"]].map(([l, id]) => (
+                      <button key={l} onClick={() => document.getElementById(id)?.scrollIntoView({ behavior:"smooth" })}
+                        style={{ background:"none", border:"none", cursor:"pointer", padding:0, textAlign:"left",
+                          fontSize:13, color:"rgba(255,255,255,0.45)", fontFamily:"inherit", transition:"color 0.2s" }}
+                        onMouseEnter={e => (e.currentTarget.style.color="#fff")}
+                        onMouseLeave={e => (e.currentTarget.style.color="rgba(255,255,255,0.45)")}>{l}</button>
+                    ))}
+                  </div>
+
+                  <div style={{ display: "flex", alignItems: "center", gap: 16, margin: "40px 0 24px" }}>
+                    <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.2em", color: "rgba(255,255,255,0.4)", textTransform: "uppercase" }}>プロダクト</span>
+                    <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.1)" }} />
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                    {[["AIでできること","product"],["導入事例","product"]].map(([l, id]) => (
+                      <button key={l} onClick={() => document.getElementById(id)?.scrollIntoView({ behavior:"smooth" })}
+                        style={{ background:"none", border:"none", cursor:"pointer", padding:0, textAlign:"left",
+                          fontSize:13, color:"rgba(255,255,255,0.45)", fontFamily:"inherit", transition:"color 0.2s" }}
+                        onMouseEnter={e => (e.currentTarget.style.color="#fff")}
+                        onMouseLeave={e => (e.currentTarget.style.color="rgba(255,255,255,0.45)")}>{l}</button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Column 2 — 会社情報 */}
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24 }}>
+                    <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.2em", color: "rgba(255,255,255,0.4)", textTransform: "uppercase" }}>会社情報</span>
+                    <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.1)" }} />
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                    {[["ビジョン","vision"],["ニュース","news"],["採用","recruit"]].map(([l, id]) => (
+                      <button key={l} onClick={() => document.getElementById(id)?.scrollIntoView({ behavior:"smooth" })}
+                        style={{ background:"none", border:"none", cursor:"pointer", padding:0, textAlign:"left",
+                          fontSize:13, color:"rgba(255,255,255,0.45)", fontFamily:"inherit", transition:"color 0.2s" }}
+                        onMouseEnter={e => (e.currentTarget.style.color="#fff")}
+                        onMouseLeave={e => (e.currentTarget.style.color="rgba(255,255,255,0.45)")}>{l}</button>
+                    ))}
+                  </div>
+
+                  <div style={{ display: "flex", alignItems: "center", gap: 16, margin: "40px 0 24px" }}>
+                    <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.2em", color: "rgba(255,255,255,0.4)", textTransform: "uppercase" }}>お問い合わせ</span>
+                    <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.1)" }} />
+                  </div>
+                  <a href="mailto:info@80llc.jp"
+                    style={{ fontSize:13, color:"rgba(255,255,255,0.45)", textDecoration:"none", transition:"color 0.2s", display:"block" }}
+                    onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.color="#fff")}
+                    onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.color="rgba(255,255,255,0.45)")}>
+                    info@80llc.jp
+                  </a>
+                </div>
+              </div>
+
+              {/* Right — TOP button */}
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", justifyContent: "flex-start" }}>
+                <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                  style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:6,
+                    background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.1)",
+                    borderRadius:8, padding:"16px 20px", cursor:"pointer",
+                    transition:"background 0.2s", color:"rgba(255,255,255,0.5)", fontFamily:"inherit" }}
+                  onMouseEnter={e => (e.currentTarget.style.background="rgba(255,255,255,0.12)")}
+                  onMouseLeave={e => (e.currentTarget.style.background="rgba(255,255,255,0.06)")}>
+                  <span style={{ fontSize:9, fontWeight:700, letterSpacing:"0.2em", textTransform:"uppercase" }}>TOP</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M12 19V5M5 12l7-7 7 7"/>
+                  </svg>
+                  <span style={{ fontSize:9, fontWeight:700, letterSpacing:"0.2em", textTransform:"uppercase" }}>PAGE</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Bottom bar */}
+            <div style={{ padding: "28px 0 32px", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+              <div style={{ fontSize:11, color:"rgba(255,255,255,0.2)", letterSpacing:"0.04em" }}>
+                © 2025 合同会社80. All rights reserved.
+              </div>
+              <div style={{ fontSize:11, color:"rgba(255,255,255,0.2)" }}>
+                名古屋市 / Nagoya, Japan
+              </div>
+            </div>
           </div>
-          <div style={{ display: "flex", gap: 28 }}>
-            {([["ビジョン","vision"],["事業内容","business"],["プロダクト","product"],["ニュース","news"],["採用","recruit"]] as const).map(([l, id]) => (
-              <button key={id} onClick={() => document.getElementById(id)?.scrollIntoView({ behavior:"smooth" })}
-                style={{ fontSize:12, color:"rgba(255,255,255,0.35)", background:"none", border:"none",
-                  cursor:"pointer", padding:0, transition:"color 0.2s", fontFamily:"inherit" }}
-                onMouseEnter={e => (e.currentTarget.style.color="#fff")}
-                onMouseLeave={e => (e.currentTarget.style.color="rgba(255,255,255,0.35)")}>
-                {l}
-              </button>
-            ))}
-          </div>
-          <div style={{ fontSize:11, color:"rgba(255,255,255,0.18)" }}>© 2025 合同会社80. All rights reserved.</div>
         </footer>
         </div>{/* /gradient wrapper */}
       </div>
