@@ -97,38 +97,59 @@ function DotCanvas() {
   return <canvas ref={ref} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }} />;
 }
 
-// ─── Neural Network Canvas ────────────────────────────────────────────────────
-const NODE_COLORS = ["#4f46e5", "#7c3aed", "#0891b2", "#6d28d9"];
-const CONN_DIST   = 170;
-const NODE_COUNT  = 85;
-
-const KEYWORDS = ["AI", "LLM", "SaaS", "ML", "API", "GPT", "RAG", "Data", "Cloud", "Python", "React", "Vector"];
-
-interface NNode {
-  x: number; y: number;
-  vx: number; vy: number;
-  r: number; color: string; glow: number;
-  label?: string; labelGlow: number;
-}
-interface Pulse {
-  from: number; to: number;
-  t: number; speed: number; color: string;
-}
-
-function NeuralCanvas() {
+// ─── Particle Text Canvas ─────────────────────────────────────────────────────
+function ParticleTextCanvas() {
   const ref = useRef<HTMLCanvasElement>(null);
-
   useEffect(() => {
     const canvas = ref.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    let W = 0, H = 0;
+    interface P { x:number; y:number; tx:number; ty:number; vx:number; vy:number; sz:number; col:string; }
+    let W = 0, H = 0, pts: P[] = [], raf = 0;
     const mouse = { x: -9999, y: -9999 };
-    let nodes: NNode[] = [];
-    let pulses: Pulse[] = [];
-    let raf = 0, lastPulse = 0;
+    const COLS = ["#1e293b","#1e293b","#3730a3","#4f46e5","#1e293b","#1e293b","#312e81"];
+
+    const build = (): P[] => {
+      const off = document.createElement("canvas");
+      off.width = W; off.height = H;
+      const oc = off.getContext("2d")!;
+
+      // auto-size to fill ~80% width across two lines
+      const L1 = "Build what's", L2 = "next.";
+      let fs = 10;
+      oc.font = `900 ${fs}px -apple-system, BlinkMacSystemFont, sans-serif`;
+      while (oc.measureText(L1).width < W * 0.80) {
+        fs += 2;
+        oc.font = `900 ${fs}px -apple-system, BlinkMacSystemFont, sans-serif`;
+      }
+      const lh = fs * 1.08;
+      const cy = H * 0.40;
+      oc.fillStyle = "#000";
+      oc.textAlign = "center";
+      oc.textBaseline = "alphabetic";
+      oc.fillText(L1, W / 2, cy);
+      oc.fillText(L2, W / 2, cy + lh);
+
+      const data = oc.getImageData(0, 0, W, H).data;
+      const gap = 4, out: P[] = [];
+      for (let y = 0; y < H; y += gap) {
+        for (let x = 0; x < W; x += gap) {
+          if (data[(y * W + x) * 4 + 3] > 128) {
+            out.push({
+              tx: x, ty: y,
+              x: Math.random() * W,
+              y: Math.random() * H,
+              vx: 0, vy: 0,
+              sz: 1.3 + Math.random() * 1.3,
+              col: COLS[Math.floor(Math.random() * COLS.length)],
+            });
+          }
+        }
+      }
+      return out;
+    };
 
     const init = () => {
       const dpr = Math.min(devicePixelRatio, 2);
@@ -136,137 +157,56 @@ function NeuralCanvas() {
       canvas.width = W * dpr; canvas.height = H * dpr;
       canvas.style.width = W + "px"; canvas.style.height = H + "px";
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      // Shuffle keyword indices so labels are spread randomly
-      const labelIdx = Array.from({ length: NODE_COUNT }, (_, i) => i).sort(() => Math.random() - 0.5);
-      nodes = Array.from({ length: NODE_COUNT }, (_, i) => ({
-        x: Math.random() * W, y: Math.random() * H,
-        vx: (Math.random() - 0.5) * 0.45, vy: (Math.random() - 0.5) * 0.45,
-        r: Math.random() * 1.8 + 1.2,
-        color: NODE_COLORS[Math.floor(Math.random() * NODE_COLORS.length)],
-        glow: 0, labelGlow: 0,
-        label: labelIdx[i] < KEYWORDS.length ? KEYWORDS[labelIdx[i]] : undefined,
-      }));
+      pts = build();
     };
+
     init();
-    window.addEventListener("resize", init);
-    window.addEventListener("mousemove", (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
+    const onResize = () => init();
+    const onMove = (e: MouseEvent) => { mouse.x = e.clientX; mouse.y = e.clientY; };
+    const onLeave = () => { mouse.x = -9999; mouse.y = -9999; };
+    window.addEventListener("resize", onResize);
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseleave", onLeave);
 
-    const render = (ts: number) => {
+    const REPEL = 150;
+    const render = () => {
       ctx.clearRect(0, 0, W, H);
-
-      for (const n of nodes) {
-        const dx = mouse.x - n.x, dy = mouse.y - n.y;
-        const md = Math.sqrt(dx*dx + dy*dy);
-        if (md < 220 && md > 0) { n.vx += (dx/md)*0.025; n.vy += (dy/md)*0.025; }
-        const spd = Math.sqrt(n.vx*n.vx + n.vy*n.vy);
-        if (spd > 1.4) { n.vx *= 1.4/spd; n.vy *= 1.4/spd; }
-        n.x += n.vx; n.y += n.vy;
-        if (n.x < 0 || n.x > W) { n.vx *= -1; n.x = Math.max(0, Math.min(W, n.x)); }
-        if (n.y < 0 || n.y > H) { n.vy *= -1; n.y = Math.max(0, Math.min(H, n.y)); }
-        n.glow = Math.max(0, n.glow - 0.018);
-      }
-
-      if (ts - lastPulse > 700) {
-        const i = Math.floor(Math.random() * nodes.length);
-        for (let j = 0; j < nodes.length; j++) {
-          if (i === j) continue;
-          if (Math.hypot(nodes[i].x - nodes[j].x, nodes[i].y - nodes[j].y) < CONN_DIST) {
-            pulses.push({ from: i, to: j, t: 0, speed: 0.007 + Math.random()*0.007, color: nodes[i].color });
-            lastPulse = ts; break;
-          }
+      for (const p of pts) {
+        const dx = mouse.x - p.x, dy = mouse.y - p.y;
+        const d2 = dx * dx + dy * dy;
+        if (d2 < REPEL * REPEL) {
+          const d = Math.sqrt(d2) || 1;
+          const f = (1 - d / REPEL) * 16;
+          p.vx -= (dx / d) * f;
+          p.vy -= (dy / d) * f;
         }
+        // spring back to target
+        p.vx += (p.tx - p.x) * 0.052;
+        p.vy += (p.ty - p.y) * 0.052;
+        // damping
+        p.vx *= 0.84; p.vy *= 0.84;
+        p.x += p.vx; p.y += p.vy;
+
+        ctx.fillStyle = p.col;
+        ctx.globalAlpha = 0.80;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.sz, 0, Math.PI * 2);
+        ctx.fill();
       }
-
-      // Connections
-      ctx.lineWidth = 0.7;
-      for (let i = 0; i < nodes.length; i++) {
-        for (let j = i+1; j < nodes.length; j++) {
-          const d = Math.hypot(nodes[i].x - nodes[j].x, nodes[i].y - nodes[j].y);
-          if (d < CONN_DIST) {
-            const a = (1 - d/CONN_DIST) * 0.22;
-            ctx.strokeStyle = `rgba(79,70,229,${a})`;
-            ctx.beginPath(); ctx.moveTo(nodes[i].x, nodes[i].y); ctx.lineTo(nodes[j].x, nodes[j].y); ctx.stroke();
-          }
-        }
-      }
-
-      // Mouse connections
-      ctx.lineWidth = 0.9;
-      for (const n of nodes) {
-        const d = Math.hypot(mouse.x - n.x, mouse.y - n.y);
-        if (d < 200) {
-          ctx.strokeStyle = `rgba(109,40,217,${(1-d/200)*0.45})`;
-          ctx.beginPath(); ctx.moveTo(mouse.x, mouse.y); ctx.lineTo(n.x, n.y); ctx.stroke();
-        }
-      }
-
-      // Nodes
-      for (const n of nodes) {
-        if (n.glow > 0.05) { ctx.shadowBlur = 16*n.glow; ctx.shadowColor = n.color; }
-        ctx.globalAlpha = 0.6 + n.glow * 0.4;
-        ctx.fillStyle = n.color;
-        ctx.beginPath(); ctx.arc(n.x, n.y, n.r + n.glow*2.5, 0, Math.PI*2); ctx.fill();
-        ctx.shadowBlur = 0; ctx.globalAlpha = 1;
-      }
-
-      // Pulses
-      pulses = pulses.filter(p => {
-        p.t += p.speed;
-        if (p.t >= 1) {
-          nodes[p.to].glow = 1;
-          if (nodes[p.to].label) nodes[p.to].labelGlow = 1;
-          return false;
-        }
-        const ni = nodes[p.from], nj = nodes[p.to];
-        for (let k = 0; k < 5; k++) {
-          const tt = Math.max(0, p.t - k*0.025);
-          const tx = ni.x + (nj.x-ni.x)*tt, ty = ni.y + (nj.y-ni.y)*tt;
-          ctx.globalAlpha = (1 - k/5) * 0.9;
-          ctx.fillStyle = p.color;
-          ctx.shadowBlur = k === 0 ? 12 : 0; ctx.shadowColor = p.color;
-          ctx.beginPath(); ctx.arc(tx, ty, k === 0 ? 2.8 : 1.5 - k*0.2, 0, Math.PI*2); ctx.fill();
-          ctx.shadowBlur = 0; ctx.globalAlpha = 1;
-        }
-        return true;
-      });
-
-      // IT word labels
-      ctx.font = "bold 10px 'Courier New', 'SF Mono', monospace";
-      ctx.textAlign = "left";
-      for (const n of nodes) {
-        if (!n.label) continue;
-        n.labelGlow = Math.max(0, n.labelGlow - 0.014);
-        const alpha = 0.18 + n.labelGlow * 0.78;
-        ctx.globalAlpha = alpha;
-        if (n.labelGlow > 0.05) {
-          ctx.shadowBlur = 10 * n.labelGlow;
-          ctx.shadowColor = n.color;
-        }
-        ctx.fillStyle = n.color;
-        ctx.fillText(n.label, n.x + n.r + 5, n.y - n.r - 2);
-        ctx.shadowBlur = 0;
-        ctx.globalAlpha = 1;
-      }
-
-      // Mouse dot
-      if (mouse.x > 0) {
-        ctx.shadowBlur = 16; ctx.shadowColor = "#6366f1";
-        ctx.fillStyle = "rgba(99,102,241,0.65)";
-        ctx.beginPath(); ctx.arc(mouse.x, mouse.y, 3.5, 0, Math.PI*2); ctx.fill();
-        ctx.shadowBlur = 0;
-      }
-
+      ctx.globalAlpha = 1;
       raf = requestAnimationFrame(render);
     };
     raf = requestAnimationFrame(render);
-    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", init); };
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseleave", onLeave);
+    };
   }, []);
 
-  return (
-    <canvas ref={ref}
-      style={{ position: "fixed", inset: 0, width: "100vw", height: "100vh",
-        zIndex: 0, display: "block", background: "#f8fafc" }} />
-  );
+  return <canvas ref={ref} style={{ position: "fixed", inset: 0, zIndex: 0, display: "block", background: "#f8fafc" }} />;
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -296,7 +236,7 @@ export default function Home() {
 
   return (
     <>
-      <NeuralCanvas />
+      <ParticleTextCanvas />
       <div style={{ position: "relative", zIndex: 1 }}>
 
         {/* ── Nav ── */}
@@ -337,19 +277,13 @@ export default function Home() {
         </nav>
 
         {/* ── Hero ── */}
-        <section style={{ minHeight: "100vh", display: "flex", alignItems: "center",
-          justifyContent: "center", padding: "120px 48px 140px", position: "relative" }}>
+        <section style={{ minHeight: "100vh", display: "flex", alignItems: "flex-end",
+          justifyContent: "center", padding: "0 48px 80px", position: "relative" }}>
           <div style={{ textAlign: "center", maxWidth: 900, width: "100%" }}>
             <p style={{ fontSize: 12, letterSpacing: "0.32em", color: "#6366f1",
               fontWeight: 700, textTransform: "uppercase", marginBottom: 32,
               animation: "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.1s both" }}>
               合同会社80 — Japan, Nagoya
-            </p>
-            <p style={{ fontSize: "clamp(20px, 2.8vw, 32px)", fontWeight: 800,
-              color: "#6366f1", letterSpacing: "0.02em", marginBottom: 20,
-              animation: "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.2s both",
-              fontStyle: "italic" }}>
-              Build what&apos;s next.
             </p>
             <h1 style={{ fontSize: "clamp(28px, 5vw, 72px)", fontWeight: 800,
               color: "#0f172a", lineHeight: 1.1, letterSpacing: "-0.04em", marginBottom: 40,
