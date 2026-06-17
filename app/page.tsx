@@ -285,8 +285,8 @@ export default function Home() {
               animation: "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.1s both" }}>
               合同会社80 — Japan, Nagoya
             </p>
-            <h1 style={{ fontSize: "clamp(28px, 5vw, 72px)", fontWeight: 800,
-              color: "#0f172a", lineHeight: 1.1, letterSpacing: "-0.04em", marginBottom: 40,
+            <h1 style={{ fontSize: "clamp(16px, 1.8vw, 24px)", fontWeight: 700,
+              color: "#0f172a", lineHeight: 1.3, letterSpacing: "-0.02em", marginBottom: 24,
               whiteSpace: "nowrap",
               animation: "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.3s both" }}>
               未来は、待つものじゃない。
