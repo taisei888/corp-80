@@ -279,12 +279,7 @@ export default function Home() {
         {/* ── Hero ── */}
         <section style={{ minHeight: "100vh", display: "flex", alignItems: "flex-end",
           justifyContent: "center", padding: "0 48px 80px", position: "relative" }}>
-          <div style={{ textAlign: "center", maxWidth: 900, width: "100%" }}>
-            <p style={{ fontSize: 19, color: "#64748b", lineHeight: 1.9,
-              animation: "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.45s both" }}>
-              合同会社80は、AIとソフトウェアで<br />現場を根本から変える。
-            </p>
-          </div>
+          <div style={{ textAlign: "center", maxWidth: 900, width: "100%" }} />
           {/* SCROLL — right side */}
           <div style={{ position: "fixed", right: 32, bottom: "50%", transform: "translateY(50%)",
             display: "flex", flexDirection: "column", alignItems: "center", gap: 16, zIndex: 10,
