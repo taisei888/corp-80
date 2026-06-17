@@ -39,14 +39,17 @@ function DotCanvas() {
     const onResize = () => init();
     const onMouse = (e: MouseEvent) => {
       const r = canvas.getBoundingClientRect();
-      mouse.x = e.clientX - r.left;
-      mouse.y = e.clientY - r.top;
+      // only react when cursor is over the section
+      if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) {
+        mouse.x = e.clientX - r.left;
+        mouse.y = e.clientY - r.top;
+      } else {
+        mouse.x = -9999; mouse.y = -9999;
+      }
     };
-    const onLeave = () => { mouse.x = -9999; mouse.y = -9999; };
 
     window.addEventListener("resize", onResize);
-    canvas.addEventListener("mousemove", onMouse);
-    canvas.addEventListener("mouseleave", onLeave);
+    window.addEventListener("mousemove", onMouse);
 
     const render = () => {
       t += 0.012;
@@ -87,12 +90,11 @@ function DotCanvas() {
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", onResize);
-      canvas.removeEventListener("mousemove", onMouse);
-      canvas.removeEventListener("mouseleave", onLeave);
+      window.removeEventListener("mousemove", onMouse);
     };
   }, []);
 
-  return <canvas ref={ref} style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />;
+  return <canvas ref={ref} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }} />;
 }
 
 // ─── Neural Network Canvas ────────────────────────────────────────────────────
