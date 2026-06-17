@@ -319,13 +319,13 @@ export default function Home() {
               {/* Right: Japanese headline + body */}
               <div className="sr" style={{ transitionDelay: "0.1s" }}>
                 <h2 style={{ fontSize: "clamp(26px, 3.2vw, 44px)", fontWeight: 800, lineHeight: 1.45, letterSpacing: "-0.02em", color: "#0f172a", marginBottom: 40 }}>
-                  合同会社80は、AIとソフトウェアで<br />人の知覚を拡張する会社です。
+                  人間らしさとテクノロジーが、<br />共存する社会へ。
                 </h2>
                 <p style={{ fontSize: 16, color: "#475569", lineHeight: 2.0, marginBottom: 28 }}>
-                  私たちのミッションは「人の知覚を、ソフトウェアで拡張する」こと。人が本来持つ力を引き出し、テクノロジーで可能性を広げる。そのためのソフトウェアを、真摯に作り続けます。
+                  効率化だけを目的にするのではなく、人が人らしく働き、考え、選択できる社会を目指します。
                 </p>
                 <p style={{ fontSize: 16, color: "#475569", lineHeight: 2.0 }}>
-                  大企業だけでなく、中小企業や現場の第一線でも最先端のテクノロジーが活きる世界を目指して。AIとソフトウェアの力で、あらゆる現場の「できない」を「できる」に変えていきます。
+                  テクノロジーが人に寄り添い、働く人・経営する人・関わるすべての人を自然に支える未来をつくります。
                 </p>
               </div>
             </div>
@@ -333,16 +333,17 @@ export default function Home() {
             {/* Values */}
             <div style={{ borderTop: "1px solid #e2e8f0", paddingTop: 72 }}>
               <div className="sr" style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.22em", color: "#6366f1", textTransform: "uppercase", marginBottom: 40 }}>Values</div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 0 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 0 }}>
                 {[
-                  { en:"Integrity", jp:"誠実さ",       desc:"顧客・パートナー・社会に対して、常に誠実に向き合う" },
-                  { en:"Curiosity", jp:"先端への好奇心", desc:"最新技術への探求を止めず、革新を追求し続ける" },
-                  { en:"Respect",   jp:"人への敬意",    desc:"関わるすべての人を尊重し、共に成長することを喜びとする" },
-                  { en:"Speed",     jp:"圧倒的な速さ",  desc:"機会を逃さず、スピードを最大の競争優位にする" },
+                  { en:"Human First",  jp:"人間起点",   desc:"技術や機能からではなく、使う人・働く人・悩む人の視点から考えます。" },
+                  { en:"Visualize",    jp:"可視化",     desc:"声・違和感・不安・負担など、見えにくいものを判断できる形に変えます。" },
+                  { en:"Practical",    jp:"実用設計",   desc:"高機能であることよりも、現場で自然に使われ続けることを大切にします。" },
+                  { en:"Coexistence",  jp:"技術共存",   desc:"テクノロジーは人を置き換えるものではなく、人の感覚や判断を支える存在として設計します。" },
+                  { en:"Iteration",    jp:"継続改善",   desc:"完璧を待たずに小さく試し、現場の反応を見ながらより良い仕組みに育てます。" },
                 ].map((v, i) => (
-                  <div key={v.en} className="sr" style={{ padding: "32px 28px", borderLeft: i === 0 ? "none" : "1px solid #e2e8f0", transitionDelay:`${i*0.08}s` }}>
-                    <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.18em", color: "#6366f1", textTransform: "uppercase", marginBottom: 14 }}>{v.en}</div>
-                    <div style={{ fontSize: 20, fontWeight: 700, color: "#0f172a", marginBottom: 12 }}>{v.jp}</div>
+                  <div key={v.en} className="sr" style={{ padding: "32px 24px", borderLeft: i === 0 ? "none" : "1px solid #e2e8f0", transitionDelay:`${i*0.08}s` }}>
+                    <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.18em", color: "#6366f1", textTransform: "uppercase", marginBottom: 14 }}>{v.en}</div>
+                    <div style={{ fontSize: 18, fontWeight: 700, color: "#0f172a", marginBottom: 12 }}>{v.jp}</div>
                     <div style={{ fontSize: 13, color: "#64748b", lineHeight: 1.85 }}>{v.desc}</div>
                   </div>
                 ))}
