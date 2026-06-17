@@ -212,9 +212,13 @@ function ParticleTextCanvas() {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function Home() {
   const [navScrolled, setNavScrolled] = useState(false);
+  const [inHero, setInHero] = useState(true);
 
   useEffect(() => {
-    const onScroll = () => setNavScrolled(window.scrollY > 40);
+    const onScroll = () => {
+      setNavScrolled(window.scrollY > 40);
+      setInHero(window.scrollY < window.innerHeight * 0.8);
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
     const io = new IntersectionObserver(
       (e) => e.forEach((en) => { if (en.isIntersecting) en.target.classList.add("visible"); }),
@@ -283,7 +287,9 @@ export default function Home() {
           {/* SCROLL — center bottom */}
           <div style={{ position: "fixed", bottom: 36, left: "50%", transform: "translateX(-50%)",
             display: "flex", flexDirection: "column", alignItems: "center", gap: 10, zIndex: 10,
-            animation: "fade-in 1s ease 1.4s both" }}>
+            animation: "fade-in 1s ease 1.4s both",
+            opacity: inHero ? 1 : 0, pointerEvents: inHero ? "auto" : "none",
+            transition: "opacity 0.4s ease" }}>
             <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.35em",
               color: "#94a3b8", textTransform: "uppercase" }}>Scroll</span>
             <div style={{ position: "relative", width: 1, height: 64, overflow: "hidden",
