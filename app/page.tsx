@@ -280,17 +280,6 @@ export default function Home() {
         <section style={{ minHeight: "100vh", display: "flex", alignItems: "flex-end",
           justifyContent: "center", padding: "0 48px 80px", position: "relative" }}>
           <div style={{ textAlign: "center", maxWidth: 900, width: "100%" }}>
-            <p style={{ fontSize: 12, letterSpacing: "0.32em", color: "#6366f1",
-              fontWeight: 700, textTransform: "uppercase", marginBottom: 32,
-              animation: "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.1s both" }}>
-              合同会社80 — Japan, Nagoya
-            </p>
-            <h1 style={{ fontSize: "clamp(16px, 1.8vw, 24px)", fontWeight: 700,
-              color: "#0f172a", lineHeight: 1.3, letterSpacing: "-0.02em", marginBottom: 24,
-              whiteSpace: "nowrap",
-              animation: "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.3s both" }}>
-              未来は、待つものじゃない。
-            </h1>
             <p style={{ fontSize: 19, color: "#64748b", lineHeight: 1.9, marginBottom: 56,
               animation: "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) 0.45s both" }}>
               合同会社80は、AIとソフトウェアで<br />現場を根本から変える。
