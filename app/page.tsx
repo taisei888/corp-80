@@ -285,6 +285,19 @@ export default function Home() {
               合同会社80は、AIとソフトウェアで<br />現場を根本から変える。
             </p>
           </div>
+          {/* SCROLL */}
+          <div style={{ position: "absolute", bottom: 40, left: "50%", transform: "translateX(-50%)",
+            display: "flex", flexDirection: "column", alignItems: "center", gap: 14,
+            animation: "fade-in 1s ease 1.4s both" }}>
+            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.35em",
+              color: "#6366f1", textTransform: "uppercase" }}>Scroll</span>
+            <div style={{ position: "relative", width: 2, height: 72, overflow: "hidden",
+              background: "rgba(99,102,241,0.15)", borderRadius: 2 }}>
+              <div style={{ position: "absolute", top: 0, left: 0, width: "100%",
+                background: "linear-gradient(to bottom, #6366f1, #a78bfa)",
+                borderRadius: 2, animation: "scroll-bar 1.6s cubic-bezier(0.4,0,0.2,1) infinite" }} />
+            </div>
+          </div>
         </section>
 
         {/* ── White overlay sections ── */}
