@@ -363,7 +363,7 @@ export default function Home() {
         <section id="business" style={{ background: "#fff", padding: "120px 64px 140px" }}>
           <div style={{ maxWidth: 1160, margin: "0 auto" }}>
             <div className="sr" style={{ textAlign: "center", marginBottom: 72 }}>
-              <h2 style={{ fontSize: "clamp(64px, 10vw, 130px)", fontWeight: 900, letterSpacing: "-0.05em", color: "#0f172a", lineHeight: 1 }}>Business</h2>
+              <h2 style={{ fontSize: "clamp(64px, 10vw, 130px)", fontWeight: 900, letterSpacing: "-0.05em", color: "#0f172a", lineHeight: 1 }}>Works</h2>
             </div>
             {/* 2×2 grid */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
@@ -663,89 +663,63 @@ export default function Home() {
         </section>
 
         {/* ── Recruit ── */}
-        <section id="recruit" style={{ background: "#0a0f1e", padding: "140px 64px", position: "relative", overflow: "hidden" }}>
-          {/* subtle grid lines */}
-          <div style={{ position: "absolute", inset: 0, pointerEvents: "none",
-            backgroundImage: "linear-gradient(rgba(99,102,241,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.06) 1px, transparent 1px)",
-            backgroundSize: "80px 80px" }} />
-          {/* glow */}
-          <div style={{ position: "absolute", top: "30%", left: "50%", transform: "translate(-50%,-50%)",
-            width: 600, height: 600, borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%)",
-            pointerEvents: "none" }} />
+        <section id="recruit" style={{ background: "#111827", padding: "120px 64px 140px" }}>
+          <div style={{ maxWidth: 1160, margin: "0 auto" }}>
 
-          <div style={{ maxWidth: 1160, margin: "0 auto", position: "relative", zIndex: 1 }}>
-            {/* label */}
-            <div className="sr" style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.3em",
-              color: "#6366f1", textTransform: "uppercase", marginBottom: 40 }}>
-              Recruit
+            {/* Title */}
+            <div className="sr" style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 80 }}>
+              <h2 style={{ fontSize: "clamp(48px, 7vw, 96px)", fontWeight: 900, letterSpacing: "-0.05em", color: "#f8fafc", lineHeight: 1 }}>Recruit</h2>
+              <a href="mailto:info@80llc.jp"
+                style={{ display: "inline-flex", alignItems: "center", gap: 10,
+                  padding: "12px 28px", borderRadius: 6,
+                  border: "1px solid rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.6)",
+                  fontSize: 13, fontWeight: 600, letterSpacing: "0.02em",
+                  textDecoration: "none", transition: "border-color 0.2s, color 0.2s" }}
+                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor="#6366f1"; (e.currentTarget as HTMLAnchorElement).style.color="#fff"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor="rgba(255,255,255,0.2)"; (e.currentTarget as HTMLAnchorElement).style.color="rgba(255,255,255,0.6)"; }}>
+                カジュアル面談を申し込む
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+              </a>
             </div>
 
-            {/* headline */}
-            <h2 className="sr" style={{ fontSize: "clamp(40px, 6vw, 88px)", fontWeight: 900,
-              letterSpacing: "-0.04em", lineHeight: 1.05, color: "#f8fafc", marginBottom: 32,
-              transitionDelay: "0.08s" }}>
-              共に、未来を<br />作りにきてほしい。
-            </h2>
-
-            <p className="sr" style={{ fontSize: 17, color: "rgba(248,250,252,0.5)", lineHeight: 1.95,
-              maxWidth: 560, marginBottom: 80, transitionDelay: "0.14s" }}>
-              合同会社80は少数精鋭のチームです。<br />
-              AIと向き合い、プロダクトを育てる仲間を探しています。<br />
-              職種・経験より、熱量と思考力を重視します。
-            </p>
-
-            {/* positions */}
-            <div className="sr" style={{ display: "flex", flexDirection: "column", gap: 0, transitionDelay: "0.2s" }}>
+            {/* Positions */}
+            <div style={{ display: "flex", flexDirection: "column" }}>
               {[
-                { role: "AI Engineer", type: "業務委託 / 正社員", tags: ["Python", "LLM", "RAG"] },
-                { role: "Frontend Engineer", type: "業務委託 / 正社員", tags: ["Next.js", "TypeScript", "UI/UX"] },
-                { role: "Sales / BizDev", type: "業務委託 / インターン", tags: ["SaaS", "法人営業", "企画"] },
+                { role: "AI Engineer",        type: "業務委託 / 正社員",  tags: ["Python", "LLM", "RAG"] },
+                { role: "Frontend Engineer",  type: "業務委託 / 正社員",  tags: ["Next.js", "TypeScript", "UI/UX"] },
+                { role: "Sales / BizDev",     type: "業務委託 / インターン", tags: ["SaaS", "法人営業", "企画"] },
               ].map((pos, i) => (
-                <div key={i} style={{
-                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                <div key={i} className="sr" style={{
+                  display: "grid", gridTemplateColumns: "1fr auto",
+                  alignItems: "center", gap: 24,
                   padding: "36px 0", borderTop: "1px solid rgba(255,255,255,0.08)",
-                  cursor: "pointer", transition: "background 0.2s",
-                  borderRadius: 0,
+                  cursor: "pointer", transitionDelay: `${i * 0.06}s`,
                 }}
-                  onMouseEnter={e => (e.currentTarget.style.background = "rgba(99,102,241,0.07)")}
-                  onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                  onMouseEnter={e => { (e.currentTarget.style.opacity = "0.6"); }}
+                  onMouseLeave={e => { (e.currentTarget.style.opacity = "1"); }}
                 >
-                  <div style={{ display: "flex", alignItems: "center", gap: 48, flexWrap: "wrap" }}>
-                    <div style={{ fontSize: "clamp(20px, 2.2vw, 28px)", fontWeight: 800,
-                      color: "#f8fafc", letterSpacing: "-0.02em", minWidth: 260 }}>{pos.role}</div>
-                    <div style={{ fontSize: 13, color: "rgba(248,250,252,0.35)", fontWeight: 500 }}>{pos.type}</div>
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 28, flexWrap: "wrap", marginBottom: 12 }}>
+                      <div style={{ fontSize: "clamp(20px, 2.2vw, 26px)", fontWeight: 800,
+                        color: "#f8fafc", letterSpacing: "-0.02em" }}>{pos.role}</div>
+                      <div style={{ fontSize: 12, color: "rgba(248,250,252,0.3)", fontWeight: 500 }}>{pos.type}</div>
+                    </div>
                     <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                       {pos.tags.map(t => (
-                        <span key={t} style={{ fontSize: 11, fontWeight: 600, padding: "4px 12px",
-                          borderRadius: 100, border: "1px solid rgba(99,102,241,0.4)",
-                          color: "#818cf8", letterSpacing: "0.04em" }}>{t}</span>
+                        <span key={t} style={{ fontSize: 11, fontWeight: 600, padding: "3px 11px",
+                          borderRadius: 100, background: "rgba(99,102,241,0.15)",
+                          color: "#a5b4fc", letterSpacing: "0.04em" }}>{t}</span>
                       ))}
                     </div>
                   </div>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(248,250,252,0.25)" strokeWidth="2">
-                    <path d="M5 12h14M12 5l7 7-7 7" />
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
                   </svg>
                 </div>
               ))}
               <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }} />
-            </div>
-
-            {/* CTA */}
-            <div className="sr" style={{ marginTop: 72, transitionDelay: "0.26s" }}>
-              <a href="mailto:info@80llc.jp"
-                style={{ display: "inline-flex", alignItems: "center", gap: 12,
-                  padding: "18px 40px", borderRadius: 8,
-                  background: "#6366f1", color: "#fff",
-                  fontSize: 15, fontWeight: 700, letterSpacing: "0.01em",
-                  textDecoration: "none", transition: "background 0.2s, transform 0.2s" }}
-                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.background="#4f46e5"; (e.currentTarget as HTMLAnchorElement).style.transform="translateY(-2px)"; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.background="#6366f1"; (e.currentTarget as HTMLAnchorElement).style.transform="translateY(0)"; }}>
-                カジュアル面談を申し込む
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
-              </a>
             </div>
           </div>
         </section>
