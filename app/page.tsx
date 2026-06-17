@@ -326,7 +326,7 @@ export default function Home() {
               </button>
             ))}
           </div>
-          <button onClick={() => scrollTo("contact")}
+          <button onClick={() => scrollTo("news")}
             style={{ padding: "9px 24px", borderRadius: 6, border: "1.5px solid #0f172a",
               background: "transparent", color: "#0f172a", fontSize: 13, fontWeight: 600,
               cursor: "pointer", transition: "all 0.2s", fontFamily: "inherit" }}
@@ -777,20 +777,44 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── Contact ── */}
-        <section id="contact" style={{ padding: "120px 48px 140px" }}>
-          <div style={{ maxWidth: 600, margin: "0 auto" }}>
-            <div className="sr" style={{ textAlign: "center", marginBottom: 52 }}>
-              <div style={{ fontSize:11, fontWeight:700, letterSpacing:"0.2em", color:"#6366f1", marginBottom:18, textTransform:"uppercase" }}>Contact</div>
-              <h2 style={{ fontSize:"clamp(32px, 5vw, 56px)", fontWeight:800, color:"#0f172a", lineHeight:1.2, letterSpacing:"-0.03em", marginBottom:18 }}>
-                一緒に、未来を<br />作りませんか。
-              </h2>
-              <p style={{ fontSize:15, color:"#64748b", lineHeight:1.9 }}>
-                テクノロジーで現場を変えたい企業様、<br />まずはお気軽にご相談ください。
-              </p>
+        {/* ── News ── */}
+        <section id="news" style={{ background: "#fff", padding: "120px 64px 140px" }}>
+          <div style={{ maxWidth: 1160, margin: "0 auto" }}>
+            <div className="sr" style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 64 }}>
+              <h2 style={{ fontSize: "clamp(48px, 7vw, 96px)", fontWeight: 900, letterSpacing: "-0.05em", color: "#0f172a", lineHeight: 1 }}>News</h2>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "#6366f1", letterSpacing: "0.1em", textTransform: "uppercase" }}>Latest Updates</div>
             </div>
-            <div className="sr" style={{ ...card, padding: "44px 40px" }}>
-              <ContactForm />
+
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              {[
+                { date: "2025.12", cat: "Product", title: "LENDS AI 新機能「採用アセスメント」正式リリース", desc: "心理・論理・コミュニケーション・敬語の4軸で候補者を自動評価する採用アセスメント機能を追加しました。" },
+                { date: "2025.10", cat: "Service", title: "AI受託開発サービス「AI Build」提供開始", desc: "LLM・RAG・業務自動化を中心としたAI開発サービスを正式に開始。初月無料相談受付中。" },
+                { date: "2025.08", cat: "Works",   title: "大手飲食チェーン向け予約システムAI化を完了", desc: "月間10万件超の予約対応をAIが自動処理。スタッフの対応工数を約70%削減することに成功。" },
+                { date: "2025.06", cat: "Works",   title: "HR企業向け入社時AIアセスメントシステムを納品", desc: "採用選考の一次評価をAIが自動化。採用精度の向上と選考時間の大幅な短縮を実現。" },
+                { date: "2025.04", cat: "Company", title: "合同会社80 設立", desc: "「人の知覚を、ソフトウェアで拡張する。」をミッションに、名古屋を拠点として合同会社80を設立。" },
+              ].map((item, i) => (
+                <div key={i} className="sr" style={{
+                  display: "grid", gridTemplateColumns: "120px 80px 1fr",
+                  gap: "0 40px", alignItems: "start",
+                  padding: "32px 0", borderTop: "1px solid #e2e8f0",
+                  transitionDelay: `${i * 0.06}s`, cursor: "pointer",
+                  transition: "opacity 0.2s",
+                }}
+                  onMouseEnter={e => (e.currentTarget.style.opacity = "0.6")}
+                  onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
+                >
+                  <div style={{ fontSize: 12, color: "#94a3b8", fontWeight: 600, letterSpacing: "0.06em", paddingTop: 4 }}>{item.date}</div>
+                  <div>
+                    <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 100,
+                      background: "#eef2ff", color: "#6366f1", letterSpacing: "0.06em" }}>{item.cat}</span>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: "#0f172a", marginBottom: 8, lineHeight: 1.5 }}>{item.title}</div>
+                    <div style={{ fontSize: 13, color: "#64748b", lineHeight: 1.8 }}>{item.desc}</div>
+                  </div>
+                </div>
+              ))}
+              <div style={{ borderTop: "1px solid #e2e8f0" }} />
             </div>
           </div>
         </section>
@@ -803,7 +827,7 @@ export default function Home() {
             <div style={{ fontSize:11, color:"rgba(255,255,255,0.3)", marginTop:4 }}>合同会社80</div>
           </div>
           <div style={{ display: "flex", gap: 28 }}>
-            {([["ビジョン","vision"],["事業内容","business"],["プロダクト","product"],["お問い合わせ","contact"]] as const).map(([l, id]) => (
+            {([["ビジョン","vision"],["事業内容","business"],["プロダクト","product"],["ニュース","news"]] as const).map(([l, id]) => (
               <button key={id} onClick={() => document.getElementById(id)?.scrollIntoView({ behavior:"smooth" })}
                 style={{ fontSize:12, color:"rgba(255,255,255,0.35)", background:"none", border:"none",
                   cursor:"pointer", padding:0, transition:"color 0.2s", fontFamily:"inherit" }}
@@ -821,74 +845,3 @@ export default function Home() {
   );
 }
 
-// ─── Contact Form ─────────────────────────────────────────────────────────────
-function ContactForm() {
-  const [form, setForm] = useState({ company:"", name:"", email:"", phone:"", message:"" });
-  const [status, setStatus] = useState<"idle"|"sending"|"done"|"error">("idle");
-
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault(); setStatus("sending");
-    try {
-      const res = await fetch("/api/contact", { method:"POST",
-        headers:{ "Content-Type":"application/json" }, body:JSON.stringify(form) });
-      setStatus(res.ok ? "done" : "error");
-    } catch { setStatus("error"); }
-  };
-
-  const inp: React.CSSProperties = {
-    width:"100%", padding:"12px 14px", borderRadius:10,
-    border:"1.5px solid #e2e8f0", background:"rgba(255,255,255,0.8)",
-    color:"#0f172a", fontSize:14, fontFamily:"inherit", outline:"none", transition:"border-color 0.2s",
-  };
-  const lbl: React.CSSProperties = { fontSize:12, fontWeight:700, color:"#475569", display:"block", marginBottom:7, letterSpacing:"0.04em" };
-
-  if (status === "done") return (
-    <div style={{ textAlign:"center", padding:"32px 0" }}>
-      <div style={{ width:52, height:52, borderRadius:"50%", background:"#eef2ff",
-        display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 18px" }}>
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M20 6L9 17l-5-5"/>
-        </svg>
-      </div>
-      <div style={{ fontSize:17, fontWeight:700, color:"#0f172a", marginBottom:8 }}>送信完了しました</div>
-      <div style={{ fontSize:14, color:"#64748b" }}>担当者より折り返しご連絡いたします。</div>
-    </div>
-  );
-
-  return (
-    <form onSubmit={submit} style={{ display:"grid", gap:14 }}>
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>
-        {[{k:"company",label:"会社名",ph:"株式会社〇〇",req:true,type:"text"},{k:"name",label:"お名前",ph:"山田 太郎",req:true,type:"text"}].map(({k,label,ph,req,type}) => (
-          <div key={k}>
-            <label style={lbl}>{label}{req && <span style={{ color:"#ef4444", marginLeft:4 }}>*</span>}</label>
-            <input required={req} type={type} placeholder={ph} value={form[k as keyof typeof form]}
-              onChange={e => setForm({...form,[k]:e.target.value})} style={inp}
-              onFocus={e => (e.target.style.borderColor="#6366f1")} onBlur={e => (e.target.style.borderColor="#e2e8f0")} />
-          </div>
-        ))}
-      </div>
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>
-        {[{k:"email",label:"メールアドレス",ph:"your@example.com",req:true,type:"email"},{k:"phone",label:"電話番号",ph:"090-0000-0000",req:false,type:"tel"}].map(({k,label,ph,req,type}) => (
-          <div key={k}>
-            <label style={lbl}>{label}{req && <span style={{ color:"#ef4444", marginLeft:4 }}>*</span>}</label>
-            <input required={req} type={type} placeholder={ph} value={form[k as keyof typeof form]}
-              onChange={e => setForm({...form,[k]:e.target.value})} style={inp}
-              onFocus={e => (e.target.style.borderColor="#6366f1")} onBlur={e => (e.target.style.borderColor="#e2e8f0")} />
-          </div>
-        ))}
-      </div>
-      <div>
-        <label style={lbl}>お問い合わせ内容</label>
-        <textarea rows={4} placeholder="ご相談内容をご記入ください" value={form.message}
-          onChange={e => setForm({...form,message:e.target.value})}
-          style={{...inp, resize:"vertical", lineHeight:1.75}}
-          onFocus={e => (e.target.style.borderColor="#6366f1")} onBlur={e => (e.target.style.borderColor="#e2e8f0")} />
-      </div>
-      <button type="submit" disabled={status==="sending"} className="btn-primary-light"
-        style={{ width:"100%", justifyContent:"center", marginTop:4, opacity:status==="sending"?0.7:1 }}>
-        {status==="sending" ? "送信中..." : "送信する"}
-      </button>
-      {status==="error" && <div style={{ fontSize:13, color:"#ef4444", textAlign:"center" }}>送信に失敗しました。時間をおいて再度お試しください。</div>}
-    </form>
-  );
-}
