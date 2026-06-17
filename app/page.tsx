@@ -177,6 +177,7 @@ function NeuralCanvas() {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function Home() {
   const [navScrolled, setNavScrolled] = useState(false);
+  const [dotMouse, setDotMouse] = useState({ x: -999, y: -999 });
 
   useEffect(() => {
     const onScroll = () => setNavScrolled(window.scrollY > 40);
@@ -515,13 +516,26 @@ export default function Home() {
 
 
         {/* ── Case Studies ── */}
-        <section style={{ background: "#f8fafc", padding: "100px 0 120px", position: "relative", overflow: "hidden" }}>
+        <section
+          style={{ background: "#f8fafc", padding: "100px 0 120px", position: "relative", overflow: "hidden" }}
+          onMouseMove={e => {
+            const r = e.currentTarget.getBoundingClientRect();
+            setDotMouse({ x: e.clientX - r.left, y: e.clientY - r.top });
+          }}
+          onMouseLeave={() => setDotMouse({ x: -999, y: -999 })}
+        >
           {/* Animated dot grid background */}
           <div style={{
             position: "absolute", inset: 0, pointerEvents: "none",
             backgroundImage: "radial-gradient(circle, rgba(99,102,241,0.35) 2px, transparent 2px)",
             backgroundSize: "36px 36px",
             animation: "dot-drift 6s linear infinite",
+          }} />
+          {/* Cursor spotlight over dots */}
+          <div style={{
+            position: "absolute", inset: 0, pointerEvents: "none",
+            background: `radial-gradient(circle 220px at ${dotMouse.x}px ${dotMouse.y}px, rgba(99,102,241,0.22) 0%, rgba(139,92,246,0.08) 40%, transparent 70%)`,
+            transition: "background 0.08s ease",
           }} />
 
           <div style={{ position: "relative", zIndex: 1 }}>
