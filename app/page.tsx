@@ -2,6 +2,99 @@
 
 import { useEffect, useRef, useState } from "react";
 
+// ─── Dot Grid Canvas ──────────────────────────────────────────────────────────
+function DotCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const canvas = ref.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const GAP = 36;
+    const mouse = { x: -9999, y: -9999 };
+    let W = 0, H = 0, raf = 0, t = 0;
+
+    // dots[row][col] = { bx, by, phase }
+    type Dot = { bx: number; by: number; phase: number; r: number };
+    let dots: Dot[] = [];
+
+    const init = () => {
+      const dpr = Math.min(devicePixelRatio, 2);
+      W = canvas.offsetWidth; H = canvas.offsetHeight;
+      canvas.width = W * dpr; canvas.height = H * dpr;
+      canvas.style.width = W + "px"; canvas.style.height = H + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      dots = [];
+      const cols = Math.ceil(W / GAP) + 1;
+      const rows = Math.ceil(H / GAP) + 1;
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          dots.push({ bx: col * GAP, by: row * GAP, phase: Math.random() * Math.PI * 2, r: 1.5 });
+        }
+      }
+    };
+
+    init();
+    const onResize = () => init();
+    const onMouse = (e: MouseEvent) => {
+      const r = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - r.left;
+      mouse.y = e.clientY - r.top;
+    };
+    const onLeave = () => { mouse.x = -9999; mouse.y = -9999; };
+
+    window.addEventListener("resize", onResize);
+    canvas.addEventListener("mousemove", onMouse);
+    canvas.addEventListener("mouseleave", onLeave);
+
+    const render = () => {
+      t += 0.012;
+      ctx.clearRect(0, 0, W, H);
+
+      for (const d of dots) {
+        // gentle float offset
+        const ox = Math.sin(t + d.phase) * 1.2;
+        const oy = Math.cos(t * 0.8 + d.phase) * 1.2;
+        const x = d.bx + ox;
+        const y = d.by + oy;
+
+        // cursor proximity
+        const dist = Math.hypot(mouse.x - x, mouse.y - y);
+        const HOVER_R = 72;
+        const proximity = dist < HOVER_R ? 1 - dist / HOVER_R : 0;
+
+        const radius = 1.5 + proximity * 3.5;
+        const alpha = 0.25 + proximity * 0.7;
+
+        if (proximity > 0) {
+          ctx.shadowBlur = 8 * proximity;
+          ctx.shadowColor = `rgba(99,102,241,${proximity * 0.8})`;
+        }
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = proximity > 0.3 ? "#6366f1" : "rgba(99,102,241,0.9)";
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.globalAlpha = 1;
+      }
+
+      raf = requestAnimationFrame(render);
+    };
+    raf = requestAnimationFrame(render);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", onResize);
+      canvas.removeEventListener("mousemove", onMouse);
+      canvas.removeEventListener("mouseleave", onLeave);
+    };
+  }, []);
+
+  return <canvas ref={ref} style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />;
+}
+
 // ─── Neural Network Canvas ────────────────────────────────────────────────────
 const NODE_COLORS = ["#4f46e5", "#7c3aed", "#0891b2", "#6d28d9"];
 const CONN_DIST   = 170;
@@ -177,7 +270,6 @@ function NeuralCanvas() {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function Home() {
   const [navScrolled, setNavScrolled] = useState(false);
-  const [dotMouse, setDotMouse] = useState({ x: -999, y: -999 });
 
   useEffect(() => {
     const onScroll = () => setNavScrolled(window.scrollY > 40);
@@ -516,27 +608,8 @@ export default function Home() {
 
 
         {/* ── Case Studies ── */}
-        <section
-          style={{ background: "#f8fafc", padding: "100px 0 120px", position: "relative", overflow: "hidden" }}
-          onMouseMove={e => {
-            const r = e.currentTarget.getBoundingClientRect();
-            setDotMouse({ x: e.clientX - r.left, y: e.clientY - r.top });
-          }}
-          onMouseLeave={() => setDotMouse({ x: -999, y: -999 })}
-        >
-          {/* Animated dot grid background */}
-          <div style={{
-            position: "absolute", inset: 0, pointerEvents: "none",
-            backgroundImage: "radial-gradient(circle, rgba(99,102,241,0.35) 2px, transparent 2px)",
-            backgroundSize: "36px 36px",
-            animation: "dot-drift 6s linear infinite",
-          }} />
-          {/* Cursor spotlight over dots */}
-          <div style={{
-            position: "absolute", inset: 0, pointerEvents: "none",
-            background: `radial-gradient(circle 220px at ${dotMouse.x}px ${dotMouse.y}px, rgba(99,102,241,0.22) 0%, rgba(139,92,246,0.08) 40%, transparent 70%)`,
-            transition: "background 0.08s ease",
-          }} />
+        <section style={{ background: "#f8fafc", padding: "100px 0 120px", position: "relative", overflow: "hidden" }}>
+          <DotCanvas />
 
           <div style={{ position: "relative", zIndex: 1 }}>
             {/* Header */}
