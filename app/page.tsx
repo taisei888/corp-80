@@ -502,20 +502,19 @@ export default function Home() {
 
 
         {/* ── Case Studies ── */}
-        <section style={{ background: "#070b14", padding: "100px 0 120px", position: "relative", overflow: "hidden" }}>
-          {/* subtle grid */}
-          <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.04) 1px, transparent 1px)", backgroundSize: "60px 60px", pointerEvents: "none" }} />
+        <section style={{ background: "#f8fafc", padding: "100px 0 120px", position: "relative", overflow: "hidden" }}>
+          <DotCanvas />
 
           <div style={{ position: "relative", zIndex: 1 }}>
             {/* Header */}
             <div style={{ maxWidth: 1160, margin: "0 auto 64px", padding: "0 64px", display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
               <div>
                 <div className="sr" style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.3em", color: "#6366f1", textTransform: "uppercase", marginBottom: 16 }}>Case Studies</div>
-                <h2 className="sr" style={{ fontSize: "clamp(32px, 4vw, 56px)", fontWeight: 900, color: "#f8fafc", letterSpacing: "-0.04em", lineHeight: 1.05, transitionDelay: "0.08s" }}>
+                <h2 className="sr" style={{ fontSize: "clamp(32px, 4vw, 56px)", fontWeight: 900, color: "#0f172a", letterSpacing: "-0.04em", lineHeight: 1.05, transitionDelay: "0.08s" }}>
                   AIを、現場に<br />届けてきた。
                 </h2>
               </div>
-              <div className="sr" style={{ fontSize: 13, color: "rgba(148,163,184,0.6)", fontWeight: 500, textAlign: "right", transitionDelay: "0.12s" }}>
+              <div className="sr" style={{ fontSize: 13, color: "#94a3b8", fontWeight: 500, textAlign: "right", transitionDelay: "0.12s" }}>
                 実際の導入実績
               </div>
             </div>
@@ -524,39 +523,47 @@ export default function Home() {
             <div style={{ overflow: "hidden", marginBottom: 16 }}>
               <div className="ticker-track" style={{ display: "flex", gap: 16, width: "max-content", padding: "0 16px" }}>
                 {((cards) => [...cards, ...cards])([
-                  { tag: "採用・HR",      title: "入社時テストのAI化",    metric: "選考時間 −62%", accent: "#6366f1" },
-                  { tag: "予約管理",      title: "予約システムのAI化",    metric: "工数 −78%",     accent: "#8b5cf6" },
-                  { tag: "バックオフィス", title: "会計ソフトのAI化",     metric: "経理負荷 −50%", accent: "#06b6d4" },
-                  { tag: "業務効率",      title: "日報管理のAI化",       metric: "提出率 +40%",   accent: "#10b981" },
+                  { tag: "採用・HR",      title: "入社時テストのAI化",    metric: "−62%", metricLabel: "選考時間", accent: "#6366f1", code: "assess.run()" },
+                  { tag: "予約管理",      title: "予約システムのAI化",    metric: "−78%", metricLabel: "対応工数", accent: "#8b5cf6", code: "booking.auto()" },
+                  { tag: "バックオフィス", title: "会計ソフトのAI化",     metric: "−50%", metricLabel: "経理負荷", accent: "#0891b2", code: "ledger.ai()" },
+                  { tag: "業務効率",      title: "日報管理のAI化",       metric: "+40%", metricLabel: "提出率",   accent: "#059669", code: "report.gen()" },
                 ]).map((c, i) => (
                   <div key={i} style={{
-                    width: 340, flexShrink: 0,
-                    borderRadius: 16,
-                    background: "#0f172a",
-                    border: "1px solid rgba(255,255,255,0.07)",
-                    padding: "32px 28px",
-                    display: "flex", flexDirection: "column", gap: 20,
-                    transition: "transform 0.4s cubic-bezier(0.16,1,0.3,1), border-color 0.3s",
-                    cursor: "pointer",
-                    position: "relative", overflow: "hidden",
+                    width: 320, flexShrink: 0, borderRadius: 16,
+                    background: "#fff",
+                    border: "1px solid #e2e8f0",
+                    boxShadow: "0 2px 16px rgba(0,0,0,0.05)",
+                    padding: "28px 26px 24px",
+                    display: "flex", flexDirection: "column", gap: 0,
+                    transition: "transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s, border-color 0.3s",
+                    cursor: "pointer", position: "relative", overflow: "hidden",
                   }}
-                    onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.borderColor = `${c.accent}60`; }}
-                    onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; }}
+                    onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = `0 12px 40px ${c.accent}22`; e.currentTarget.style.borderColor = `${c.accent}50`; }}
+                    onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = "0 2px 16px rgba(0,0,0,0.05)"; e.currentTarget.style.borderColor = "#e2e8f0"; }}
                   >
-                    {/* accent bar */}
-                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: c.accent, borderRadius: "16px 16px 0 0", opacity: 0.8 }} />
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", color: c.accent, textTransform: "uppercase",
-                        padding: "4px 12px", borderRadius: 100, border: `1px solid ${c.accent}40`, background: `${c.accent}12` }}>{c.tag}</span>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(148,163,184,0.3)" strokeWidth="2">
+                    {/* top accent bar */}
+                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg, ${c.accent}, ${c.accent}88)`, borderRadius: "16px 16px 0 0" }} />
+                    {/* terminal-style code snippet */}
+                    <div style={{ fontFamily: "'SF Mono', 'Fira Code', monospace", fontSize: 11, color: c.accent,
+                      background: `${c.accent}0e`, border: `1px solid ${c.accent}22`, borderRadius: 6,
+                      padding: "5px 10px", marginBottom: 20, display: "inline-block", letterSpacing: "0.02em" }}>
+                      $ {c.code}
+                    </div>
+                    {/* tag + arrow */}
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", color: c.accent,
+                        textTransform: "uppercase", padding: "3px 10px", borderRadius: 100,
+                        background: `${c.accent}12`, border: `1px solid ${c.accent}30` }}>{c.tag}</span>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="2">
                         <path d="M7 17L17 7M17 7H7M17 7v10"/>
                       </svg>
                     </div>
-                    <div>
-                      <div style={{ fontSize: 18, fontWeight: 800, color: "#f1f5f9", letterSpacing: "-0.02em", lineHeight: 1.35, marginBottom: 8 }}>{c.title}</div>
-                    </div>
-                    <div style={{ marginTop: "auto", paddingTop: 16, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-                      <div style={{ fontSize: 22, fontWeight: 900, color: c.accent, letterSpacing: "-0.02em" }}>{c.metric}</div>
+                    {/* title */}
+                    <div style={{ fontSize: 17, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em", lineHeight: 1.4, marginBottom: 20 }}>{c.title}</div>
+                    {/* metric */}
+                    <div style={{ marginTop: "auto", paddingTop: 16, borderTop: "1px solid #f1f5f9", display: "flex", alignItems: "baseline", gap: 8 }}>
+                      <div style={{ fontSize: 32, fontWeight: 900, color: c.accent, letterSpacing: "-0.03em", lineHeight: 1 }}>{c.metric}</div>
+                      <div style={{ fontSize: 12, color: "#64748b", fontWeight: 600 }}>{c.metricLabel}</div>
                     </div>
                   </div>
                 ))}
@@ -568,38 +575,42 @@ export default function Home() {
               <div style={{ display: "flex", gap: 16, width: "max-content", padding: "0 16px",
                 animation: "ticker 44s linear infinite reverse" }}>
                 {((cards) => [...cards, ...cards])([
-                  { tag: "DX推進",   title: "生成AIの社内導入",       metric: "生産性 +55%",   accent: "#f59e0b" },
-                  { tag: "Web",      title: "ホームページへのAI実装", metric: "CV率 +38%",     accent: "#0ea5e9" },
-                  { tag: "マーケ",   title: "SEO対策のAI化",         metric: "流入 +210%",    accent: "#ec4899" },
-                  { tag: "コンテンツ", title: "自動ブログ更新AI",     metric: "運用コスト −90%", accent: "#a78bfa" },
+                  { tag: "DX推進",    title: "生成AIの社内導入",       metric: "+55%", metricLabel: "生産性",    accent: "#f59e0b", code: "deploy.ai()" },
+                  { tag: "Web",       title: "ホームページへのAI実装", metric: "+38%", metricLabel: "CV率",      accent: "#0ea5e9", code: "chat.embed()" },
+                  { tag: "マーケ",    title: "SEO対策のAI化",          metric: "+210%", metricLabel: "オーガニック流入", accent: "#ec4899", code: "seo.optimize()" },
+                  { tag: "コンテンツ", title: "自動ブログ更新AI",      metric: "−90%", metricLabel: "運用コスト", accent: "#8b5cf6", code: "content.auto()" },
                 ]).map((c, i) => (
                   <div key={i} style={{
-                    width: 340, flexShrink: 0,
-                    borderRadius: 16,
-                    background: "#0f172a",
-                    border: "1px solid rgba(255,255,255,0.07)",
-                    padding: "32px 28px",
-                    display: "flex", flexDirection: "column", gap: 20,
-                    transition: "transform 0.4s cubic-bezier(0.16,1,0.3,1), border-color 0.3s",
-                    cursor: "pointer",
-                    position: "relative", overflow: "hidden",
+                    width: 320, flexShrink: 0, borderRadius: 16,
+                    background: "#fff",
+                    border: "1px solid #e2e8f0",
+                    boxShadow: "0 2px 16px rgba(0,0,0,0.05)",
+                    padding: "28px 26px 24px",
+                    display: "flex", flexDirection: "column", gap: 0,
+                    transition: "transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s, border-color 0.3s",
+                    cursor: "pointer", position: "relative", overflow: "hidden",
                   }}
-                    onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.borderColor = `${c.accent}60`; }}
-                    onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; }}
+                    onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = `0 12px 40px ${c.accent}22`; e.currentTarget.style.borderColor = `${c.accent}50`; }}
+                    onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = "0 2px 16px rgba(0,0,0,0.05)"; e.currentTarget.style.borderColor = "#e2e8f0"; }}
                   >
-                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: c.accent, borderRadius: "16px 16px 0 0", opacity: 0.8 }} />
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", color: c.accent, textTransform: "uppercase",
-                        padding: "4px 12px", borderRadius: 100, border: `1px solid ${c.accent}40`, background: `${c.accent}12` }}>{c.tag}</span>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(148,163,184,0.3)" strokeWidth="2">
+                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg, ${c.accent}, ${c.accent}88)`, borderRadius: "16px 16px 0 0" }} />
+                    <div style={{ fontFamily: "'SF Mono', 'Fira Code', monospace", fontSize: 11, color: c.accent,
+                      background: `${c.accent}0e`, border: `1px solid ${c.accent}22`, borderRadius: 6,
+                      padding: "5px 10px", marginBottom: 20, display: "inline-block", letterSpacing: "0.02em" }}>
+                      $ {c.code}
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", color: c.accent,
+                        textTransform: "uppercase", padding: "3px 10px", borderRadius: 100,
+                        background: `${c.accent}12`, border: `1px solid ${c.accent}30` }}>{c.tag}</span>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="2">
                         <path d="M7 17L17 7M17 7H7M17 7v10"/>
                       </svg>
                     </div>
-                    <div>
-                      <div style={{ fontSize: 18, fontWeight: 800, color: "#f1f5f9", letterSpacing: "-0.02em", lineHeight: 1.35, marginBottom: 8 }}>{c.title}</div>
-                    </div>
-                    <div style={{ marginTop: "auto", paddingTop: 16, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-                      <div style={{ fontSize: 22, fontWeight: 900, color: c.accent, letterSpacing: "-0.02em" }}>{c.metric}</div>
+                    <div style={{ fontSize: 17, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em", lineHeight: 1.4, marginBottom: 20 }}>{c.title}</div>
+                    <div style={{ marginTop: "auto", paddingTop: 16, borderTop: "1px solid #f1f5f9", display: "flex", alignItems: "baseline", gap: 8 }}>
+                      <div style={{ fontSize: 32, fontWeight: 900, color: c.accent, letterSpacing: "-0.03em", lineHeight: 1 }}>{c.metric}</div>
+                      <div style={{ fontSize: 12, color: "#64748b", fontWeight: 600 }}>{c.metricLabel}</div>
                     </div>
                   </div>
                 ))}
