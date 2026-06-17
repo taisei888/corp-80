@@ -280,19 +280,18 @@ export default function Home() {
         <section style={{ minHeight: "100vh", display: "flex", alignItems: "flex-end",
           justifyContent: "center", padding: "0 48px 80px", position: "relative" }}>
           <div style={{ textAlign: "center", maxWidth: 900, width: "100%" }} />
-          {/* SCROLL — right side */}
-          <div style={{ position: "fixed", right: 32, bottom: "50%", transform: "translateY(50%)",
-            display: "flex", flexDirection: "column", alignItems: "center", gap: 16, zIndex: 10,
+          {/* SCROLL — center bottom */}
+          <div style={{ position: "absolute", bottom: 48, left: "50%", transform: "translateX(-50%)",
+            display: "flex", flexDirection: "column", alignItems: "center", gap: 10, zIndex: 10,
             animation: "fade-in 1s ease 1.4s both" }}>
-            <div style={{ position: "relative", width: 1, height: 80, overflow: "hidden",
+            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.35em",
+              color: "#94a3b8", textTransform: "uppercase" }}>Scroll</span>
+            <div style={{ position: "relative", width: 1, height: 64, overflow: "hidden",
               background: "rgba(99,102,241,0.15)", borderRadius: 2 }}>
               <div style={{ position: "absolute", top: 0, left: 0, width: "100%",
                 background: "linear-gradient(to bottom, #6366f1, #a78bfa)",
                 borderRadius: 2, animation: "scroll-bar 1.6s cubic-bezier(0.4,0,0.2,1) infinite" }} />
             </div>
-            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.3em",
-              color: "#94a3b8", textTransform: "uppercase",
-              writingMode: "vertical-rl", textOrientation: "mixed" }}>Scroll</span>
           </div>
         </section>
 
