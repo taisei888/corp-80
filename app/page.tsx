@@ -109,7 +109,7 @@ function ParticleTextCanvas() {
     interface P { x:number; y:number; tx:number; ty:number; vx:number; vy:number; sz:number; col:string; }
     let W = 0, H = 0, pts: P[] = [], raf = 0;
     const mouse = { x: -9999, y: -9999 };
-    const COLS = ["#0f172a","#0f172a","#0f172a","#4f46e5","#6366f1","#0f172a","#3730a3"];
+    const COLS = ["#1e293b","#1e293b","#3730a3","#4f46e5","#1e293b","#1e293b","#312e81"];
 
     const build = (): P[] => {
       const off = document.createElement("canvas");
@@ -133,7 +133,7 @@ function ParticleTextCanvas() {
       oc.fillText(L2, W / 2, cy + lh);
 
       const data = oc.getImageData(0, 0, W, H).data;
-      const gap = 3, out: P[] = [];
+      const gap = 4, out: P[] = [];
       for (let y = 0; y < H; y += gap) {
         for (let x = 0; x < W; x += gap) {
           if (data[(y * W + x) * 4 + 3] > 128) {
@@ -142,7 +142,7 @@ function ParticleTextCanvas() {
               x: Math.random() * W,
               y: Math.random() * H,
               vx: 0, vy: 0,
-              sz: 1.8 + Math.random() * 1.4,
+              sz: 1.3 + Math.random() * 1.3,
               col: COLS[Math.floor(Math.random() * COLS.length)],
             });
           }
@@ -188,7 +188,7 @@ function ParticleTextCanvas() {
         p.x += p.vx; p.y += p.vy;
 
         ctx.fillStyle = p.col;
-        ctx.globalAlpha = 0.92;
+        ctx.globalAlpha = 0.80;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.sz, 0, Math.PI * 2);
         ctx.fill();
