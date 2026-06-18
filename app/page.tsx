@@ -370,6 +370,7 @@ export default function Home() {
 
               {/* 01 — quix */}
               <div className="sr" style={{ borderRadius: 20, overflow: "hidden", cursor: "pointer" }}
+                onClick={() => window.open("/quix", "_blank")}
                 onMouseEnter={e => { (e.currentTarget.querySelector(".biz-img") as HTMLElement).style.transform = "scale(1.03)"; }}
                 onMouseLeave={e => { (e.currentTarget.querySelector(".biz-img") as HTMLElement).style.transform = "scale(1)"; }}>
                 <div className="biz-img" style={{ height: 380, overflow: "hidden",
@@ -385,6 +386,7 @@ export default function Home() {
 
               {/* 02 — LENDS AI */}
               <div className="sr" style={{ borderRadius: 20, overflow: "hidden", cursor: "pointer", transitionDelay: "0.08s" }}
+                onClick={() => window.open("https://www.lens-ai.jp", "_blank")}
                 onMouseEnter={e => { (e.currentTarget.querySelector(".biz-img") as HTMLElement).style.transform = "scale(1.03)"; }}
                 onMouseLeave={e => { (e.currentTarget.querySelector(".biz-img") as HTMLElement).style.transform = "scale(1)"; }}>
                 <div className="biz-img" style={{ height: 380, overflow: "hidden",
@@ -400,6 +402,7 @@ export default function Home() {
 
               {/* 03 — AI Labs */}
               <div className="sr" style={{ borderRadius: 20, overflow: "hidden", cursor: "pointer", transitionDelay: "0.16s" }}
+                onClick={() => window.open("/ai-labs", "_blank")}
                 onMouseEnter={e => { (e.currentTarget.querySelector(".biz-img") as HTMLElement).style.transform = "scale(1.03)"; }}
                 onMouseLeave={e => { (e.currentTarget.querySelector(".biz-img") as HTMLElement).style.transform = "scale(1)"; }}>
                 <div className="biz-img" style={{ height: 380, overflow: "hidden",
