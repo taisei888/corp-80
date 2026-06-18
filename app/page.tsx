@@ -824,12 +824,17 @@ export default function Home() {
             </div>
 
             {/* Bottom bar */}
-            <div style={{ padding: "28px 0 32px", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <div style={{ padding: "28px 0 32px", display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:16 }}>
               <div style={{ fontSize:11, color:"rgba(255,255,255,0.2)", letterSpacing:"0.04em" }}>
                 © 2025 合同会社80. All rights reserved.
               </div>
-              <div style={{ fontSize:11, color:"rgba(255,255,255,0.2)" }}>
-                名古屋市 / Nagoya, Japan
+              <div style={{ display:"flex", gap:24, alignItems:"center", flexWrap:"wrap" }}>
+                {([["会社概要","/company"],["プライバシーポリシー","/privacy"],["利用規約","/terms"],["サイトマップ","/sitemap-page"]] as [string,string][]).map(([label,href])=>(
+                  <a key={href} href={href} style={{ fontSize:11, color:"rgba(255,255,255,0.25)", textDecoration:"none", transition:"color 0.2s" }}
+                    onMouseEnter={e=>e.currentTarget.style.color="rgba(255,255,255,0.6)"}
+                    onMouseLeave={e=>e.currentTarget.style.color="rgba(255,255,255,0.25)"}>{label}</a>
+                ))}
+                <span style={{ fontSize:11, color:"rgba(255,255,255,0.2)" }}>名古屋市 / Nagoya, Japan</span>
               </div>
             </div>
           </div>
