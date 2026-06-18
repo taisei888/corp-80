@@ -258,7 +258,7 @@ export default function Home() {
             style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}>
             <img src="/7.png" alt="80" style={{ height: 48, display: "block" }} />
           </button>
-          <div style={{ display: "flex", gap: 36 }}>
+          <div className="mob-hide" style={{ display: "flex", gap: 36 }}>
             {([["ビジョン","vision"],["事業内容","business"],["プロダクト","product"]] as const).map(([l, id]) => (
               <button key={id} onClick={() => scrollTo(id)}
                 style={{ background: "none", border: "none", cursor: "pointer",
@@ -306,11 +306,11 @@ export default function Home() {
           <div style={{ height: 160, background: "linear-gradient(to bottom, transparent, #fff)", pointerEvents: "none" }} />
 
         {/* ── Vision ── */}
-        <section id="vision" style={{ background: "#fff", padding: "120px 64px 140px" }}>
+        <section id="vision" className="mob-section" style={{ background: "#fff", padding: "120px 64px 140px" }}>
           <div style={{ maxWidth: 1160, margin: "0 auto" }}>
 
             {/* Editorial split layout */}
-            <div className="sr" style={{ display: "grid", gridTemplateColumns: "1fr 1.8fr", gap: 80, alignItems: "flex-start", marginBottom: 100 }}>
+            <div className="sr mob-grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1.8fr", gap: 80, alignItems: "flex-start", marginBottom: 100 }}>
               {/* Left: label + big English */}
               <div style={{ position: "sticky", top: 120 }}>
                 <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.22em", color: "#6366f1", textTransform: "uppercase", marginBottom: 24 }}>
@@ -338,7 +338,7 @@ export default function Home() {
             {/* Values */}
             <div style={{ borderTop: "1px solid #e2e8f0", paddingTop: 72 }}>
               <div className="sr" style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.22em", color: "#6366f1", textTransform: "uppercase", marginBottom: 40 }}>Values</div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 0 }}>
+              <div className="mob-grid-values" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 0 }}>
                 {[
                   { en:"Human First",  jp:"人間起点",   desc:"技術や機能からではなく、使う人・働く人・悩む人の視点から考えます。" },
                   { en:"Visualize",    jp:"可視化",     desc:"声・違和感・不安・負担など、見えにくいものを判断できる形に変えます。" },
@@ -359,13 +359,13 @@ export default function Home() {
         </section>
 
         {/* ── Business ── */}
-        <section id="business" style={{ background: "#fff", padding: "120px 64px 140px" }}>
+        <section id="business" className="mob-section" style={{ background: "#fff", padding: "120px 64px 140px" }}>
           <div style={{ maxWidth: 1160, margin: "0 auto" }}>
             <div className="sr" style={{ textAlign: "center", marginBottom: 72 }}>
               <h2 style={{ fontSize: "clamp(64px, 10vw, 130px)", fontWeight: 900, letterSpacing: "-0.05em", color: "#0f172a", lineHeight: 1 }}>Works</h2>
             </div>
             {/* 2×2 grid */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <div className="mob-grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
 
               {/* 01 — quix */}
               <div className="sr" style={{ borderRadius: 20, overflow: "hidden", cursor: "pointer" }}
@@ -435,7 +435,7 @@ export default function Home() {
         </section>
 
         {/* ── AI Capabilities ── */}
-        <section id="product" style={{ background: "#fff", padding: "120px 64px 140px" }}>
+        <section id="product" className="mob-section" style={{ background: "#fff", padding: "120px 64px 140px" }}>
           <div style={{ maxWidth: 1160, margin: "0 auto" }}>
 
             {/* Header */}
@@ -450,7 +450,7 @@ export default function Home() {
             </div>
 
             {/* FOLIO-style: left text + right 2 cards */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "start" }}>
+            <div className="mob-grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "start" }}>
 
               {/* Left: description */}
               <div className="sr">
@@ -623,7 +623,7 @@ export default function Home() {
         </section>
 
         {/* ── News ── */}
-        <section id="news" style={{ background: "#fff", padding: "120px 64px 140px" }}>
+        <section id="news" className="mob-section" style={{ background: "#fff", padding: "120px 64px 140px" }}>
           <div style={{ maxWidth: 1160, margin: "0 auto" }}>
             <div className="sr" style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 64 }}>
               <h2 style={{ fontSize: "clamp(48px, 7vw, 96px)", fontWeight: 900, letterSpacing: "-0.05em", color: "#0f172a", lineHeight: 1 }}>News</h2>
@@ -638,7 +638,7 @@ export default function Home() {
                 { date: "2025.06", cat: "Works",   title: "HR企業向け入社時AIアセスメントシステムを納品", desc: "採用選考の一次評価をAIが自動化。採用精度の向上と選考時間の大幅な短縮を実現。" },
                 { date: "2025.04", cat: "Company", title: "合同会社80 設立", desc: "「人の知覚を、ソフトウェアで拡張する。」をミッションに、名古屋を拠点として合同会社80を設立。" },
               ].map((item, i) => (
-                <div key={i} className="sr" style={{
+                <div key={i} className="sr mob-news-item" style={{
                   display: "grid", gridTemplateColumns: "120px 80px 1fr",
                   gap: "0 40px", alignItems: "start",
                   padding: "32px 0", borderTop: "1px solid #e2e8f0",
@@ -665,11 +665,11 @@ export default function Home() {
         </section>
 
         {/* ── Recruit ── */}
-        <section id="recruit" style={{ background: "#111827", padding: "120px 64px 140px" }}>
+        <section id="recruit" className="mob-section" style={{ background: "#111827", padding: "120px 64px 140px" }}>
           <div style={{ maxWidth: 1160, margin: "0 auto" }}>
 
             {/* Title */}
-            <div className="sr" style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 80 }}>
+            <div className="sr mob-recruit-header" style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 80 }}>
               <h2 style={{ fontSize: "clamp(48px, 7vw, 96px)", fontWeight: 900, letterSpacing: "-0.05em", color: "#f8fafc", lineHeight: 1 }}>Recruit</h2>
               <a href="mailto:info@80llc.jp"
                 style={{ display: "inline-flex", alignItems: "center", gap: 10,
@@ -729,7 +729,7 @@ export default function Home() {
         {/* ── Footer ── */}
         <footer style={{ background: "#13151f", padding: "80px 64px 0" }}>
           <div style={{ maxWidth: 1160, margin: "0 auto" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "220px 1fr 200px", gap: 64, paddingBottom: 80, borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+            <div className="mob-grid-footer" style={{ display: "grid", gridTemplateColumns: "220px 1fr 200px", gap: 64, paddingBottom: 80, borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
 
               {/* Left — logo + tagline */}
               <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
@@ -840,6 +840,50 @@ export default function Home() {
         </footer>
         </div>{/* /gradient wrapper */}
       </div>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .mob-hide { display: none !important; }
+
+          .mob-section {
+            padding-left: 20px !important;
+            padding-right: 20px !important;
+          }
+
+          .mob-grid-2 {
+            grid-template-columns: 1fr !important;
+            gap: 32px !important;
+          }
+
+          .mob-grid-values {
+            grid-template-columns: 1fr 1fr !important;
+            gap: 0 !important;
+          }
+          .mob-grid-values > div {
+            border-left: none !important;
+            border-top: 1px solid #e2e8f0;
+            padding: 24px 16px !important;
+          }
+
+          .mob-grid-footer {
+            grid-template-columns: 1fr !important;
+            gap: 40px !important;
+          }
+
+          .mob-news-item {
+            grid-template-columns: auto auto 1fr !important;
+            gap: 0 12px !important;
+          }
+
+          .mob-recruit-header {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 20px !important;
+          }
+
+          .biz-img { height: 220px !important; }
+        }
+      `}</style>
     </>
   );
 }
