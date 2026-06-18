@@ -525,7 +525,7 @@ export default function QuixPage() {
         <div style={{ fontSize: 11, color: "rgba(255,255,255,0.2)", letterSpacing: "0.04em" }}>
           © 2025 合同会社80. All rights reserved.
         </div>
-        <a href="/" style={{ fontSize: 20, fontWeight: 900, color: "#fff", textDecoration: "none", letterSpacing: "-0.04em", opacity: 0.4 }}>80</a>
+        <a href="/"><img src="/8.png" alt="80" style={{ height: 28, display: "block", opacity: 0.4 }} /></a>
       </footer>
 
       <style>{`

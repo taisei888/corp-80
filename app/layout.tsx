@@ -12,6 +12,10 @@ export const metadata: Metadata = {
   title: "合同会社80 | 人の知覚を、ソフトウェアで拡張する。",
   description:
     "LENDS AIをはじめとする自社SaaS開発、AI受託開発、HP制作デザインを手がける合同会社80の公式サイトです。",
+  icons: {
+    icon: "/7.png",
+    apple: "/7.png",
+  },
 };
 
 export default function RootLayout({

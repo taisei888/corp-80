@@ -62,7 +62,7 @@ export default function PrivacyPage() {
         display: "flex", alignItems: "center", justifyContent: "space-between",
         padding: "0 48px", height: 64,
       }}>
-        <a href="/" style={{ fontSize: 22, fontWeight: 900, color: "#0f172a", textDecoration: "none", letterSpacing: "-0.04em" }}>80</a>
+        <a href="/"><img src="/7.png" alt="80" style={{ height: 28, display: "block" }} /></a>
         <a href="/" style={{ fontSize: 13, fontWeight: 600, color: "#475569", textDecoration: "none", padding: "8px 20px", borderRadius: 100, border: "1.5px solid #e2e8f0" }}>← トップに戻る</a>
       </nav>
 

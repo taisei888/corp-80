@@ -255,9 +255,8 @@ export default function Home() {
           transition: "all 0.3s ease",
         }}>
           <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            style={{ background: "none", border: "none", cursor: "pointer",
-              fontSize: 22, fontWeight: 900, color: "#0f172a", letterSpacing: "-0.03em" }}>
-            80
+            style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+            <img src="/7.png" alt="80" style={{ height: 28, display: "block" }} />
           </button>
           <div style={{ display: "flex", gap: 36 }}>
             {([["ビジョン","vision"],["事業内容","business"],["プロダクト","product"]] as const).map(([l, id]) => (
@@ -735,7 +734,7 @@ export default function Home() {
               {/* Left — logo + tagline */}
               <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                 <div>
-                  <div style={{ fontSize: 28, fontWeight: 900, color: "#fff", letterSpacing: "-0.04em", marginBottom: 12 }}>80</div>
+                  <div style={{ marginBottom: 12 }}><img src="/8.png" alt="80" style={{ height: 32, display: "block" }} /></div>
                   <div style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", lineHeight: 1.8 }}>
                     人の知覚を、<br />ソフトウェアで拡張する。
                   </div>

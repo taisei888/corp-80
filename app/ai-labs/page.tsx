@@ -146,7 +146,7 @@ export default function AILabsPage() {
         padding: "0 48px", height: 64,
       }}>
         <a href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ fontSize: 20, fontWeight: 900, color: "#0f172a", letterSpacing: "-0.04em" }}>80</span>
+          <img src="/7.png" alt="80" style={{ height: 26, display: "block" }} />
           <span style={{ width: 1, height: 16, background: "#e2e8f0" }} />
           <span style={{ fontSize: 13, fontWeight: 700, color: "#6366f1", letterSpacing: "0.1em", textTransform: "uppercase" }}>AI Labs</span>
         </a>
@@ -556,7 +556,7 @@ export default function AILabsPage() {
         <div style={{ fontSize: 11, color: "rgba(255,255,255,0.25)", letterSpacing: "0.04em" }}>
           © 2025 合同会社80. All rights reserved.
         </div>
-        <a href="/" style={{ fontSize: 20, fontWeight: 900, color: "#fff", textDecoration: "none", letterSpacing: "-0.04em", opacity: 0.6 }}>80</a>
+        <a href="/"><img src="/8.png" alt="80" style={{ height: 28, display: "block", opacity: 0.6 }} /></a>
       </footer>
 
       <style>{`
