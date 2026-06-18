@@ -85,7 +85,7 @@ export default function CompanyPage() {
         display: "flex", alignItems: "center", justifyContent: "space-between",
         padding: "0 48px", height: 64,
       }}>
-        <a href="/"><img src="/7.png" alt="80" style={{ height: 28, display: "block" }} /></a>
+        <a href="/"><img src="/7.png" alt="80" style={{ height: 48, display: "block" }} /></a>
         <a
           href="/"
           style={{
