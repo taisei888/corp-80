@@ -213,8 +213,13 @@ function ParticleTextCanvas() {
 export default function Home() {
   const [navScrolled, setNavScrolled] = useState(false);
   const [inHero, setInHero] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
     const onScroll = () => {
       setNavScrolled(window.scrollY > 40);
       setInHero(window.scrollY < window.innerHeight * 0.8);
@@ -225,7 +230,11 @@ export default function Home() {
       { threshold: 0.15, rootMargin: "0px 0px -60px 0px" }
     );
     document.querySelectorAll(".sr").forEach((el) => io.observe(el));
-    return () => { window.removeEventListener("scroll", onScroll); io.disconnect(); };
+    return () => {
+      window.removeEventListener("resize", checkMobile);
+      window.removeEventListener("scroll", onScroll);
+      io.disconnect();
+    };
   }, []);
 
   const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
@@ -240,7 +249,7 @@ export default function Home() {
 
   return (
     <>
-      <ParticleTextCanvas />
+      {!isMobile && <ParticleTextCanvas />}
       <div style={{ position: "relative", zIndex: 1 }}>
 
         {/* ── Nav ── */}
@@ -248,15 +257,17 @@ export default function Home() {
           position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
           height: navScrolled ? 60 : 70,
           display: "flex", alignItems: "center", justifyContent: "space-between",
-          padding: "0 48px",
-          background: navScrolled ? "rgba(248,250,252,0.88)" : "transparent",
-          backdropFilter: navScrolled ? "blur(20px)" : "none",
-          borderBottom: navScrolled ? "1px solid rgba(0,0,0,0.07)" : "none",
+          padding: isMobile ? "0 20px" : "0 48px",
+          background: isMobile
+            ? "rgba(248,250,252,0.95)"
+            : navScrolled ? "rgba(248,250,252,0.88)" : "transparent",
+          backdropFilter: navScrolled || isMobile ? "blur(20px)" : "none",
+          borderBottom: navScrolled || isMobile ? "1px solid rgba(0,0,0,0.07)" : "none",
           transition: "all 0.3s ease",
         }}>
           <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}>
-            <img src="/7.png" alt="80" style={{ height: 48, display: "block" }} />
+            <img src="/7.png" alt="80" style={{ height: 40, display: "block" }} />
           </button>
           <div className="mob-hide" style={{ display: "flex", gap: 36 }}>
             {([["ビジョン","vision"],["事業内容","business"],["プロダクト","product"]] as const).map(([l, id]) => (
@@ -270,8 +281,8 @@ export default function Home() {
             ))}
           </div>
           <button onClick={() => scrollTo("news")}
-            style={{ padding: "9px 24px", borderRadius: 6, border: "1.5px solid #0f172a",
-              background: "transparent", color: "#0f172a", fontSize: 13, fontWeight: 600,
+            style={{ padding: "8px 18px", borderRadius: 6, border: "1.5px solid #0f172a",
+              background: "transparent", color: "#0f172a", fontSize: 12, fontWeight: 600,
               cursor: "pointer", transition: "all 0.2s", fontFamily: "inherit" }}
             onMouseEnter={e => { e.currentTarget.style.background="#0f172a"; e.currentTarget.style.color="#fff"; }}
             onMouseLeave={e => { e.currentTarget.style.background="transparent"; e.currentTarget.style.color="#0f172a"; }}>
@@ -279,26 +290,90 @@ export default function Home() {
           </button>
         </nav>
 
-        {/* ── Hero ── */}
-        <section style={{ minHeight: "100vh", display: "flex", alignItems: "flex-end",
-          justifyContent: "center", padding: "0 48px 80px", position: "relative" }}>
-          <div style={{ textAlign: "center", maxWidth: 900, width: "100%" }} />
-          {/* SCROLL — center bottom */}
-          <div style={{ position: "fixed", bottom: 36, left: "50%", transform: "translateX(-50%)",
-            display: "flex", flexDirection: "column", alignItems: "center", gap: 10, zIndex: 10,
-            animation: "fade-in 1s ease 1.4s both",
-            opacity: inHero ? 1 : 0, pointerEvents: inHero ? "auto" : "none",
-            transition: "opacity 0.4s ease" }}>
-            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.35em",
-              color: "#94a3b8", textTransform: "uppercase" }}>Scroll</span>
-            <div style={{ position: "relative", width: 1, height: 64, overflow: "hidden",
-              background: "rgba(99,102,241,0.15)", borderRadius: 2 }}>
-              <div style={{ position: "absolute", top: 0, left: 0, width: "100%",
-                background: "linear-gradient(to bottom, #6366f1, #a78bfa)",
-                borderRadius: 2, animation: "scroll-bar 1.6s cubic-bezier(0.4,0,0.2,1) infinite" }} />
+        {/* ── Hero (Desktop) ── */}
+        {!isMobile && (
+          <section style={{ minHeight: "100vh", display: "flex", alignItems: "flex-end",
+            justifyContent: "center", padding: "0 48px 80px", position: "relative" }}>
+            <div style={{ textAlign: "center", maxWidth: 900, width: "100%" }} />
+            <div style={{ position: "fixed", bottom: 36, left: "50%", transform: "translateX(-50%)",
+              display: "flex", flexDirection: "column", alignItems: "center", gap: 10, zIndex: 10,
+              animation: "fade-in 1s ease 1.4s both",
+              opacity: inHero ? 1 : 0, pointerEvents: inHero ? "auto" : "none",
+              transition: "opacity 0.4s ease" }}>
+              <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.35em",
+                color: "#94a3b8", textTransform: "uppercase" }}>Scroll</span>
+              <div style={{ position: "relative", width: 1, height: 64, overflow: "hidden",
+                background: "rgba(99,102,241,0.15)", borderRadius: 2 }}>
+                <div style={{ position: "absolute", top: 0, left: 0, width: "100%",
+                  background: "linear-gradient(to bottom, #6366f1, #a78bfa)",
+                  borderRadius: 2, animation: "scroll-bar 1.6s cubic-bezier(0.4,0,0.2,1) infinite" }} />
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
+
+        {/* ── Hero (Mobile) ── */}
+        {isMobile && (
+          <section style={{
+            minHeight: "100vh", display: "flex", flexDirection: "column",
+            justifyContent: "center", padding: "100px 24px 60px",
+            background: "linear-gradient(160deg, #f8fafc 0%, #eef2ff 60%, #e8eeff 100%)",
+            position: "relative", overflow: "hidden",
+          }}>
+            {/* bg accent */}
+            <div style={{ position: "absolute", top: "10%", right: "-10%", width: 280, height: 280,
+              borderRadius: "50%", background: "radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%)",
+              pointerEvents: "none" }} />
+
+            <div style={{ position: "relative" }}>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.22em", color: "#6366f1",
+                textTransform: "uppercase", marginBottom: 20,
+                display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ width: 20, height: 1, background: "#6366f1", display: "inline-block" }} />
+                合同会社80
+              </div>
+
+              <h1 style={{ fontSize: "clamp(48px, 14vw, 72px)", fontWeight: 900,
+                letterSpacing: "-0.05em", color: "#0f172a", lineHeight: 1.0, marginBottom: 28 }}>
+                Build<br />
+                what&apos;s<br />
+                <span style={{ color: "#6366f1" }}>next.</span>
+              </h1>
+
+              <p style={{ fontSize: 15, color: "#475569", lineHeight: 1.9, marginBottom: 40, maxWidth: 320 }}>
+                人の知覚を、ソフトウェアで拡張する。<br />
+                AIで、ビジネスの次を共につくる。
+              </p>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                <button onClick={() => scrollTo("business")}
+                  style={{ padding: "16px 28px", borderRadius: 8, border: "none",
+                    background: "#0f172a", color: "#fff", fontSize: 14, fontWeight: 700,
+                    cursor: "pointer", fontFamily: "inherit", textAlign: "left",
+                    display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  事業内容を見る
+                  <span>→</span>
+                </button>
+                <button onClick={() => scrollTo("news")}
+                  style={{ padding: "16px 28px", borderRadius: 8,
+                    border: "1.5px solid #e2e8f0", background: "transparent",
+                    color: "#0f172a", fontSize: 14, fontWeight: 600,
+                    cursor: "pointer", fontFamily: "inherit", textAlign: "left",
+                    display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  お問い合わせ
+                  <span style={{ color: "#6366f1" }}>→</span>
+                </button>
+              </div>
+            </div>
+
+            {/* scroll hint */}
+            <div style={{ position: "absolute", bottom: 32, left: "50%", transform: "translateX(-50%)",
+              display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+              <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.3em", color: "#94a3b8", textTransform: "uppercase" }}>Scroll</span>
+              <div style={{ width: 1, height: 40, background: "linear-gradient(to bottom, #94a3b8, transparent)" }} />
+            </div>
+          </section>
+        )}
 
         {/* ── White overlay sections ── */}
         <div style={{ position: "relative" }}>
