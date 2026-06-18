@@ -191,43 +191,8 @@ export default function CompanyPage() {
         </div>
       </section>
 
-      {/* ── Access ── */}
-      <section style={{ padding: "100px 80px", background: "#fff" }}>
-        <div style={{ maxWidth: 1160, margin: "0 auto" }}>
-          <div className="sr-c" style={{ ...sr, marginBottom: 56 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.25em", color: "#6366f1", textTransform: "uppercase", marginBottom: 16 }}>Access</div>
-            <h2 style={{ fontSize: "clamp(28px, 4vw, 48px)", fontWeight: 900, letterSpacing: "-0.04em", color: "#0f172a" }}>アクセス</h2>
-          </div>
 
-          <div className="sr-c" style={{ ...sr, transitionDelay: "0.1s", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "center" }}>
-            <div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: "#0f172a", marginBottom: 16 }}>合同会社80</div>
-              <div style={{ fontSize: 14, color: "#64748b", lineHeight: 2.0 }}>
-                〒462-0849<br />
-                愛知県名古屋市北区楠味鋺2-914-2-2F<br /><br />
-                TEL：050-8896-5889<br />
-                MAIL：ito.t@80grp.com
-              </div>
-            </div>
-            <div style={{
-              borderRadius: 20, overflow: "hidden",
-              border: "1.5px solid #e2e8f0", height: 280,
-              background: "#f1f5f9", display: "flex", alignItems: "center", justifyContent: "center",
-            }}>
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3260.2!2d136.9!3d35.2!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z5oSb55-l55yM5ZCN5Y-k5bGL5YyX5YyX5Yy65qCq5byP5Lya56S-!5e0!3m2!1sja!2sjp!4v1234567890"
-                width="100%" height="280"
-                style={{ border: 0, display: "block" }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Footer ── */}
+{/* ── Footer ── */}
       <footer style={{ background: "#0f172a", padding: "48px 80px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ fontSize: 11, color: "rgba(255,255,255,0.25)", letterSpacing: "0.04em" }}>© 2025 合同会社80. All rights reserved.</div>
         <div style={{ display: "flex", gap: 24 }}>
