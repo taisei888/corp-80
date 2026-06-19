@@ -85,7 +85,7 @@ export default function PrivacyPage() {
             </div>
           ))}
           <div style={{ paddingTop: 32, borderTop: "1px solid #e2e8f0" }}>
-            <p style={{ fontSize: 13, color: "#94a3b8" }}>制定日：2023年3月1日<br />最終改定日：2025年1月1日</p>
+            <p style={{ fontSize: 13, color: "#94a3b8" }}>制定日：2024年4月1日<br />最終改定日：2025年1月1日</p>
           </div>
         </div>
       </section>

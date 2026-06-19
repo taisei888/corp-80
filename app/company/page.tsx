@@ -37,7 +37,7 @@ export default function CompanyPage() {
     { label: "電話番号", value: "050-8896-5889" },
     { label: "メールアドレス", value: "ito.t@80grp.com" },
     { label: "資本金", value: "501万円" },
-    { label: "設立", value: "2023年3月" },
+    { label: "設立", value: "2024年4月" },
     { label: "許認可番号", value: "有料職業紹介事業　許可番号：23-ユ-303078" },
   ];
 

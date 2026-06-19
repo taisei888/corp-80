@@ -239,14 +239,6 @@ export default function Home() {
 
   const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
-  const card: React.CSSProperties = {
-    background: "#fff",
-    border: "1px solid #e2e8f0",
-    boxShadow: "0 4px 24px rgba(0,0,0,0.06)",
-    borderRadius: 20,
-    padding: "40px 36px",
-  };
-
   return (
     <>
       {!isMobile && <ParticleTextCanvas />}
@@ -259,15 +251,15 @@ export default function Home() {
           display: "flex", alignItems: "center", justifyContent: "space-between",
           padding: isMobile ? "0 20px" : "0 48px",
           background: isMobile
-            ? "rgba(248,250,252,0.95)"
+            ? (navScrolled ? "rgba(248,250,252,0.95)" : "transparent")
             : navScrolled ? "rgba(248,250,252,0.88)" : "transparent",
-          backdropFilter: navScrolled || isMobile ? "blur(20px)" : "none",
-          borderBottom: navScrolled || isMobile ? "1px solid rgba(0,0,0,0.07)" : "none",
+          backdropFilter: navScrolled ? "blur(20px)" : "none",
+          borderBottom: navScrolled ? "1px solid rgba(0,0,0,0.07)" : "none",
           transition: "all 0.3s ease",
         }}>
           <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}>
-            <img src="/7.png" alt="80" style={{ height: 40, display: "block" }} />
+            <img src={(isMobile && inHero) ? "/8.png" : "/7.png"} alt="80" style={{ height: 40, display: "block", transition: "opacity 0.3s" }} />
           </button>
           <div className="mob-hide" style={{ display: "flex", gap: 36 }}>
             {([["ビジョン","vision"],["事業内容","business"],["プロダクト","product"]] as const).map(([l, id]) => (
@@ -280,14 +272,17 @@ export default function Home() {
               </button>
             ))}
           </div>
-          <button onClick={() => scrollTo("news")}
-            style={{ padding: "8px 18px", borderRadius: 6, border: "1.5px solid #0f172a",
-              background: "transparent", color: "#0f172a", fontSize: 12, fontWeight: 600,
-              cursor: "pointer", transition: "all 0.2s", fontFamily: "inherit" }}
-            onMouseEnter={e => { e.currentTarget.style.background="#0f172a"; e.currentTarget.style.color="#fff"; }}
-            onMouseLeave={e => { e.currentTarget.style.background="transparent"; e.currentTarget.style.color="#0f172a"; }}>
+          <a href="/contact"
+            style={{ padding: "8px 18px", borderRadius: 6,
+              border: (isMobile && inHero) ? "1.5px solid rgba(255,255,255,0.3)" : "1.5px solid #0f172a",
+              background: "transparent",
+              color: (isMobile && inHero) ? "#f8fafc" : "#0f172a",
+              fontSize: 12, fontWeight: 600,
+              cursor: "pointer", transition: "all 0.3s", fontFamily: "inherit", textDecoration: "none" }}
+            onMouseEnter={e => { e.currentTarget.style.background = (isMobile && inHero) ? "rgba(255,255,255,0.1)" : "#0f172a"; e.currentTarget.style.color="#fff"; }}
+            onMouseLeave={e => { e.currentTarget.style.background="transparent"; e.currentTarget.style.color = (isMobile && inHero) ? "#f8fafc" : "#0f172a"; }}>
             お問い合わせ
-          </button>
+          </a>
         </nav>
 
         {/* ── Hero (Desktop) ── */}
@@ -316,61 +311,76 @@ export default function Home() {
         {isMobile && (
           <section style={{
             minHeight: "100vh", display: "flex", flexDirection: "column",
-            justifyContent: "center", padding: "100px 24px 60px",
-            background: "linear-gradient(160deg, #f8fafc 0%, #eef2ff 60%, #e8eeff 100%)",
+            justifyContent: "flex-end", padding: "0 0 48px",
+            background: "#0f172a",
             position: "relative", overflow: "hidden",
           }}>
-            {/* bg accent */}
-            <div style={{ position: "absolute", top: "10%", right: "-10%", width: 280, height: 280,
-              borderRadius: "50%", background: "radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%)",
-              pointerEvents: "none" }} />
+            {/* animated gradient orbs */}
+            <div className="mob-hero-orb1" style={{ position: "absolute", top: "-15%", right: "-20%", width: "70vw", height: "70vw",
+              borderRadius: "50%", background: "radial-gradient(circle, rgba(99,102,241,0.35) 0%, transparent 70%)",
+              pointerEvents: "none", filter: "blur(40px)" }} />
+            <div className="mob-hero-orb2" style={{ position: "absolute", bottom: "10%", left: "-25%", width: "60vw", height: "60vw",
+              borderRadius: "50%", background: "radial-gradient(circle, rgba(124,58,237,0.25) 0%, transparent 70%)",
+              pointerEvents: "none", filter: "blur(50px)" }} />
 
-            <div style={{ position: "relative" }}>
-              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.22em", color: "#6366f1",
-                textTransform: "uppercase", marginBottom: 20,
-                display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ width: 20, height: 1, background: "#6366f1", display: "inline-block" }} />
-                合同会社80
+            {/* grid pattern overlay */}
+            <div style={{ position: "absolute", inset: 0, opacity: 0.04, pointerEvents: "none",
+              backgroundImage: "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)",
+              backgroundSize: "40px 40px" }} />
+
+            {/* top section with big text */}
+            <div style={{ position: "relative", flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: "100px 28px 0" }}>
+              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.3em", color: "#6366f1",
+                textTransform: "uppercase", marginBottom: 24,
+                display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ width: 24, height: 1.5, background: "#6366f1", display: "inline-block" }} />
+                LLC 80
               </div>
 
-              <h1 style={{ fontSize: "clamp(48px, 14vw, 72px)", fontWeight: 900,
-                letterSpacing: "-0.05em", color: "#0f172a", lineHeight: 1.0, marginBottom: 28 }}>
+              <h1 style={{ fontSize: "clamp(56px, 16vw, 80px)", fontWeight: 900,
+                letterSpacing: "-0.05em", color: "#f8fafc", lineHeight: 0.95, marginBottom: 32 }}>
                 Build<br />
                 what&apos;s<br />
-                <span style={{ color: "#6366f1" }}>next.</span>
+                <span style={{
+                  background: "linear-gradient(135deg, #6366f1, #a78bfa, #818cf8)",
+                  WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+                }}>next.</span>
               </h1>
 
-              <p style={{ fontSize: 15, color: "#475569", lineHeight: 1.9, marginBottom: 40, maxWidth: 320 }}>
+              <p style={{ fontSize: 14, color: "rgba(248,250,252,0.5)", lineHeight: 1.9, maxWidth: 300 }}>
                 人の知覚を、ソフトウェアで拡張する。<br />
                 AIで、ビジネスの次を共につくる。
               </p>
+            </div>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {/* bottom CTA area */}
+            <div style={{ position: "relative", padding: "0 28px" }}>
+              <div style={{ display: "flex", gap: 10 }}>
                 <button onClick={() => scrollTo("business")}
-                  style={{ padding: "16px 28px", borderRadius: 8, border: "none",
-                    background: "#0f172a", color: "#fff", fontSize: 14, fontWeight: 700,
-                    cursor: "pointer", fontFamily: "inherit", textAlign: "left",
+                  style={{ flex: 1, padding: "18px 20px", borderRadius: 12, border: "none",
+                    background: "#fff", color: "#0f172a", fontSize: 14, fontWeight: 700,
+                    cursor: "pointer", fontFamily: "inherit",
                     display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  事業内容を見る
-                  <span>→</span>
+                  事業内容
+                  <span style={{ fontSize: 18 }}>→</span>
                 </button>
-                <button onClick={() => scrollTo("news")}
-                  style={{ padding: "16px 28px", borderRadius: 8,
-                    border: "1.5px solid #e2e8f0", background: "transparent",
-                    color: "#0f172a", fontSize: 14, fontWeight: 600,
-                    cursor: "pointer", fontFamily: "inherit", textAlign: "left",
-                    display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <a href="/contact"
+                  style={{ flex: 1, padding: "18px 20px", borderRadius: 12,
+                    border: "1px solid rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.05)",
+                    color: "#f8fafc", fontSize: 14, fontWeight: 600,
+                    cursor: "pointer", fontFamily: "inherit",
+                    display: "flex", justifyContent: "space-between", alignItems: "center",
+                    textDecoration: "none" }}>
                   お問い合わせ
-                  <span style={{ color: "#6366f1" }}>→</span>
-                </button>
+                  <span style={{ color: "#a78bfa", fontSize: 18 }}>→</span>
+                </a>
               </div>
             </div>
 
             {/* scroll hint */}
-            <div style={{ position: "absolute", bottom: 32, left: "50%", transform: "translateX(-50%)",
-              display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
-              <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.3em", color: "#94a3b8", textTransform: "uppercase" }}>Scroll</span>
-              <div style={{ width: 1, height: 40, background: "linear-gradient(to bottom, #94a3b8, transparent)" }} />
+            <div style={{ position: "absolute", bottom: 12, left: "50%", transform: "translateX(-50%)",
+              display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+              <div className="mob-scroll-line" style={{ width: 1, height: 32, background: "linear-gradient(to bottom, rgba(99,102,241,0.6), transparent)", borderRadius: 1 }} />
             </div>
           </section>
         )}
@@ -378,7 +388,12 @@ export default function Home() {
         {/* ── White overlay sections ── */}
         <div style={{ position: "relative" }}>
           {/* Gradient fade from transparent to white */}
-          <div style={{ height: 160, background: "linear-gradient(to bottom, transparent, #fff)", pointerEvents: "none" }} />
+          {!isMobile && (
+            <div style={{ height: 160, background: "linear-gradient(to bottom, transparent, #fff)", pointerEvents: "none" }} />
+          )}
+          {isMobile && (
+            <div style={{ height: 80, background: "linear-gradient(to bottom, #0f172a, #fff)", pointerEvents: "none" }} />
+          )}
 
         {/* ── Vision ── */}
         <section id="vision" className="mob-section" style={{ background: "#fff", padding: "120px 64px 140px" }}>
@@ -491,16 +506,17 @@ export default function Home() {
               </div>
 
               {/* 04 — jGO */}
-              <div className="sr" style={{ borderRadius: 20, overflow: "hidden", cursor: "pointer", transitionDelay: "0.24s" }}
-                onMouseEnter={e => { (e.currentTarget.querySelector(".biz-img") as HTMLElement).style.transform = "scale(1.03)"; }}
-                onMouseLeave={e => { (e.currentTarget.querySelector(".biz-img") as HTMLElement).style.transform = "scale(1)"; }}>
+              <div className="sr" style={{ borderRadius: 20, overflow: "hidden", cursor: "default", transitionDelay: "0.24s", opacity: 0.7 }}>
                 <div className="biz-img" style={{ height: 380, overflow: "hidden",
                   transition: "transform 0.6s cubic-bezier(0.16,1,0.3,1)" }}>
                   <img src="/4.jpg" alt="jGO" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                 </div>
                 <div style={{ padding: "22px 4px" }}>
                   <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 8, fontWeight: 600 }}>04</div>
-                  <div style={{ fontSize: 22, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em" }}>jGO — 人材紹介</div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{ fontSize: 22, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em" }}>jGO — 人材紹介</div>
+                    <span style={{ fontSize: 10, fontWeight: 700, padding: "3px 10px", borderRadius: 100, background: "#f1f5f9", color: "#94a3b8", letterSpacing: "0.06em" }}>Coming Soon</span>
+                  </div>
                   <div style={{ fontSize: 14, color: "#64748b", marginTop: 6, lineHeight: 1.7 }}>グローバル視点で人材と企業をつなぐキャリア支援サービス。テクノロジーと人の知見で最適なマッチングを実現します。（有料職業紹介事業）</div>
                 </div>
               </div>
@@ -707,11 +723,11 @@ export default function Home() {
 
             <div style={{ display: "flex", flexDirection: "column" }}>
               {[
-                { date: "2025.12", cat: "Product", title: "LENDS AI 新機能「採用アセスメント」正式リリース", desc: "心理・論理・コミュニケーション・敬語の4軸で候補者を自動評価する採用アセスメント機能を追加しました。" },
-                { date: "2025.10", cat: "Service", title: "AI受託開発サービス「AI Build」提供開始", desc: "LLM・RAG・業務自動化を中心としたAI開発サービスを正式に開始。初月無料相談受付中。" },
-                { date: "2025.08", cat: "Works",   title: "大手飲食チェーン向け予約システムAI化を完了", desc: "月間10万件超の予約対応をAIが自動処理。スタッフの対応工数を約70%削減することに成功。" },
-                { date: "2025.06", cat: "Works",   title: "HR企業向け入社時AIアセスメントシステムを納品", desc: "採用選考の一次評価をAIが自動化。採用精度の向上と選考時間の大幅な短縮を実現。" },
-                { date: "2025.04", cat: "Company", title: "合同会社80 設立", desc: "「人の知覚を、ソフトウェアで拡張する。」をミッションに、名古屋を拠点として合同会社80を設立。" },
+                { date: "2026.06", cat: "Research", title: "RAGパイプラインの精度向上に関する社内検証を実施", desc: "チャンク分割戦略とリランキングモデルの組み合わせにより、社内FAQ検索の回答精度を従来比で約25%改善。" },
+                { date: "2026.04", cat: "Research", title: "マルチモーダルLLMを活用した業務文書解析の研究開発", desc: "画像・表・PDFを含む業務文書をLLMで構造的に解析する手法を検証中。請求書・契約書の自動処理への応用を目指す。" },
+                { date: "2026.02", cat: "Research", title: "LLMエージェントによる業務フロー自動化の技術検証", desc: "複数ツールを跨いだタスクをAIエージェントが自律的に処理する仕組みのPoC開発に着手。" },
+                { date: "2025.12", cat: "Product",  title: "LENDS AI 新機能「採用アセスメント」正式リリース", desc: "心理・論理・コミュニケーション・敬語の4軸で候補者を自動評価する採用アセスメント機能を追加しました。" },
+                { date: "2025.10", cat: "Research", title: "小規模LLMのファインチューニングによる業務特化AI検証", desc: "オープンソースLLMを業務データで追加学習し、汎用モデルと比較してドメイン特化タスクの精度向上を確認。" },
               ].map((item, i) => (
                 <div key={i} className="sr mob-news-item" style={{
                   display: "grid", gridTemplateColumns: "120px 80px 1fr",
@@ -746,7 +762,7 @@ export default function Home() {
             {/* Title */}
             <div className="sr mob-recruit-header" style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 80 }}>
               <h2 style={{ fontSize: "clamp(48px, 7vw, 96px)", fontWeight: 900, letterSpacing: "-0.05em", color: "#f8fafc", lineHeight: 1 }}>Recruit</h2>
-              <a href="mailto:info@80llc.jp"
+              <a href="mailto:ito.t@80grp.com"
                 style={{ display: "inline-flex", alignItems: "center", gap: 10,
                   padding: "12px 28px", borderRadius: 6,
                   border: "1px solid rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.6)",
@@ -826,12 +842,15 @@ export default function Home() {
                     <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.1)" }} />
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                    {[["quix","business"],["LENDS AI","business"],["AI Labs","business"],["jGO","business"]].map(([l, id]) => (
-                      <button key={l} onClick={() => document.getElementById(id)?.scrollIntoView({ behavior:"smooth" })}
-                        style={{ background:"none", border:"none", cursor:"pointer", padding:0, textAlign:"left",
-                          fontSize:13, color:"rgba(255,255,255,0.45)", fontFamily:"inherit", transition:"color 0.2s" }}
-                        onMouseEnter={e => (e.currentTarget.style.color="#fff")}
-                        onMouseLeave={e => (e.currentTarget.style.color="rgba(255,255,255,0.45)")}>{l}</button>
+                    {[["quix","/quix"],["LENDS AI","https://www.lens-ai.jp"],["AI Labs","/ai-labs"],["jGO",null]].map(([l, href]) => (
+                      href ? (
+                        <a key={l as string} href={href as string} target={href.startsWith("http") ? "_blank" : undefined} rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
+                          style={{ fontSize:13, color:"rgba(255,255,255,0.45)", textDecoration:"none", transition:"color 0.2s" }}
+                          onMouseEnter={e => (e.currentTarget.style.color="#fff")}
+                          onMouseLeave={e => (e.currentTarget.style.color="rgba(255,255,255,0.45)")}>{l}</a>
+                      ) : (
+                        <span key={l as string} style={{ fontSize:13, color:"rgba(255,255,255,0.25)" }}>{l}</span>
+                      )
                     ))}
                   </div>
 
@@ -870,11 +889,11 @@ export default function Home() {
                     <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.2em", color: "rgba(255,255,255,0.4)", textTransform: "uppercase" }}>お問い合わせ</span>
                     <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.1)" }} />
                   </div>
-                  <a href="mailto:info@80llc.jp"
+                  <a href="/contact"
                     style={{ fontSize:13, color:"rgba(255,255,255,0.45)", textDecoration:"none", transition:"color 0.2s", display:"block" }}
                     onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.color="#fff")}
                     onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.color="rgba(255,255,255,0.45)")}>
-                    info@80llc.jp
+                    お問い合わせフォーム →
                   </a>
                 </div>
               </div>
@@ -954,6 +973,24 @@ export default function Home() {
             flex-direction: column !important;
             align-items: flex-start !important;
             gap: 20px !important;
+          }
+
+          .mob-hero-orb1 {
+            animation: orb-float 8s ease-in-out infinite alternate;
+          }
+          .mob-hero-orb2 {
+            animation: orb-float 10s ease-in-out infinite alternate-reverse;
+          }
+          @keyframes orb-float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(-10px, 15px) scale(1.08); }
+          }
+          .mob-scroll-line {
+            animation: scroll-pulse 2s ease-in-out infinite;
+          }
+          @keyframes scroll-pulse {
+            0%, 100% { opacity: 0.3; transform: scaleY(0.6); transform-origin: top; }
+            50% { opacity: 1; transform: scaleY(1); transform-origin: top; }
           }
 
           .biz-img { height: 220px !important; }

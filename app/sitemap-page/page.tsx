@@ -22,6 +22,7 @@ export default function SitemapPage() {
       links: [
         { label: "プライバシーポリシー", href: "/privacy", desc: "個人情報の取り扱いについて" },
         { label: "利用規約", href: "/terms", desc: "サービス利用に関する規約" },
+        { label: "お問い合わせ", href: "/contact", desc: "お問い合わせフォーム" },
         { label: "サイトマップ", href: "/sitemap-page", desc: "本ページ" },
       ],
     },
