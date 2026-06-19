@@ -31,10 +31,42 @@ export default function HearingTool() {
   });
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
+  const [scraping, setScraping] = useState(false);
+  const [scrapeUrl, setScrapeUrl] = useState("");
   const [error, setError] = useState("");
   const resultRef = useRef<HTMLDivElement>(null);
 
   const update = (key: string, val: string) => setForm(prev => ({ ...prev, [key]: val }));
+
+  const scrapeCompany = async () => {
+    if (!scrapeUrl.trim()) return;
+    setScraping(true);
+    setError("");
+    try {
+      let url = scrapeUrl.trim();
+      if (!url.startsWith("http")) url = "https://" + url;
+      const res = await fetch("/api/scrape", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      const info = data.info;
+      setForm(prev => ({
+        ...prev,
+        company: info.company || prev.company,
+        industry: info.industry || prev.industry,
+        employees: info.employees || prev.employees,
+        locations: info.locations || prev.locations,
+        current_tools: info.current_tools || prev.current_tools,
+      }));
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "スクレイピングに失敗しました");
+    } finally {
+      setScraping(false);
+    }
+  };
 
   const buildMemo = () => {
     return FIELDS
@@ -123,6 +155,47 @@ export default function HearingTool() {
           <p style={{ fontSize: 13, color: "rgba(255,255,255,0.35)", lineHeight: 1.7 }}>
             商談時のメモを入力してください。全項目埋める必要はありません。わかる範囲でOKです。
           </p>
+        </div>
+
+        {/* URL Auto-fill */}
+        <div style={{
+          marginBottom: 28, padding: "20px 20px", borderRadius: 12,
+          background: "rgba(99,102,241,0.05)", border: "1px solid rgba(99,102,241,0.15)",
+        }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "#6366f1", marginBottom: 10, letterSpacing: "0.04em" }}>
+            会社HPから自動入力
+          </div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <input
+              type="text"
+              value={scrapeUrl}
+              onChange={e => setScrapeUrl(e.target.value)}
+              placeholder="https://example.co.jp"
+              onKeyDown={e => e.key === "Enter" && scrapeCompany()}
+              style={{
+                flex: 1, padding: "10px 14px", borderRadius: 8,
+                border: "1px solid rgba(99,102,241,0.2)", background: "rgba(0,0,0,0.2)",
+                fontSize: 13, fontFamily: "inherit", color: "#f8fafc", outline: "none",
+              }}
+              onFocus={e => e.currentTarget.style.borderColor = "rgba(99,102,241,0.5)"}
+              onBlur={e => e.currentTarget.style.borderColor = "rgba(99,102,241,0.2)"}
+            />
+            <button
+              onClick={scrapeCompany}
+              disabled={scraping || !scrapeUrl.trim()}
+              style={{
+                padding: "10px 20px", borderRadius: 8, border: "none",
+                background: scraping ? "rgba(99,102,241,0.3)" : "#6366f1",
+                color: "#fff", fontSize: 12, fontWeight: 700, cursor: scraping ? "wait" : "pointer",
+                fontFamily: "inherit", whiteSpace: "nowrap", transition: "all 0.2s",
+              }}
+            >
+              {scraping ? "読込中..." : "読み込む"}
+            </button>
+          </div>
+          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.2)", marginTop: 8 }}>
+            会社HPのURLを貼ると、会社名・業種・従業員数などを自動入力します
+          </div>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
