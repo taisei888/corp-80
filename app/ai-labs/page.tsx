@@ -64,67 +64,53 @@ export default function AILabsPage() {
   };
 
   const concerns = [
-    "AIで何ができるかそもそもわからない",
-    "自社の業務にどう使えばいいの？",
-    "導入費用が高そうで不安…",
-    "社員が使いこなせる？ITが苦手な人も…",
-    "既存システムとの連携が難しそう…",
-    "どの業務から改善すべき？",
+    "紙の書類やExcelが多く、管理が大変",
+    "社内の情報共有がうまくいかない",
+    "ベテランのノウハウが引き継げない",
+    "中途採用がなかなかうまくいかない",
+    "デジタル化を進めたいが何から始めれば…",
+    "システム導入しても現場が使いこなせるか不安",
   ];
 
   const challenges = [
-    { num: "01", text: "同じ質問が何度もくる" },
-    { num: "02", text: "情報がバラバラ（紙・Excel・LINE）" },
-    { num: "03", text: "担当者しかわからない業務" },
-    { num: "04", text: "日報の確認に時間がかかる" },
-    { num: "05", text: "顧客対応に時間が奪われる" },
-    { num: "06", text: "入力・転記作業がとにかく多い" },
-    { num: "07", text: "データはあるが活用できない" },
-    { num: "08", text: "新人教育・引継ぎに時間がかかる" },
-    { num: "09", text: "現場の状況が見えにくい" },
-    { num: "10", text: "管理者の確認業務が多い" },
+    { num: "01", text: "日報・報告書・チェックシートが紙のまま" },
+    { num: "02", text: "Excelが複雑化して担当者しか触れない" },
+    { num: "03", text: "情報が人に依存し、共有されない" },
+    { num: "04", text: "製造現場の進捗が見えにくい" },
+    { num: "05", text: "ベテランの退職でノウハウが消えるリスク" },
+    { num: "06", text: "新人教育・引き継ぎに時間がかかる" },
+    { num: "07", text: "求人を出しても応募が集まらない" },
+    { num: "08", text: "採用しても定着しにくい" },
+    { num: "09", text: "経営判断に必要な数字がすぐ出ない" },
+    { num: "10", text: "管理者の確認業務が多すぎる" },
   ];
 
-  const aiCanDo = [
-    { num: "01", title: "社内問い合わせの自動回答" },
-    { num: "02", title: "顧客問い合わせの一次対応" },
-    { num: "03", title: "日報・報告書の自動要約" },
-    { num: "04", title: "マニュアルや資料の検索" },
-    { num: "05", title: "データの整理・分析" },
-    { num: "06", title: "見積・提案・メール作成補助" },
-    { num: "07", title: "営業履歴や顧客情報の整理" },
-    { num: "08", title: "採用応募者の情報整理" },
-    { num: "09", title: "アンケート・従業員の声の分析" },
-    { num: "10", title: "業務フローの自動化" },
+  const solutions = [
+    { num: "01", tag: "DIGITALIZATION", title: "紙・Excel業務のデジタル化", desc: "日報・チェックシート・報告書・申請書など、紙やExcelの業務をスマホ・PCから入力できるフォームに置き換え。自動集計・検索・共有まで一気に対応します。" },
+    { num: "02", tag: "MANUFACTURING", title: "製造管理システム", desc: "工程ごとの進捗状況、不具合報告、点検記録を一覧管理。管理者は事務所にいながら現場の状況をリアルタイムで把握できます。" },
+    { num: "03", tag: "DASHBOARD", title: "ダッシュボード管理", desc: "製造進捗、書類提出状況、未対応タスク、採用状況、教育進捗など、経営に必要な情報を一画面に集約。一目で状況を把握できます。" },
+    { num: "04", tag: "KNOWLEDGE BASE", title: "社内ナレッジ共有 / 社内FAQ", desc: "業務マニュアルやベテランのノウハウを蓄積し、検索できる仕組みに。AIが質問に対して該当するマニュアルを回答します。" },
+    { num: "05", tag: "EDUCATION", title: "教育・引き継ぎ管理", desc: "誰が何を習得済みか、何が未対応かを一覧で管理。世代交代に向けた教育の抜け漏れを防ぎ、教育担当の負担も軽減します。" },
+    { num: "06", tag: "RECRUITMENT", title: "採用改善支援", desc: "求人票の改善、応募者の適性診断、面接質問の設計まで対応。必要に応じて人材紹介も可能。採用から定着まで一貫して支援します。" },
   ];
 
-  const devExamples = [
-    { num: "01", tag: "FAQ / MANUAL SEARCH", title: "社内FAQ・マニュアル検索AI", desc: "社内規程やマニュアルをAIが学習。チャットで質問するだけで即座に回答します。" },
-    { num: "02", tag: "CUSTOMER SUPPORT", title: "問い合わせ対応AI", desc: "顧客からのよくある質問にAIが自動回答。解決しない場合は担当者にエスカレーション。" },
-    { num: "03", tag: "DAILY REPORT", title: "日報・報告書 要約AI", desc: "日々の報告を自動で要約。管理者は3行サマリーで状況を把握できます。" },
-    { num: "04", tag: "SALES SUPPORT", title: "営業支援AI", desc: "商談履歴から次のアクションを提案。見積もり作成もAIが補助します。" },
-    { num: "05", tag: "DOCUMENT WRITING", title: "書類作成サポートAI", desc: "過去の見積書・提案書をAIが学習し、テンプレート生成や文面補完を行います。" },
-    { num: "06", tag: "DATA VISUALIZATION", title: "データ分析・見える化", desc: "売上・顧客・業務データをダッシュボードで可視化。AIが傾向分析も行います。" },
-    { num: "07", tag: "HR / ASSESSMENT", title: "採用・人事アセスメントAI", desc: "応募者情報の自動整理、面接メモの要約、アンケート分析をAIが担当。" },
-  ];
-
-  const departments = [
-    { dept: "管理部", icon: "📋", challenge: "社内問い合わせ／書類確認／申請対応が多い", uses: ["社内FAQ", "申請ルール確認", "書類作成補助"] },
-    { dept: "営業部", icon: "📈", challenge: "提案書作成／顧客管理／フォロー漏れ", uses: ["営業履歴整理", "提案文作成", "次回アクション提案"] },
-    { dept: "人事部", icon: "👥", challenge: "採用対応／面接情報整理／従業員把握", uses: ["応募者整理", "面接メモ要約", "アンケート分析"] },
-    { dept: "カスタマーサポート", icon: "💬", challenge: "同じ問い合わせが多い／対応品質にばらつき", uses: ["問い合わせAI", "回答候補作成", "対応履歴分析"] },
-    { dept: "現場・店舗", icon: "🏪", challenge: "報告業務／マニュアル確認／情報共有", uses: ["日報要約", "マニュアル検索", "店舗状況の可視化"] },
+  const useCases = [
+    { industry: "製造業", icon: "🏭", challenge: "紙の日報・点検記録が多い / 製造進捗が見えない / 世代交代が迫っている", uses: ["紙業務のデジタル化", "製造管理システム", "教育・引き継ぎ管理"] },
+    { industry: "建設業", icon: "🏗", challenge: "現場ごとに報告が異なる / 安全管理の記録 / 職人の技術継承", uses: ["報告書のデジタル化", "ダッシュボード管理", "ナレッジ共有"] },
+    { industry: "物流・倉庫", icon: "📦", challenge: "在庫管理がExcel / ピッキングミス / 配送状況の把握", uses: ["在庫管理のデジタル化", "作業状況の見える化", "チェックリスト"] },
+    { industry: "飲食・小売", icon: "🏪", challenge: "シフト管理 / 在庫確認 / 本部への報告業務", uses: ["日報・報告デジタル化", "店舗状況の可視化", "社内FAQ"] },
+    { industry: "サービス業", icon: "💼", challenge: "顧客対応の属人化 / 社内ルールの周知 / 採用難", uses: ["ナレッジ共有", "採用改善支援", "ダッシュボード"] },
   ];
 
   const benefits = [
-    { label: "社内問い合わせ対応", before: "8時間/日", after: "1時間/日", metric: "-87%", metricLabel: "時間削減" },
-    { label: "新人教育・引き継ぎ", before: "3週間（担当者頼み）", after: "3日", metric: "-85%", metricLabel: "時間削減" },
-    { label: "顧客対応スピード", before: "24時間以内（担当者待ち）", after: "即時 24/365", metric: "24x", metricLabel: "レスポンス向上" },
+    { label: "紙・Excel業務", before: "手書き → 転記 → 集計", after: "入力 → 自動集計 → 即共有", metric: "80", metricLabel: "作業時間削減" },
+    { label: "ノウハウ共有", before: "聞かないとわからない", after: "検索すれば出てくる", metric: "90", metricLabel: "問い合わせ削減" },
+    { label: "経営状況の把握", before: "各部署に確認 → 集計", after: "ダッシュボードで即確認", metric: "30", metricLabel: "秒で状況把握" },
   ];
 
   const moreBenefits = [
-    "管理者の対応時間削減", "社内情報の活用", "属人化を防止",
-    "報告内容を整理", "業務の抜け漏れ防止", "社内データ活用",
+    "製造現場の見える化", "教育の抜け漏れ防止", "採用精度の向上",
+    "Excel属人化の解消", "世代交代の準備", "経営判断のスピードアップ",
   ];
 
   const principles = [
@@ -133,48 +119,74 @@ export default function AILabsPage() {
     "最初から複雑にしすぎない",
     "小さく作って早く試す",
     "実際の運用を見ながら改善する",
-    "必要に応じて機能を追加する",
     "AIだけでなく、業務フロー全体を考える",
+    "慣れるまで専任担当が伴走する",
   ];
 
   const processSteps = [
     { step: "01", title: "ヒアリング", body: "業務内容、課題、改善したい作業を確認" },
-    { step: "02", title: "業務整理・要件整理", body: "改善対象、システム化範囲、優先順位を整理" },
-    { step: "03", title: "画面・機能設計", body: "使う人に合わせて画面と機能を設計" },
-    { step: "04", title: "開発", body: "AI機能、管理画面、データ管理、連携機能を実装" },
-    { step: "05", title: "テスト運用", body: "一部の部署で試験的に利用し使いやすさ確認" },
-    { step: "06", title: "改善・本格運用", body: "利用状況をもとに改善し社内全体へ展開" },
+    { step: "02", title: "現状整理", body: "紙・Excel・業務フローの棚卸しと優先順位整理" },
+    { step: "03", title: "設計・提案", body: "使う人に合わせて画面と機能を設計" },
+    { step: "04", title: "小さく導入", body: "効果が出やすい部分から先に導入・調整" },
+    { step: "05", title: "見える化・拡張", body: "ダッシュボード化、AI活用、機能追加" },
+    { step: "06", title: "伴走・改善", body: "月10時間以上の直接サポートで定着まで伴走" },
   ];
 
   const modules = [
-    "AIチャット機能", "管理画面", "ユーザー管理", "データ保存",
-    "検索機能", "レポート自動作成", "通知機能", "LINE連携",
-    "スプレッドシート連携", "顧客管理機能", "アンケート機能",
-    "ダッシュボード", "権限管理", "履歴管理", "資料・マニュアル登録",
+    "紙帳票のデジタル化", "日報・報告書システム", "チェックシート", "製造管理",
+    "工程進捗管理", "ダッシュボード", "社内FAQ・ナレッジ", "教育管理",
+    "引き継ぎ管理", "採用アセスメント", "求人改善AI", "在庫管理",
+    "不具合報告", "データ分析", "通知・アラート",
   ];
 
   const plans = [
-    { name: "ライト開発", desc: "小規模AI機能、限定的な業務改善", price: "30〜80万円", features: ["単機能のAIチャット", "簡易な管理画面", "試作・PoCにも最適"], popular: false },
-    { name: "スタンダード開発", desc: "社内向けAIシステム、管理画面、データ保存", price: "80〜200万円", features: ["社内AIシステム一式", "管理画面・データ管理", "基本的な業務フロー対応"], popular: true },
-    { name: "カスタム開発", desc: "複数機能、外部連携、ダッシュボード", price: "200〜500万円", features: ["複数機能の統合システム", "外部サービス連携", "部署別管理・本格運用"], popular: false },
-    { name: "保守・改善サポート", desc: "運用後の修正、改善提案、AI調整", price: "月額 2〜20万円", features: ["運用後の修正・改善", "軽微な機能追加", "AI回答精度の調整"], popular: false },
+    {
+      name: "受注開発プラン",
+      planLabel: "Plan A",
+      desc: "貴社の業務に合わせてシステムを一から構築する開発型プラン",
+      originalPrice: "300〜500万円",
+      campaignPrice: "150万円〜",
+      note: "＋ 保守サポート 月額5万円",
+      features: ["貴社専用のシステム設計・開発", "業務フローに完全対応", "月10時間以上の直接サポート", "慣れるまで専任担当が伴走"],
+      popular: false,
+    },
+    {
+      name: "月額サブスクプラン",
+      planLabel: "Plan B",
+      desc: "初期費用を抑えて、月額利用ですぐに始められるプラン",
+      originalPrice: "月額 50万円",
+      campaignPrice: "月額 30万円",
+      note: "初期費用なし・最低契約期間12ヶ月",
+      features: ["全機能を月額で利用可能", "段階的に機能を追加できる", "月10時間以上の直接サポート", "慣れるまで専任担当が伴走"],
+      popular: true,
+    },
+    {
+      name: "買取予定サブスクプラン",
+      planLabel: "Plan C",
+      desc: "月額で利用開始し、将来的にシステムを買い取れるプラン",
+      originalPrice: "月額 40万円",
+      campaignPrice: "月額 25万円",
+      note: "6ヶ月以降、買取移行が可能",
+      features: ["まずは月額でリスクなく開始", "合わなければ解約も可能", "自社管理へ移行時に買取可", "月10時間以上の直接サポート"],
+      popular: false,
+    },
   ];
 
   const whyAffordable = [
     { num: "01", title: "開発工程にもAIを活用", desc: "効率的な作業フローでコストを圧縮" },
-    { num: "02", title: "スタートアップ価格", desc: "実績作り重視の適正価格" },
-    { num: "03", title: "必要な機能に絞って提案", desc: "過剰開発をしない" },
+    { num: "02", title: "スタートアップ価格で提供中", desc: "実績作りのため、今なら特別価格でご提供" },
+    { num: "03", title: "必要な機能に絞って提案", desc: "過剰開発をせず、本当に必要なものだけ" },
     { num: "04", title: "汎用構成を活用", desc: "既存の仕組み・テンプレートでコスト抑制" },
-    { num: "05", title: "小さく作って改善", desc: "無駄な開発を回避するアジャイル方式" },
+    { num: "05", title: "小さく作って改善", desc: "無駄な開発を回避する段階的な進め方" },
   ];
 
   const firstSteps = [
     "現在の業務課題のヒアリング",
-    "AIで改善できる業務の洗い出し",
-    "優先順位の整理",
-    "小さく始められる開発案のご提案",
-    "概算費用のご提示",
-    "導入までのスケジュール案の作成",
+    "紙・Excel・属人化の棚卸し",
+    "デジタル化の優先順位整理",
+    "採用課題の整理",
+    "小さく始められる導入案のご提案",
+    "概算費用・スケジュールのご提示",
   ];
 
   return (
@@ -230,18 +242,18 @@ export default function AILabsPage() {
           </div>
 
           <h1 style={{
-            fontSize: isMobile ? "clamp(32px, 10vw, 48px)" : "clamp(48px, 6vw, 80px)",
-            fontWeight: 900, letterSpacing: "-0.04em", color: "#f8fafc", lineHeight: 1.15, marginBottom: 32,
+            fontSize: isMobile ? "clamp(28px, 9vw, 44px)" : "clamp(40px, 5vw, 72px)",
+            fontWeight: 900, letterSpacing: "-0.04em", color: "#f8fafc", lineHeight: 1.2, marginBottom: 32,
           }}>
-            AIを、社内で使える<br />
+            紙・Excel・属人化を、<br />
             <span style={{ background: "linear-gradient(135deg, #6366f1, #a78bfa)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-              仕組みに。
+              次世代に引き継げる<br />仕組みに。
             </span>
           </h1>
 
-          <p style={{ fontSize: isMobile ? 14 : 17, color: "rgba(248,250,252,0.55)", lineHeight: 1.9, maxWidth: 520, marginBottom: 48 }}>
-            企業ごとの課題に合わせて、専用システムを開発。<br />
-            問い合わせ・日報・書類対応を効率化します。
+          <p style={{ fontSize: isMobile ? 14 : 17, color: "rgba(248,250,252,0.55)", lineHeight: 1.9, maxWidth: 560, marginBottom: 48 }}>
+            製造管理・社内共有・採用改善まで一体で支援。<br />
+            業務のデジタル化から定着まで、伴走型でサポートします。
           </p>
 
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
@@ -271,9 +283,9 @@ export default function AILabsPage() {
           <div className="sr2" style={sr2}>
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.25em", color: "#6366f1", textTransform: "uppercase", marginBottom: 16 }}>Concerns</div>
             <h2 style={{ fontSize: "clamp(24px, 4vw, 44px)", fontWeight: 900, letterSpacing: "-0.03em", color: "#0f172a", lineHeight: 1.3, marginBottom: 16 }}>
-              AIに興味はあるけれど、<br />何から始めたら？
+              こんなお悩み、<br />ありませんか？
             </h2>
-            <p style={{ fontSize: 15, color: "#64748b", marginBottom: 48 }}>大切なのは「技術」ではなく、業務課題から考えること。</p>
+            <p style={{ fontSize: 15, color: "#64748b", marginBottom: 48 }}>多くの企業が抱える課題は共通しています。</p>
           </div>
           <div className="al-concerns-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
             {concerns.map((c, i) => (
@@ -290,13 +302,13 @@ export default function AILabsPage() {
         </div>
       </section>
 
-      {/* ── 03. Challenges ── */}
+      {/* ── 03. Root Cause ── */}
       <section style={{ padding: isMobile ? "80px 20px" : "120px 80px", background: "#fff" }}>
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
           <div className="sr2" style={{ ...sr2, marginBottom: 48 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.25em", color: "#6366f1", textTransform: "uppercase", marginBottom: 16 }}>Challenges</div>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.25em", color: "#6366f1", textTransform: "uppercase", marginBottom: 16 }}>Root Cause</div>
             <h2 style={{ fontSize: "clamp(24px, 4vw, 44px)", fontWeight: 900, letterSpacing: "-0.03em", color: "#0f172a", lineHeight: 1.3 }}>
-              会社の中で起きている<br />&quot;あるある&quot;な業務課題
+              課題の根本は、<br />&quot;情報が紙や人に依存している&quot;こと。
             </h2>
           </div>
           <div className="al-challenges-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
@@ -310,85 +322,65 @@ export default function AILabsPage() {
               </div>
             ))}
           </div>
-          <div className="sr2" style={{ ...sr2, marginTop: 32, fontSize: 14, color: "#6366f1", fontWeight: 700, textAlign: "center" }}>
-            AIは、日々の業務に課題を感じている企業にこそ活用できる。
+          <div className="sr2" style={{ ...sr2, marginTop: 32, padding: "24px 28px", borderRadius: 16, background: "#ede9fe", textAlign: "center" }}>
+            <p style={{ fontSize: 15, fontWeight: 700, color: "#4c1d95", lineHeight: 1.8 }}>
+              必要なのは単なるデジタル化ではなく、<br />
+              &quot;会社の仕組みを次世代に引き継げる状態にすること&quot;です。
+            </p>
           </div>
         </div>
       </section>
 
-      {/* ── 04. What AI Can Do ── */}
+      {/* ── 04. Solutions ── */}
       <section style={{ padding: isMobile ? "80px 20px" : "120px 80px", background: "#0f172a" }}>
-        <div style={{ maxWidth: 900, margin: "0 auto" }}>
-          <div className="sr2" style={{ ...sr2, marginBottom: 48 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.25em", color: "rgba(99,102,241,0.8)", textTransform: "uppercase", marginBottom: 16 }}>What AI Can Do</div>
-            <h2 style={{ fontSize: "clamp(24px, 4vw, 44px)", fontWeight: 900, letterSpacing: "-0.03em", color: "#f8fafc", lineHeight: 1.3 }}>
-              AIは、「手間」「確認」「判断」<br />を助ける。
-            </h2>
-          </div>
-          <div className="al-aican-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
-            {aiCanDo.map((a, i) => (
-              <div key={i} className="sr2" style={{ ...sr2, transitionDelay: `${i * 0.04}s`,
-                padding: "20px 24px", borderRadius: 12,
-                background: "rgba(99,102,241,0.06)", border: "1px solid rgba(99,102,241,0.12)",
-                display: "flex", alignItems: "center", gap: 16,
-              }}>
-                <span style={{ fontSize: 20, fontWeight: 900, color: "#6366f1", letterSpacing: "-0.02em", flexShrink: 0, width: 32, textAlign: "center" }}>{a.num}</span>
-                <span style={{ fontSize: 14, fontWeight: 600, color: "rgba(248,250,252,0.85)" }}>{a.title}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 05. Development Examples ── */}
-      <section style={{ padding: isMobile ? "80px 20px" : "120px 80px", background: "#fff" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div className="sr2" style={{ ...sr2, marginBottom: 64 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.25em", color: "#6366f1", textTransform: "uppercase", marginBottom: 16 }}>Development Examples</div>
-            <h2 style={{ fontSize: "clamp(24px, 4vw, 44px)", fontWeight: 900, letterSpacing: "-0.03em", color: "#0f172a", lineHeight: 1.3 }}>
-              こんなAIシステムが作れます。
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.25em", color: "rgba(99,102,241,0.8)", textTransform: "uppercase", marginBottom: 16 }}>Solutions</div>
+            <h2 style={{ fontSize: "clamp(24px, 4vw, 44px)", fontWeight: 900, letterSpacing: "-0.03em", color: "#f8fafc", lineHeight: 1.3 }}>
+              業務デジタル化から採用改善まで、<br />一体で支援します。
             </h2>
           </div>
           <div className="al-dev-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
-            {devExamples.map((d, i) => (
+            {solutions.map((d, i) => (
               <div key={i} className="sr2" style={{ ...sr2, transitionDelay: `${i * 0.06}s`,
-                padding: "32px 28px", borderRadius: 20, background: "#fafafa",
-                border: "1.5px solid #f1f5f9", transition: "all 0.3s",
+                padding: "32px 28px", borderRadius: 20,
+                background: "rgba(255,255,255,0.04)",
+                border: "1.5px solid rgba(255,255,255,0.08)", transition: "all 0.3s",
               }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = "#6366f160"; e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 8px 32px rgba(99,102,241,0.1)"; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = "#f1f5f9"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = "#6366f160"; e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 8px 32px rgba(99,102,241,0.15)"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
               >
-                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", color: "#6366f1", textTransform: "uppercase", marginBottom: 16,
-                  padding: "4px 10px", borderRadius: 100, background: "rgba(99,102,241,0.08)", display: "inline-block" }}>{d.tag}</div>
-                <div style={{ fontSize: 17, fontWeight: 800, color: "#0f172a", marginBottom: 12, lineHeight: 1.4 }}>{d.title}</div>
-                <div style={{ fontSize: 13, color: "#64748b", lineHeight: 1.8 }}>{d.desc}</div>
+                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", color: "#a78bfa", textTransform: "uppercase", marginBottom: 16,
+                  padding: "4px 10px", borderRadius: 100, background: "rgba(99,102,241,0.12)", display: "inline-block" }}>{d.tag}</div>
+                <div style={{ fontSize: 17, fontWeight: 800, color: "#f8fafc", marginBottom: 12, lineHeight: 1.4 }}>{d.title}</div>
+                <div style={{ fontSize: 13, color: "rgba(248,250,252,0.5)", lineHeight: 1.8 }}>{d.desc}</div>
               </div>
             ))}
           </div>
-          <div className="sr2" style={{ ...sr2, marginTop: 32, fontSize: 12, color: "#94a3b8", textAlign: "center" }}>
-            ※ 必要な機能だけを組み合わせて、専用システムとして構築します。
+          <div className="sr2" style={{ ...sr2, marginTop: 32, fontSize: 12, color: "rgba(255,255,255,0.35)", textAlign: "center" }}>
+            ※ 必要な機能だけを組み合わせて、貴社専用のシステムとして構築します。
           </div>
         </div>
       </section>
 
-      {/* ── 06. Department Use Cases ── */}
+      {/* ── 05. Use Cases ── */}
       <section style={{ padding: isMobile ? "80px 20px" : "120px 80px", background: "#f8fafc" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div className="sr2" style={{ ...sr2, marginBottom: 64 }}>
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.25em", color: "#6366f1", textTransform: "uppercase", marginBottom: 16 }}>Use Cases</div>
             <h2 style={{ fontSize: "clamp(24px, 4vw, 44px)", fontWeight: 900, letterSpacing: "-0.03em", color: "#0f172a", lineHeight: 1.3 }}>
-              部署ごとに、AIの使い方は変わる。
+              業種ごとに、解決できる課題は変わる。
             </h2>
           </div>
           <div className="al-dept-grid" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 16 }}>
-            {departments.map((d, i) => (
+            {useCases.map((d, i) => (
               <div key={i} className="sr2" style={{ ...sr2, transitionDelay: `${i * 0.08}s`,
                 padding: "28px 20px", borderRadius: 16, background: "#fff",
                 border: "1.5px solid #f1f5f9", textAlign: "center",
               }}>
                 <div style={{ fontSize: 28, marginBottom: 12 }}>{d.icon}</div>
-                <div style={{ fontSize: 15, fontWeight: 800, color: "#0f172a", marginBottom: 12 }}>{d.dept}</div>
-                <div style={{ fontSize: 12, color: "#94a3b8", lineHeight: 1.7, marginBottom: 16, minHeight: 40 }}>{d.challenge}</div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: "#0f172a", marginBottom: 12 }}>{d.industry}</div>
+                <div style={{ fontSize: 12, color: "#94a3b8", lineHeight: 1.7, marginBottom: 16, minHeight: 48 }}>{d.challenge}</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                   {d.uses.map((u, j) => (
                     <div key={j} style={{ fontSize: 11, fontWeight: 600, padding: "4px 8px", borderRadius: 6,
@@ -399,18 +391,18 @@ export default function AILabsPage() {
             ))}
           </div>
           <div className="sr2" style={{ ...sr2, marginTop: 32, fontSize: 14, color: "#6366f1", fontWeight: 700, textAlign: "center" }}>
-            → 部署ごとの&quot;困りごと&quot;から逆算して、AIの使いどころを設計します。
+            業種・規模に合わせて、最適な組み合わせをご提案します。
           </div>
         </div>
       </section>
 
-      {/* ── 07. Benefits ── */}
+      {/* ── 06. Benefits ── */}
       <section style={{ padding: isMobile ? "80px 20px" : "120px 80px", background: "#fff" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div className="sr2" style={{ ...sr2, marginBottom: 64 }}>
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.25em", color: "#6366f1", textTransform: "uppercase", marginBottom: 16 }}>Benefits</div>
             <h2 style={{ fontSize: "clamp(24px, 4vw, 44px)", fontWeight: 900, letterSpacing: "-0.03em", color: "#0f172a", lineHeight: 1.3 }}>
-              Before → Afterで、効果を見える化。
+              Before → Afterで変わること。
             </h2>
           </div>
           <div className="al-benefits-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
@@ -430,7 +422,7 @@ export default function AILabsPage() {
                   </div>
                 </div>
                 <div style={{ fontSize: "clamp(32px, 4vw, 48px)", fontWeight: 900, color: "#6366f1", letterSpacing: "-0.03em", lineHeight: 1 }}>
-                  <Counter to={parseInt(b.metric.replace(/[^0-9]/g, ""))} suffix={b.metric.includes("x") ? "x" : "%"} />
+                  <Counter to={parseInt(b.metric)} suffix="%" />
                 </div>
                 <div style={{ fontSize: 12, color: "#64748b", fontWeight: 600, marginTop: 4 }}>{b.metricLabel}</div>
               </div>
@@ -446,7 +438,7 @@ export default function AILabsPage() {
         </div>
       </section>
 
-      {/* ── 08. Development Policy ── */}
+      {/* ── 07. Development Policy ── */}
       <section style={{ padding: isMobile ? "80px 20px" : "120px 80px", background: "#f8fafc" }}>
         <div style={{ maxWidth: 800, margin: "0 auto" }}>
           <div className="sr2" style={{ ...sr2, marginBottom: 48 }}>
@@ -455,7 +447,7 @@ export default function AILabsPage() {
               大きく作る前に、<br />小さく試して改善します。
             </h2>
             <p style={{ fontSize: 14, color: "#64748b", lineHeight: 1.9, marginTop: 16 }}>
-              AI導入は最初から大規模に始める必要はありません。効果が出やすい業務から小さく始め、利用状況を見ながら改善・拡張します。
+              導入は最初から大規模に始める必要はありません。効果が出やすい業務から小さく始め、利用状況を見ながら改善・拡張します。
             </p>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -472,13 +464,13 @@ export default function AILabsPage() {
         </div>
       </section>
 
-      {/* ── 09. Process ── */}
+      {/* ── 08. Process ── */}
       <section style={{ padding: isMobile ? "80px 20px" : "120px 80px", background: "#fff" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div className="sr2" style={{ ...sr2, marginBottom: 64 }}>
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.25em", color: "#6366f1", textTransform: "uppercase", marginBottom: 16 }}>Process</div>
             <h2 style={{ fontSize: "clamp(24px, 4vw, 44px)", fontWeight: 900, letterSpacing: "-0.03em", color: "#0f172a", lineHeight: 1.3 }}>
-              ヒアリング → 運用改善まで6ステップ
+              ヒアリング → 定着まで6ステップ
             </h2>
           </div>
           <div className="al-process-grid" style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 2, position: "relative" }}>
@@ -504,18 +496,18 @@ export default function AILabsPage() {
             ))}
           </div>
           <div className="sr2" style={{ ...sr2, marginTop: 32, fontSize: 14, color: "#6366f1", fontWeight: 700, textAlign: "center" }}>
-            → 運用後の改善まで伴走。現場で本当に使えるシステムに育てます。
+            → 慣れるまで専任担当が伴走。現場で本当に使えるシステムに育てます。
           </div>
         </div>
       </section>
 
-      {/* ── 10. Modules ── */}
+      {/* ── 09. Modules ── */}
       <section style={{ padding: isMobile ? "80px 20px" : "120px 80px", background: "#0f172a" }}>
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
           <div className="sr2" style={{ ...sr2, marginBottom: 48 }}>
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.25em", color: "rgba(99,102,241,0.8)", textTransform: "uppercase", marginBottom: 16 }}>Scope</div>
             <h2 style={{ fontSize: "clamp(24px, 4vw, 44px)", fontWeight: 900, letterSpacing: "-0.03em", color: "#f8fafc", lineHeight: 1.3 }}>
-              機能を組み合わせて、<br />専用システムとして開発。
+              必要な機能を組み合わせて、<br />貴社専用のシステムを構築。
             </h2>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center" }}>
@@ -537,33 +529,54 @@ export default function AILabsPage() {
         </div>
       </section>
 
-      {/* ── 11. Pricing ── */}
+      {/* ── 10. Pricing ── */}
       <section style={{ padding: isMobile ? "80px 20px" : "120px 80px", background: "#fff" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-          <div className="sr2" style={{ ...sr2, marginBottom: 64 }}>
+          <div className="sr2" style={{ ...sr2, marginBottom: 24 }}>
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.25em", color: "#6366f1", textTransform: "uppercase", marginBottom: 16 }}>Pricing</div>
             <h2 style={{ fontSize: "clamp(24px, 4vw, 44px)", fontWeight: 900, letterSpacing: "-0.03em", color: "#0f172a", lineHeight: 1.3 }}>
-              料金は内容に応じてご相談
+              3つの導入プラン
             </h2>
-            <p style={{ fontSize: 14, color: "#64748b", marginTop: 12 }}>規模・機能・連携内容で変動 → 課題をお伺いした上でお見積もり</p>
+            <p style={{ fontSize: 14, color: "#64748b", marginTop: 12 }}>貴社の状況に合わせて、最適なプランをご提案します。</p>
           </div>
-          <div className="al-pricing-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
+
+          {/* Campaign banner */}
+          <div className="sr2" style={{ ...sr2, marginBottom: 32, padding: "14px 28px", borderRadius: 100,
+            background: "linear-gradient(135deg, #ef4444, #dc2626)", textAlign: "center",
+          }}>
+            <span style={{ fontSize: 13, fontWeight: 700, color: "#fff", letterSpacing: "0.05em" }}>
+              導入支援キャンペーン実施中 ─ 今なら特別価格でご提供しています
+            </span>
+          </div>
+
+          <div className="al-pricing-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
             {plans.map((p, i) => (
               <div key={i} className="sr2" style={{ ...sr2, transitionDelay: `${i * 0.08}s`,
-                padding: "36px 24px", borderRadius: 20,
+                padding: "40px 28px", borderRadius: 20,
                 background: p.popular ? "linear-gradient(135deg, #0f172a, #1e1b4b)" : "#fafafa",
                 border: p.popular ? "2px solid #6366f1" : "1.5px solid #f1f5f9",
-                position: "relative",
+                position: "relative", textAlign: "center",
               }}>
                 {p.popular && <div style={{ position: "absolute", top: -1, left: "50%", transform: "translateX(-50%) translateY(-50%)",
-                  fontSize: 10, fontWeight: 700, padding: "3px 14px", borderRadius: 100,
-                  background: "#6366f1", color: "#fff", letterSpacing: "0.08em" }}>POPULAR</div>}
-                <div style={{ fontSize: 15, fontWeight: 800, color: p.popular ? "#f8fafc" : "#0f172a", marginBottom: 8 }}>{p.name}</div>
-                <div style={{ fontSize: 12, color: p.popular ? "rgba(255,255,255,0.45)" : "#94a3b8", marginBottom: 24, lineHeight: 1.6, minHeight: 40 }}>{p.desc}</div>
-                <div style={{ fontSize: "clamp(20px, 2.5vw, 28px)", fontWeight: 900, color: p.popular ? "#a78bfa" : "#6366f1", marginBottom: 24, letterSpacing: "-0.02em" }}>{p.price}</div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  fontSize: 10, fontWeight: 700, padding: "4px 18px", borderRadius: 100,
+                  background: "#6366f1", color: "#fff", letterSpacing: "0.1em" }}>RECOMMENDED</div>}
+                <div style={{ fontSize: 11, fontWeight: 700, color: p.popular ? "#a78bfa" : "#6366f1", letterSpacing: "0.15em", marginBottom: 8 }}>{p.planLabel}</div>
+                <div style={{ fontSize: 17, fontWeight: 800, color: p.popular ? "#f8fafc" : "#0f172a", marginBottom: 8 }}>{p.name}</div>
+                <div style={{ fontSize: 12, color: p.popular ? "rgba(255,255,255,0.45)" : "#94a3b8", marginBottom: 24, lineHeight: 1.6, minHeight: 36 }}>{p.desc}</div>
+
+                {/* Original price with strikethrough */}
+                <div style={{ fontSize: 14, color: p.popular ? "rgba(255,255,255,0.3)" : "#c0c0c0", textDecoration: "line-through", marginBottom: 4 }}>
+                  {p.originalPrice}
+                </div>
+                {/* Campaign price */}
+                <div style={{ fontSize: "clamp(24px, 3vw, 32px)", fontWeight: 900, color: "#ef4444", marginBottom: 8, letterSpacing: "-0.02em" }}>
+                  {p.campaignPrice}
+                </div>
+                <div style={{ fontSize: 11, color: p.popular ? "rgba(255,255,255,0.35)" : "#94a3b8", marginBottom: 24 }}>{p.note}</div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 10, textAlign: "left" }}>
                   {p.features.map((f, j) => (
-                    <div key={j} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 12, color: p.popular ? "rgba(255,255,255,0.6)" : "#64748b", lineHeight: 1.5 }}>
+                    <div key={j} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: p.popular ? "rgba(255,255,255,0.6)" : "#64748b", lineHeight: 1.5 }}>
                       <span style={{ color: p.popular ? "#a78bfa" : "#6366f1", flexShrink: 0 }}>✓</span>
                       {f}
                     </div>
@@ -573,18 +586,19 @@ export default function AILabsPage() {
             ))}
           </div>
           <div className="sr2" style={{ ...sr2, marginTop: 24, fontSize: 12, color: "#94a3b8", textAlign: "center" }}>
-            ※ 上記はあくまで目安です。実際の料金は開発内容や運用範囲に応じて個別にご相談となります。
+            ※ 上記はすべて税別表記です。最終的な費用は対象業務や機能範囲に応じて個別にお見積もりいたします。<br />
+            ※ 全プラン共通で月10時間以上の直接サポート付き。慣れるまで専任担当が伴走します。
           </div>
         </div>
       </section>
 
-      {/* ── 12. Why Affordable ── */}
+      {/* ── 11. Why Affordable ── */}
       <section style={{ padding: isMobile ? "80px 20px" : "120px 80px", background: "#f8fafc" }}>
         <div style={{ maxWidth: 800, margin: "0 auto" }}>
           <div className="sr2" style={{ ...sr2, marginBottom: 48 }}>
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.25em", color: "#6366f1", textTransform: "uppercase", marginBottom: 16 }}>Why Affordable</div>
             <h2 style={{ fontSize: "clamp(24px, 4vw, 44px)", fontWeight: 900, letterSpacing: "-0.03em", color: "#0f172a", lineHeight: 1.3 }}>
-              導入しやすい形でご提案。
+              導入しやすい価格で提供できる理由。
             </h2>
             <p style={{ fontSize: 14, color: "#64748b", lineHeight: 1.9, marginTop: 12 }}>
               安く作るのではなく、無駄を減らして必要なものから作ります。
@@ -607,15 +621,15 @@ export default function AILabsPage() {
         </div>
       </section>
 
-      {/* ── 13. First Steps ── */}
+      {/* ── 12. First Steps ── */}
       <section style={{ padding: isMobile ? "80px 20px" : "120px 80px", background: "#fff" }}>
         <div style={{ maxWidth: 800, margin: "0 auto" }}>
           <div className="sr2" style={{ ...sr2, marginBottom: 48 }}>
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.25em", color: "#6366f1", textTransform: "uppercase", marginBottom: 16 }}>First Steps</div>
             <h2 style={{ fontSize: "clamp(24px, 4vw, 44px)", fontWeight: 900, letterSpacing: "-0.03em", color: "#0f172a", lineHeight: 1.3 }}>
-              まずは「何ができるか」の<br />整理から始めます。
+              まずは現状の整理から<br />始めます。
             </h2>
-            <p style={{ fontSize: 14, color: "#64748b", marginTop: 12 }}>初回ご提案で6項目をご提供します。</p>
+            <p style={{ fontSize: 14, color: "#64748b", marginTop: 12 }}>初回ご相談で以下をご提供します。</p>
           </div>
           <div className="al-steps-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
             {firstSteps.map((s, i) => (
@@ -634,12 +648,12 @@ export default function AILabsPage() {
             ))}
           </div>
           <div className="sr2" style={{ ...sr2, marginTop: 32, fontSize: 14, color: "#6366f1", fontWeight: 700, textAlign: "center" }}>
-            AI導入が初めてでも、何ができるかの整理からサポートします。
+            デジタル化が初めてでも、何から始めるかの整理からサポートします。
           </div>
         </div>
       </section>
 
-      {/* ── 14. CTA ── */}
+      {/* ── 13. CTA ── */}
       <section style={{ padding: isMobile ? "80px 20px 100px" : "160px 80px", background: "#0f172a", position: "relative", overflow: "hidden" }}>
         <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)",
           width: 800, height: 800, borderRadius: "50%",
@@ -648,7 +662,7 @@ export default function AILabsPage() {
         <div className="sr2" style={{ ...sr2, maxWidth: 720, margin: "0 auto", textAlign: "center", position: "relative" }}>
           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.25em", color: "rgba(99,102,241,0.8)", textTransform: "uppercase", marginBottom: 24 }}>Contact</div>
           <h2 style={{ fontSize: "clamp(28px, 5vw, 56px)", fontWeight: 900, letterSpacing: "-0.04em", color: "#f8fafc", lineHeight: 1.15, marginBottom: 24 }}>
-            AIを、現場で使える<br />業務改善システムに。
+            紙・Excel・属人化を、<br />次世代に引き継げる<br />仕組みに変えませんか。
           </h2>
           <p style={{ fontSize: 15, color: "rgba(255,255,255,0.45)", lineHeight: 1.9, marginBottom: 48 }}>
             初回ご相談は無料です。<br />まずは現状の課題からお聞かせください。
@@ -691,7 +705,6 @@ export default function AILabsPage() {
         @media (max-width: 768px) {
           .al-concerns-grid { grid-template-columns: 1fr !important; }
           .al-challenges-grid { grid-template-columns: 1fr !important; }
-          .al-aican-grid { grid-template-columns: 1fr !important; }
           .al-dev-grid { grid-template-columns: 1fr !important; }
           .al-dept-grid { grid-template-columns: 1fr 1fr !important; }
           .al-benefits-grid { grid-template-columns: 1fr !important; }
