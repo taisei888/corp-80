@@ -1017,6 +1017,12 @@ export default function DemoPage() {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const s = params.get("s") as DemoId | null;
+    if (s && demos.some(d => d.id === s)) setActive(s);
+  }, []);
+
+  useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 900);
     check();
     window.addEventListener("resize", check);
