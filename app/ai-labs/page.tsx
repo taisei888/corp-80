@@ -92,30 +92,21 @@ const plans = [
   {
     name: "受注開発プラン",
     planLabel: "Plan A",
-    desc: "貴社の業務に合わせてシステムを一から構築",
-    originalPrice: "300〜500万円",
-    campaignPrice: "150万円〜",
-    note: "＋ 保守サポート 月額5万円",
+    desc: "貴社の業務に合わせてシステムを一から構築する開発型プラン",
     features: ["貴社専用のシステム設計・開発", "業務フローに完全対応", "月10時間以上の直接サポート", "慣れるまで専任担当が伴走"],
     popular: false,
   },
   {
     name: "月額サブスクプラン",
     planLabel: "Plan B",
-    desc: "初期費用を抑えて、月額利用ですぐに始められる",
-    originalPrice: "月額 50万円",
-    campaignPrice: "月額 30万円",
-    note: "初期費用なし・最低契約期間12ヶ月",
+    desc: "初期費用を抑えて、月額利用ですぐに始められるプラン",
     features: ["全機能を月額で利用可能", "段階的に機能を追加できる", "月10時間以上の直接サポート", "慣れるまで専任担当が伴走"],
     popular: true,
   },
   {
     name: "買取予定サブスクプラン",
     planLabel: "Plan C",
-    desc: "月額で利用開始し、将来的にシステムを買い取れる",
-    originalPrice: "月額 40万円",
-    campaignPrice: "月額 25万円",
-    note: "6ヶ月以降、買取移行が可能",
+    desc: "月額で利用開始し、将来的にシステムを買い取れるプラン",
     features: ["まずは月額でリスクなく開始", "合わなければ解約も可能", "自社管理へ移行時に買取可", "月10時間以上の直接サポート"],
     popular: false,
   },
@@ -383,9 +374,9 @@ export default function AILabsPage() {
           <div className="sr2" style={{ ...sr2, marginBottom: 56, textAlign: "center" }}>
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.25em", color: accent, textTransform: "uppercase", marginBottom: 12 }}>Services</div>
             <h2 style={{ fontSize: "clamp(24px, 4vw, 40px)", fontWeight: 900, letterSpacing: "-0.03em", color: "#0f172a", lineHeight: 1.3 }}>
-              8つのAIサービスで、<br />業務を変革します。
+              あらゆる業務課題に、<br />AIで応えます。
             </h2>
-            <p style={{ fontSize: 14, color: "#64748b", marginTop: 12 }}>各サービスは単体でも、組み合わせても導入可能です。</p>
+            <p style={{ fontSize: 14, color: "#64748b", marginTop: 12, lineHeight: 1.8 }}>以下は代表的なサービス例です。貴社の課題に合わせて、最適なシステムをゼロから構築します。</p>
           </div>
           <div className="al-services-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
             {solutions.map((s, i) => (
@@ -414,6 +405,21 @@ export default function AILabsPage() {
                 </div>
               </a>
             ))}
+          </div>
+          <div className="sr2" style={{ ...sr2, marginTop: 32, textAlign: "center" }}>
+            <p style={{ fontSize: 13, color: "#64748b", lineHeight: 1.8, marginBottom: 16 }}>
+              上記以外にも、在庫管理・教育管理・工程進捗・通知システムなど、<br />
+              貴社の業務に必要な機能をすべてオーダーメイドで構築できます。
+            </p>
+            <a href="/contact" style={{
+              display: "inline-flex", alignItems: "center", gap: 6,
+              fontSize: 13, fontWeight: 700, color: accent, textDecoration: "none",
+            }}>
+              「こんなこともできる？」まずはご相談ください
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
+            </a>
           </div>
         </div>
       </section>
@@ -596,15 +602,6 @@ export default function AILabsPage() {
             <p style={{ fontSize: 14, color: "#64748b", marginTop: 12 }}>貴社の状況に合わせて、最適なプランをご提案します。</p>
           </div>
 
-          {/* Campaign banner */}
-          <div className="sr2" style={{ ...sr2, marginBottom: 32, padding: "12px 28px", borderRadius: 100,
-            background: "#fef2f2", border: "1px solid #fecaca", textAlign: "center",
-          }}>
-            <span style={{ fontSize: 13, fontWeight: 700, color: "#dc2626", letterSpacing: "0.02em" }}>
-              導入支援キャンペーン実施中 ─ 今なら特別価格でご提供しています
-            </span>
-          </div>
-
           <div className="al-pricing-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
             {plans.map((p, i) => (
               <div key={i} className="sr2" style={{ ...sr2, transitionDelay: `${i * 0.08}s`,
@@ -620,15 +617,7 @@ export default function AILabsPage() {
                 <div style={{ fontSize: 17, fontWeight: 800, color: "#0f172a", marginBottom: 8 }}>{p.name}</div>
                 <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 24, lineHeight: 1.6, minHeight: 36 }}>{p.desc}</div>
 
-                <div style={{ fontSize: 14, color: "#c0c0c0", textDecoration: "line-through", marginBottom: 4 }}>
-                  {p.originalPrice}
-                </div>
-                <div style={{ fontSize: "clamp(24px, 3vw, 32px)", fontWeight: 900, color: "#dc2626", marginBottom: 8, letterSpacing: "-0.02em" }}>
-                  {p.campaignPrice}
-                </div>
-                <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 24 }}>{p.note}</div>
-
-                <div style={{ display: "flex", flexDirection: "column", gap: 10, textAlign: "left" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10, textAlign: "left", marginBottom: 24 }}>
                   {p.features.map((f, j) => (
                     <div key={j} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "#475569", lineHeight: 1.5 }}>
                       <span style={{ color: accent, flexShrink: 0, marginTop: 1 }}>
@@ -640,11 +629,27 @@ export default function AILabsPage() {
                     </div>
                   ))}
                 </div>
+
+                <a href="/contact" style={{
+                  display: "inline-flex", alignItems: "center", gap: 6,
+                  fontSize: 13, fontWeight: 700, color: p.popular ? "#fff" : accent,
+                  background: p.popular ? accent : accentLight,
+                  padding: "10px 24px", borderRadius: 100, textDecoration: "none",
+                  transition: "all 0.2s",
+                }}
+                  onMouseEnter={e => { if (!p.popular) { e.currentTarget.style.background = `${accent}20`; } }}
+                  onMouseLeave={e => { if (!p.popular) { e.currentTarget.style.background = accentLight; } }}
+                >
+                  詳しく相談する
+                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                  </svg>
+                </a>
               </div>
             ))}
           </div>
           <div className="sr2" style={{ ...sr2, marginTop: 24, fontSize: 12, color: "#94a3b8", textAlign: "center", lineHeight: 1.8 }}>
-            ※ 上記はすべて税別表記です。最終的な費用は対象業務や機能範囲に応じて個別にお見積もりいたします。<br />
+            ※ 費用は対象業務や機能範囲に応じて個別にお見積もりいたします。<br />
             ※ 全プラン共通で月10時間以上の直接サポート付き。慣れるまで専任担当が伴走します。
           </div>
         </div>
