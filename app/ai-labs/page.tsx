@@ -130,11 +130,11 @@ const useCases = [
 export default function AILabsPage() {
   useScrollReveal();
   const [isMobile, setIsMobile] = useState(false);
-  const [heroInput, setHeroInput] = useState("");
-  const [heroReply, setHeroReply] = useState("");
-  const [heroLoading, setHeroLoading] = useState(false);
-  const [heroAsked, setHeroAsked] = useState("");
-  const replyRef = useRef<HTMLDivElement>(null);
+  const [visibleCards, setVisibleCards] = useState(0);
+  const [typingIdx, setTypingIdx] = useState(0);
+  const [liveResult, setLiveResult] = useState("");
+  const [liveTyped, setLiveTyped] = useState("");
+  const liveRequested = useRef(false);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -152,27 +152,55 @@ export default function AILabsPage() {
   const accent = "#6366f1";
   const accentLight = "#eef2ff";
 
-  async function handleAsk() {
-    const q = heroInput.trim();
-    if (!q || heroLoading) return;
-    setHeroLoading(true);
-    setHeroAsked(q);
-    setHeroReply("");
-    try {
-      const res = await fetch("/api/ai-chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: q }),
-      });
-      const data = await res.json();
-      setHeroReply(data.reply || "申し訳ございません。もう一度お試しください。");
-    } catch {
-      setHeroReply("通信エラーが発生しました。もう一度お試しください。");
-    } finally {
-      setHeroLoading(false);
-      setTimeout(() => replyRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 100);
-    }
-  }
+  const timelineTasks = [
+    { label: "メール下書き", icon: "M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75", result: "件名：先日のお打ち合わせの御礼\n\nお世話になっております。先日はお忙しい中お時間をいただき、誠にありがとうございました。ご提案内容について社内で検討を進めております。来週中に改めてご連絡差し上げます。", color: "#6366f1" },
+    { label: "議事録を要約", icon: "M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z", result: "【決定事項】\n・新システムは9月導入で確定\n・予算上限は500万円\n【TODO】\n・田中：要件定義書を金曜までに提出\n・佐藤：ベンダー3社に見積もり依頼", color: "#0ea5e9" },
+    { label: "英語に翻訳", icon: "M10.5 21l5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 016-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 01-3.827-5.802", result: "Original：弊社のAIソリューションは業務効率を劇的に改善します。\n\nTranslation：Our AI solutions dramatically improve operational efficiency across your entire organization.", color: "#10b981" },
+    { label: "売上データ分析", icon: "M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z", result: "前月比 +12.3%（¥18.4M → ¥20.7M）\n好調要因：新規顧客5社獲得、リピート率が82%→89%に改善\n注意：広告費が予算を15%超過。ROI要確認。", color: "#f59e0b" },
+    { label: "AIがリアルタイムで回答", icon: "M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z", result: "", color: "#ec4899", live: true },
+  ];
+
+  // Auto-reveal cards one by one
+  useEffect(() => {
+    if (visibleCards >= timelineTasks.length) return;
+    const timer = setTimeout(() => setVisibleCards(v => v + 1), visibleCards === 0 ? 800 : 1800);
+    return () => clearTimeout(timer);
+  }, [visibleCards, timelineTasks.length]);
+
+  // Typing effect for each card
+  useEffect(() => {
+    if (typingIdx >= visibleCards) return;
+    const timer = setTimeout(() => setTypingIdx(t => t + 1), 600);
+    return () => clearTimeout(timer);
+  }, [visibleCards, typingIdx]);
+
+  // Live API call for the last card
+  useEffect(() => {
+    if (visibleCards < timelineTasks.length) return;
+    if (liveRequested.current) return;
+    liveRequested.current = true;
+    fetch("/api/ai-chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: "日本の面白い雑学を1つ教えて。短く。" }),
+    })
+      .then(r => r.json())
+      .then(d => setLiveResult(d.reply || ""))
+      .catch(() => setLiveResult("AIが考え中..."));
+  }, [visibleCards, timelineTasks.length]);
+
+  // Typewriter for live result
+  useEffect(() => {
+    if (!liveResult) return;
+    let i = 0;
+    setLiveTyped("");
+    const id = setInterval(() => {
+      i++;
+      setLiveTyped(liveResult.slice(0, i));
+      if (i >= liveResult.length) clearInterval(id);
+    }, 25);
+    return () => clearInterval(id);
+  }, [liveResult]);
 
   const solvForId = (id: string) => solutions.find(s => s.id === id);
 
@@ -219,152 +247,157 @@ export default function AILabsPage() {
       {/* ── 01. Hero ── */}
       <section style={{
         minHeight: "100vh", display: "flex", flexDirection: "column",
-        justifyContent: "center", alignItems: "center",
-        padding: isMobile ? "120px 20px 60px" : "140px 48px 80px",
+        justifyContent: "center",
+        padding: isMobile ? "100px 20px 60px" : "120px 48px 80px",
         background: "#fff", position: "relative", overflow: "hidden",
-        textAlign: "center",
       }}>
-        {/* Subtle grid background */}
-        <div style={{ position: "absolute", inset: 0, opacity: 0.35, pointerEvents: "none",
+        {/* Subtle dot background */}
+        <div style={{ position: "absolute", inset: 0, opacity: 0.3, pointerEvents: "none",
           backgroundImage: "radial-gradient(circle, #e2e8f0 1px, transparent 1px)",
           backgroundSize: "32px 32px" }} />
-        {/* Gradient blob */}
-        <div style={{ position: "absolute", top: "15%", right: "10%", width: 400, height: 400,
-          borderRadius: "50%", background: "radial-gradient(circle, rgba(99,102,241,0.08) 0%, transparent 70%)",
-          pointerEvents: "none", filter: "blur(60px)" }} />
-        <div style={{ position: "absolute", bottom: "10%", left: "5%", width: 300, height: 300,
-          borderRadius: "50%", background: "radial-gradient(circle, rgba(14,165,233,0.06) 0%, transparent 70%)",
-          pointerEvents: "none", filter: "blur(60px)" }} />
 
-        <div style={{ maxWidth: 720, position: "relative", width: "100%" }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 8,
-            fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", color: accent,
-            textTransform: "uppercase", marginBottom: 28,
-            padding: "6px 16px", borderRadius: 100,
-            border: `1.5px solid ${accentLight}`, background: accentLight,
-          }}>
-            <span style={{ width: 6, height: 6, borderRadius: "50%", background: accent, animation: "pulse 2s infinite" }} />
-            AI Labs
-          </div>
-
-          <h1 style={{
-            fontSize: isMobile ? "clamp(26px, 8vw, 40px)" : "clamp(36px, 4.5vw, 56px)",
-            fontWeight: 900, letterSpacing: "-0.04em", color: "#0f172a", lineHeight: 1.25, marginBottom: 20,
-          }}>
-            業務の困りごと、<br />
-            <span style={{ color: accent }}>AIに聞いてみませんか？</span>
-          </h1>
-
-          <p style={{ fontSize: isMobile ? 14 : 16, color: "#64748b", lineHeight: 1.8, marginBottom: 40 }}>
-            業務のデジタル化から定着まで、伴走型でサポートします。<br />
-            まずは下のフォームで、お気軽にお悩みを入力してください。
-          </p>
-
-          {/* AI Chat Input */}
-          <div style={{
-            background: "#fff", borderRadius: 20, padding: 6,
-            boxShadow: "0 4px 40px rgba(0,0,0,0.06), 0 0 0 1px #f1f5f9",
-            maxWidth: 600, margin: "0 auto", position: "relative",
-          }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <input
-                type="text"
-                value={heroInput}
-                onChange={e => setHeroInput(e.target.value)}
-                onKeyDown={e => { if (e.key === "Enter") handleAsk(); }}
-                placeholder="今困ってる業務は？（例：日報が紙で管理が大変）"
-                style={{
-                  flex: 1, border: "none", outline: "none", padding: "14px 18px",
-                  fontSize: 14, color: "#0f172a", background: "transparent",
-                  fontFamily: "inherit",
-                }}
-              />
-              <button
-                onClick={handleAsk}
-                disabled={heroLoading || !heroInput.trim()}
-                style={{
-                  padding: "12px 24px", borderRadius: 14, border: "none",
-                  background: heroLoading || !heroInput.trim() ? "#cbd5e1" : accent,
-                  color: "#fff", fontSize: 13, fontWeight: 700, cursor: heroLoading ? "wait" : "pointer",
-                  transition: "all 0.2s", flexShrink: 0, fontFamily: "inherit",
-                }}
-              >
-                {heroLoading ? "考え中..." : "AIに聞く"}
-              </button>
-            </div>
-          </div>
-
-          {/* AI Reply */}
-          {(heroAsked || heroLoading) && (
-            <div ref={replyRef} style={{
-              marginTop: 24, textAlign: "left", maxWidth: 600, margin: "24px auto 0",
+        <div style={{ maxWidth: 1100, margin: "0 auto", position: "relative", width: "100%",
+          display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 40 : 60, alignItems: "center",
+        }}>
+          {/* Left: Copy */}
+          <div>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 8,
+              fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", color: accent,
+              textTransform: "uppercase", marginBottom: 24,
+              padding: "6px 16px", borderRadius: 100,
+              border: `1.5px solid ${accentLight}`, background: accentLight,
             }}>
-              {/* User message */}
-              <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
-                <div style={{
-                  padding: "10px 16px", borderRadius: "16px 16px 4px 16px",
-                  background: accent, color: "#fff", fontSize: 13, lineHeight: 1.6, maxWidth: "80%",
-                }}>
-                  {heroAsked}
-                </div>
-              </div>
-              {/* AI reply */}
-              <div style={{ display: "flex", justifyContent: "flex-start", marginBottom: 8 }}>
-                <div style={{
-                  padding: "14px 18px", borderRadius: "16px 16px 16px 4px",
-                  background: "#f8fafc", border: "1px solid #f1f5f9",
-                  fontSize: 13, color: "#334155", lineHeight: 1.8, maxWidth: "85%",
-                  whiteSpace: "pre-wrap",
-                }}>
-                  {heroLoading ? (
-                    <span style={{ color: "#94a3b8" }}>
-                      <span style={{ display: "inline-flex", gap: 4 }}>
-                        <span style={{ animation: "blink 1.4s infinite", animationDelay: "0s" }}>.</span>
-                        <span style={{ animation: "blink 1.4s infinite", animationDelay: "0.2s" }}>.</span>
-                        <span style={{ animation: "blink 1.4s infinite", animationDelay: "0.4s" }}>.</span>
-                      </span>
-                      {" "}AIが回答を考えています
-                    </span>
-                  ) : (
-                    <>
-                      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-                        <div style={{ width: 20, height: 20, borderRadius: "50%", background: accent, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="#fff" strokeWidth={2.5}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
-                          </svg>
-                        </div>
-                        <span style={{ fontSize: 11, fontWeight: 700, color: accent }}>AI Labs</span>
-                      </div>
-                      {heroReply}
-                    </>
-                  )}
-                </div>
-              </div>
+              <span style={{ width: 6, height: 6, borderRadius: "50%", background: accent, animation: "pulse 2s infinite" }} />
+              AI Labs
             </div>
-          )}
 
-          {/* Quick suggestions */}
-          {!heroAsked && (
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center", marginTop: 20 }}>
-              {[
-                "日報が紙で管理が大変",
-                "ベテランが退職して困る",
-                "Excelが複雑で属人化",
-                "採用がうまくいかない",
-              ].map((q) => (
-                <button key={q} onClick={() => { setHeroInput(q); }} style={{
-                  padding: "8px 16px", borderRadius: 100, border: "1px solid #e2e8f0",
-                  background: "#fff", color: "#64748b", fontSize: 12, cursor: "pointer",
-                  transition: "all 0.2s", fontFamily: "inherit",
-                }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = accent; e.currentTarget.style.color = accent; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = "#e2e8f0"; e.currentTarget.style.color = "#64748b"; }}
-                >
-                  {q}
-                </button>
-              ))}
+            <h1 style={{
+              fontSize: isMobile ? "clamp(26px, 8vw, 38px)" : "clamp(32px, 3.5vw, 48px)",
+              fontWeight: 900, letterSpacing: "-0.04em", color: "#0f172a", lineHeight: 1.25, marginBottom: 20,
+            }}>
+              AIは、もう<br />
+              <span style={{ color: accent }}>ここまでできる。</span>
+            </h1>
+
+            <p style={{ fontSize: isMobile ? 14 : 15, color: "#64748b", lineHeight: 1.9, marginBottom: 32, maxWidth: 420 }}>
+              メール下書き、議事録要約、翻訳、データ分析 ─<br />
+              今まで人がやっていた業務を、AIがリアルタイムで処理しています。
+            </p>
+
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+              <a href="/demo" style={{
+                display: "inline-flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 700,
+                color: "#fff", background: accent, padding: "14px 28px", borderRadius: 100,
+                textDecoration: "none", transition: "all 0.3s",
+                boxShadow: "0 6px 24px rgba(99,102,241,0.25)",
+              }}
+                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; }}
+              >
+                デモを体験する
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                </svg>
+              </a>
+              <a href="/contact" style={{
+                display: "inline-flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 600,
+                color: "#475569", background: "transparent", padding: "14px 28px", borderRadius: 100,
+                textDecoration: "none", border: "1.5px solid #e2e8f0", transition: "all 0.3s",
+              }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = accent; e.currentTarget.style.color = accent; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = "#e2e8f0"; e.currentTarget.style.color = "#475569"; }}
+              >
+                無料相談
+              </a>
             </div>
-          )}
+          </div>
+
+          {/* Right: AI Timeline */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 12, position: "relative" }}>
+            {/* Timeline line */}
+            <div style={{
+              position: "absolute", left: 19, top: 0, bottom: 0, width: 2,
+              background: `linear-gradient(to bottom, ${accent}20, ${accent}05)`,
+              zIndex: 0,
+            }} />
+
+            {timelineTasks.map((task, i) => {
+              const visible = i < visibleCards;
+              const typed = i < typingIdx;
+              const isLive = task.live;
+              const content = isLive ? (liveTyped || null) : task.result;
+
+              return (
+                <div key={i} style={{
+                  opacity: visible ? 1 : 0,
+                  transform: visible ? "translateY(0)" : "translateY(20px)",
+                  transition: "all 0.6s cubic-bezier(0.16,1,0.3,1)",
+                  display: "flex", gap: 14, alignItems: "flex-start", position: "relative", zIndex: 1,
+                }}>
+                  {/* Dot */}
+                  <div style={{
+                    width: 40, height: 40, borderRadius: "50%", flexShrink: 0,
+                    background: `${task.color}12`, border: `2px solid ${task.color}30`,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    transition: "all 0.3s",
+                    ...(visible && typed ? { background: task.color, borderColor: task.color } : {}),
+                  }}>
+                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24"
+                      stroke={visible && typed ? "#fff" : task.color} strokeWidth={1.8}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d={task.icon} />
+                    </svg>
+                  </div>
+
+                  {/* Card */}
+                  <div style={{
+                    flex: 1, padding: "14px 18px", borderRadius: 14,
+                    background: "#fff", border: "1px solid #f1f5f9",
+                    boxShadow: visible ? "0 2px 12px rgba(0,0,0,0.04)" : "none",
+                    transition: "all 0.3s",
+                  }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: typed && content ? 8 : 0 }}>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: task.color }}>{task.label}</span>
+                      {visible && !typed && (
+                        <span style={{ fontSize: 10, color: "#94a3b8", display: "inline-flex", gap: 3 }}>
+                          <span style={{ animation: "blink 1.4s infinite" }}>.</span>
+                          <span style={{ animation: "blink 1.4s infinite", animationDelay: "0.2s" }}>.</span>
+                          <span style={{ animation: "blink 1.4s infinite", animationDelay: "0.4s" }}>.</span>
+                        </span>
+                      )}
+                      {typed && !isLive && (
+                        <span style={{ fontSize: 9, fontWeight: 600, color: "#10b981", background: "#f0fdf4", padding: "2px 8px", borderRadius: 100 }}>完了</span>
+                      )}
+                      {isLive && liveTyped && !liveResult.length ? null : isLive && liveTyped && liveTyped.length >= liveResult.length && (
+                        <span style={{ fontSize: 9, fontWeight: 600, color: "#ec4899", background: "#fdf2f8", padding: "2px 8px", borderRadius: 100 }}>LIVE</span>
+                      )}
+                    </div>
+                    {typed && content && (
+                      <div style={{
+                        fontSize: 11, color: "#475569", lineHeight: 1.7,
+                        whiteSpace: "pre-wrap",
+                        animation: isLive ? "none" : "fadeIn 0.4s ease",
+                      }}>
+                        {isLive ? liveTyped : content}
+                        {isLive && liveTyped.length < (liveResult?.length || 999) && (
+                          <span style={{ animation: "blink 0.8s infinite", color: accent }}>|</span>
+                        )}
+                      </div>
+                    )}
+                    {isLive && typed && !liveResult && (
+                      <div style={{ fontSize: 11, color: "#94a3b8", display: "flex", alignItems: "center", gap: 6, marginTop: 4 }}>
+                        <span style={{ display: "inline-flex", gap: 3 }}>
+                          <span style={{ animation: "blink 1.4s infinite" }}>.</span>
+                          <span style={{ animation: "blink 1.4s infinite", animationDelay: "0.2s" }}>.</span>
+                          <span style={{ animation: "blink 1.4s infinite", animationDelay: "0.4s" }}>.</span>
+                        </span>
+                        {" "}AIがリアルタイムで生成中
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </section>
 
@@ -727,6 +760,10 @@ export default function AILabsPage() {
         @keyframes blink {
           0%, 100% { opacity: 0.2; }
           50% { opacity: 1; }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(4px); }
+          to { opacity: 1; transform: translateY(0); }
         }
         @media (max-width: 768px) {
           .al-services-grid { grid-template-columns: 1fr 1fr !important; }
