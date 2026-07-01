@@ -116,8 +116,8 @@ function ParticleTextCanvas() {
       off.width = W; off.height = H;
       const oc = off.getContext("2d")!;
 
-      // auto-size to fill ~80% width across two lines
-      const L1 = "Build what's", L2 = "next.";
+      // auto-size to fill viewport
+      const L1 = "Build what's", L2 = "NEXT.";
       let fs = 10;
       oc.font = `900 ${fs}px -apple-system, BlinkMacSystemFont, sans-serif`;
       while (oc.measureText(L1).width < W * 0.80) {
@@ -214,6 +214,16 @@ export default function Home() {
   const [navScrolled, setNavScrolled] = useState(false);
   const [inHero, setInHero] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+  const [newsItems, setNewsItems] = useState<Array<{title:string;source:string;link:string;pubDate:string}>>([]);
+  const [newsLoading, setNewsLoading] = useState(true);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [typedText, setTypedText] = useState("");
+  const [typingDone, setTypingDone] = useState(false);
+  const [aiStatus, setAiStatus] = useState("> ニュースソースに接続中...");
+  const [translating, setTranslating] = useState(false);
+  const [translated, setTranslated] = useState("");
+  const [summarizing, setSummarizing] = useState(false);
+  const [aiSummary, setAiSummary] = useState("");
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -236,6 +246,121 @@ export default function Home() {
       io.disconnect();
     };
   }, []);
+
+  // Fetch real news
+  useEffect(() => {
+    setNewsLoading(true);
+    fetch("/api/news")
+      .then(r => r.json())
+      .then(d => setNewsItems(d.items || []))
+      .catch(() => setNewsItems([]))
+      .finally(() => setNewsLoading(false));
+  }, []);
+
+  // AI status messages during loading
+  useEffect(() => {
+    if (!newsLoading) {
+      setAiStatus(newsItems.length > 0 ? `> 完了。${newsItems.length}件のニュースを取得しました。` : "> ニュースを取得できませんでした。");
+      return;
+    }
+    const msgs = ["> ニュースソースに接続中...", "> ヘッドラインを抽出中...", "> AIが分析中..."];
+    let idx = 0;
+    setAiStatus(msgs[0]);
+    const timer = setInterval(() => { idx = (idx + 1) % msgs.length; setAiStatus(msgs[idx]); }, 1200);
+    return () => clearInterval(timer);
+  }, [newsLoading, newsItems.length]);
+
+  // Typewriter effect for current headline
+  useEffect(() => {
+    if (newsItems.length === 0 || newsLoading) return;
+    const headline = newsItems[activeIndex]?.title || "";
+    setTypedText("");
+    setTypingDone(false);
+    setTranslated("");
+    setAiSummary("");
+    let i = 0;
+    const timer = setInterval(() => {
+      i++;
+      setTypedText(headline.slice(0, i));
+      if (i >= headline.length) { clearInterval(timer); setTypingDone(true); }
+    }, 28);
+    return () => clearInterval(timer);
+  }, [activeIndex, newsItems, newsLoading]);
+
+  // Auto-advance to next headline
+  useEffect(() => {
+    if (!typingDone || newsItems.length <= 1) return;
+    const timer = setTimeout(() => {
+      setActiveIndex(prev => (prev + 1) % newsItems.length);
+    }, 6000);
+    return () => clearTimeout(timer);
+  }, [typingDone, newsItems.length, activeIndex]);
+
+  const handleTranslate = async () => {
+    if (translating || newsItems.length === 0) return;
+    setTranslating(true);
+    setTranslated("");
+    try {
+      const res = await fetch("/api/ai-chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          system: "Translate the following Japanese news headline to natural English. Return only the translation, nothing else.",
+          message: newsItems[activeIndex].title,
+        }),
+      });
+      const data = await res.json();
+      setTranslated(data.reply || "Translation failed.");
+    } catch {
+      setTranslated("Translation failed.");
+    } finally {
+      setTranslating(false);
+    }
+  };
+
+  const handleSummary = async () => {
+    if (summarizing || newsItems.length === 0) return;
+    setSummarizing(true);
+    setAiSummary("");
+    try {
+      const res = await fetch("/api/ai-chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          system: "あなたはニュースアナリストです。以下のニュース見出しについて、背景や意味を3行程度で簡潔に解説してください。日本語で回答してください。",
+          message: newsItems[activeIndex].title,
+        }),
+      });
+      const data = await res.json();
+      setAiSummary(data.reply || "解説を生成できませんでした。");
+    } catch {
+      setAiSummary("解説を生成できませんでした。");
+    } finally {
+      setSummarizing(false);
+    }
+  };
+
+  const handleDownload = () => {
+    if (newsItems.length === 0) return;
+    const today = new Date();
+    const fname = `news_${today.getFullYear()}${String(today.getMonth()+1).padStart(2,"0")}${String(today.getDate()).padStart(2,"0")}.txt`;
+    const lines = newsItems.map((n, i) => `${i+1}. ${n.title}\n   ${n.source} | ${n.link}`).join("\n\n");
+    const blob = new Blob([lines], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = fname; a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const timeAgo = (pubDate: string) => {
+    if (!pubDate) return "";
+    const diff = Date.now() - new Date(pubDate).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 60) return `${mins}分前`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}時間前`;
+    return `${Math.floor(hrs / 24)}日前`;
+  };
 
   const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
@@ -285,27 +410,334 @@ export default function Home() {
           </a>
         </nav>
 
+        {/* ── News Hero ── */}
+        <section style={{
+          minHeight: "100vh", display: "flex", flexDirection: "column",
+          justifyContent: "center", alignItems: "center",
+          padding: isMobile ? "100px 20px 60px" : "120px 48px 80px",
+          background: "#fff", position: "relative", overflow: "hidden",
+        }}>
+          {/* Background grid */}
+          <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
+            <div style={{ position: "absolute", inset: 0, opacity: 0.035,
+              backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 59px, #94a3b8 59px, #94a3b8 60px), repeating-linear-gradient(90deg, transparent, transparent 59px, #94a3b8 59px, #94a3b8 60px)",
+            }} />
+            <div style={{ position: "absolute", inset: 0,
+              background: "radial-gradient(ellipse at center, transparent 20%, rgba(255,255,255,0.92) 65%)",
+            }} />
+          </div>
+
+          <div style={{ maxWidth: 800, width: "100%", position: "relative" }}>
+
+            {/* AI Status terminal line */}
+            <div style={{
+              fontFamily: "'SF Mono', 'Fira Code', Menlo, monospace",
+              fontSize: 11, color: newsLoading ? "#6366f1" : "#22c55e",
+              marginBottom: 20, textAlign: "center",
+              transition: "color 0.3s",
+            }}>
+              {aiStatus}
+              {newsLoading && (
+                <span style={{ display: "inline-block", width: 6, height: 12, background: "#6366f1", marginLeft: 4, verticalAlign: "text-bottom", animation: "cursor-blink 1s step-end infinite" }} />
+              )}
+            </div>
+
+            {/* Title */}
+            <div style={{ textAlign: "center", marginBottom: isMobile ? 28 : 36 }}>
+              <div style={{
+                display: "inline-flex", alignItems: "center", gap: 8,
+                padding: "6px 16px", borderRadius: 100,
+                border: "1px solid #e2e8f0",
+                fontSize: 11, fontWeight: 600, color: "#64748b",
+                letterSpacing: "0.08em", marginBottom: 24,
+                fontFamily: "'SF Mono', 'Fira Code', Menlo, monospace",
+              }}>
+                <span style={{
+                  width: 6, height: 6, borderRadius: "50%", background: "#22c55e",
+                  boxShadow: "0 0 6px rgba(34,197,94,0.4)",
+                  animation: "pulse-dot 2s ease-in-out infinite",
+                }} />
+                {(() => { const d = new Date(); return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,"0")}.${String(d.getDate()).padStart(2,"0")}`; })()}
+              </div>
+              <h1 style={{
+                fontSize: isMobile ? "clamp(36px, 10vw, 52px)" : "clamp(48px, 5vw, 64px)",
+                fontWeight: 900, lineHeight: 1, letterSpacing: "-0.04em",
+                color: "#0f172a", marginBottom: 10,
+              }}>
+                Today&apos;s <span style={{ color: "#6366f1" }}>News</span>
+              </h1>
+              <p style={{ fontSize: 12, color: "#94a3b8", fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase" }}>
+                AI &amp; Technology — 合同会社80
+              </p>
+            </div>
+
+            {/* ── Terminal Card ── */}
+            <div style={{
+              borderRadius: 16, overflow: "hidden",
+              background: "#0f172a",
+              boxShadow: "0 8px 40px rgba(15,23,42,0.25), 0 0 0 1px rgba(99,102,241,0.1)",
+              marginBottom: 20,
+            }}>
+              {/* Terminal header */}
+              <div style={{
+                padding: "12px 20px",
+                display: "flex", alignItems: "center", justifyContent: "space-between",
+                background: "#1e293b",
+                borderBottom: "1px solid rgba(255,255,255,0.06)",
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <div style={{ display: "flex", gap: 6 }}>
+                    <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#ef4444" }} />
+                    <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#f59e0b" }} />
+                    <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#22c55e" }} />
+                  </div>
+                  <span style={{
+                    fontSize: 11, fontWeight: 500, color: "rgba(148,163,184,0.6)",
+                    fontFamily: "'SF Mono', 'Fira Code', Menlo, monospace", marginLeft: 6,
+                  }}>
+                    news.ai — headlines
+                  </span>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  {!newsLoading && newsItems.length > 0 && (
+                    <span style={{
+                      fontSize: 10, fontWeight: 800, color: "#6366f1",
+                      fontFamily: "'SF Mono', 'Fira Code', Menlo, monospace",
+                      letterSpacing: "0.1em",
+                    }}>
+                      {String(activeIndex + 1).padStart(2, "0")}/{String(newsItems.length).padStart(2, "0")}
+                    </span>
+                  )}
+                  <span style={{
+                    fontSize: 9, fontWeight: 700, color: "#22c55e",
+                    letterSpacing: "0.12em", textTransform: "uppercase",
+                    padding: "3px 10px", borderRadius: 100,
+                    background: "rgba(34,197,94,0.1)",
+                    border: "1px solid rgba(34,197,94,0.2)",
+                    display: "flex", alignItems: "center", gap: 5,
+                  }}>
+                    <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#22c55e", animation: "pulse-dot 2s ease-in-out infinite" }} />
+                    LIVE
+                  </span>
+                </div>
+              </div>
+
+              {/* Terminal body */}
+              <div style={{ padding: isMobile ? "28px 20px 32px" : "36px 36px 40px" }}>
+                {newsLoading ? (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 14, alignItems: "flex-start" }}>
+                    {[85, 65, 45].map((w, i) => (
+                      <div key={i} style={{
+                        height: 16, borderRadius: 4,
+                        background: "linear-gradient(90deg, rgba(99,102,241,0.1) 25%, rgba(99,102,241,0.2) 50%, rgba(99,102,241,0.1) 75%)",
+                        backgroundSize: "200% 100%",
+                        animation: "shimmer 1.8s ease-in-out infinite",
+                        animationDelay: `${i * 0.15}s`,
+                        width: `${w}%`,
+                      }} />
+                    ))}
+                  </div>
+                ) : newsItems.length === 0 ? (
+                  <div style={{ color: "#64748b", fontSize: 14, textAlign: "center", padding: "20px 0" }}>
+                    ニュースを取得できませんでした
+                  </div>
+                ) : (
+                  <>
+                    {/* Headline */}
+                    <h2 style={{
+                      fontSize: isMobile ? "clamp(20px, 5.5vw, 28px)" : "clamp(26px, 2.8vw, 34px)",
+                      fontWeight: 700, lineHeight: 1.65, letterSpacing: "-0.01em",
+                      color: "#f1f5f9", marginBottom: 20,
+                      minHeight: isMobile ? 90 : 110,
+                    }}>
+                      {typedText}
+                      {!typingDone && (
+                        <span style={{
+                          display: "inline-block", width: 3, height: "0.85em",
+                          background: "#6366f1", marginLeft: 3, verticalAlign: "text-bottom",
+                          animation: "cursor-blink 1s step-end infinite",
+                        }} />
+                      )}
+                    </h2>
+
+                    {/* Source + time + link */}
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                      {newsItems[activeIndex]?.source && (
+                        <span style={{
+                          fontSize: 11, fontWeight: 600, color: "#a5b4fc",
+                          padding: "3px 10px", borderRadius: 100,
+                          background: "rgba(99,102,241,0.15)",
+                          border: "1px solid rgba(99,102,241,0.2)",
+                        }}>
+                          {newsItems[activeIndex].source}
+                        </span>
+                      )}
+                      {newsItems[activeIndex]?.pubDate && (
+                        <span style={{ fontSize: 11, color: "#64748b", fontFamily: "'SF Mono', 'Fira Code', Menlo, monospace" }}>
+                          {timeAgo(newsItems[activeIndex].pubDate)}
+                        </span>
+                      )}
+                      <a href={newsItems[activeIndex]?.link} target="_blank" rel="noopener noreferrer"
+                        style={{ fontSize: 11, color: "#6366f1", textDecoration: "none", fontWeight: 600, display: "flex", alignItems: "center", gap: 3, marginLeft: "auto" }}>
+                        記事を読む
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                          <path d="M7 17L17 7M17 7H7M17 7v10"/>
+                        </svg>
+                      </a>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Dot indicators inside terminal */}
+              {!newsLoading && newsItems.length > 0 && (
+                <div style={{
+                  padding: "0 36px 20px",
+                  display: "flex", gap: 6, justifyContent: "center",
+                }}>
+                  {newsItems.map((_, i) => (
+                    <button key={i} onClick={() => setActiveIndex(i)}
+                      style={{
+                        width: activeIndex === i ? 24 : 8, height: 6,
+                        borderRadius: 100, border: "none", cursor: "pointer",
+                        background: activeIndex === i ? "#6366f1" : "rgba(255,255,255,0.1)",
+                        transition: "all 0.3s cubic-bezier(0.16,1,0.3,1)",
+                        padding: 0,
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* AI result panels */}
+            {translated && (
+              <div style={{
+                border: "1px solid #c7d2fe", borderRadius: 12,
+                padding: isMobile ? "16px 16px" : "20px 24px",
+                marginBottom: 12,
+                background: "linear-gradient(180deg, #fafbff, #f5f3ff)",
+                animation: "fade-up 0.4s ease both",
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
+                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="#6366f1" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 21l5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 016-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 01-3.827-5.802" />
+                  </svg>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: "#6366f1", letterSpacing: "0.12em" }}>ENGLISH TRANSLATION</span>
+                </div>
+                <div style={{ fontSize: isMobile ? 14 : 15, color: "#334155", lineHeight: 1.8 }}>{translated}</div>
+              </div>
+            )}
+
+            {aiSummary && (
+              <div style={{
+                border: "1px solid #bbf7d0", borderRadius: 12,
+                padding: isMobile ? "16px 16px" : "20px 24px",
+                marginBottom: 12,
+                background: "linear-gradient(180deg, #f0fdf4, #ecfdf5)",
+                animation: "fade-up 0.4s ease both",
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
+                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="#16a34a" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                  </svg>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: "#16a34a", letterSpacing: "0.12em" }}>AI ANALYSIS</span>
+                </div>
+                <div style={{ fontSize: isMobile ? 13 : 14, color: "#334155", lineHeight: 1.9, whiteSpace: "pre-wrap" }}>{aiSummary}</div>
+              </div>
+            )}
+
+            {/* Action buttons */}
+            {!newsLoading && newsItems.length > 0 && typingDone && (
+              <div style={{
+                display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap",
+                animation: "fade-up 0.5s ease both",
+              }}>
+                {/* AI Analysis */}
+                <button onClick={handleSummary} disabled={summarizing} style={{
+                  display: "flex", alignItems: "center", gap: 7,
+                  padding: "11px 20px", borderRadius: 10,
+                  border: "1.5px solid #6366f1", background: "#6366f1", color: "#fff",
+                  fontSize: 12, fontWeight: 700,
+                  cursor: summarizing ? "wait" : "pointer", transition: "all 0.25s", fontFamily: "inherit",
+                  opacity: summarizing ? 0.7 : 1,
+                }}
+                  onMouseEnter={e => { if(!summarizing){ e.currentTarget.style.background="#4f46e5"; e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow="0 6px 20px rgba(99,102,241,0.3)"; } }}
+                  onMouseLeave={e => { e.currentTarget.style.background="#6366f1"; e.currentTarget.style.transform=""; e.currentTarget.style.boxShadow="none"; }}
+                >
+                  <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                  </svg>
+                  {summarizing ? "分析中..." : aiSummary ? "再分析" : "AI解説"}
+                </button>
+
+                {/* Translate */}
+                <button onClick={handleTranslate} disabled={translating} style={{
+                  display: "flex", alignItems: "center", gap: 7,
+                  padding: "11px 20px", borderRadius: 10, border: "1.5px solid #e2e8f0",
+                  background: "#fff", color: translating ? "#94a3b8" : "#475569", fontSize: 12, fontWeight: 600,
+                  cursor: translating ? "wait" : "pointer", transition: "all 0.25s", fontFamily: "inherit",
+                }}
+                  onMouseEnter={e => { if(!translating){ e.currentTarget.style.borderColor="#6366f1"; e.currentTarget.style.color="#6366f1"; e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow="0 4px 12px rgba(99,102,241,0.1)"; } }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor="#e2e8f0"; e.currentTarget.style.color=translating?"#94a3b8":"#475569"; e.currentTarget.style.transform=""; e.currentTarget.style.boxShadow="none"; }}
+                >
+                  <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 21l5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 016-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 01-3.827-5.802" />
+                  </svg>
+                  {translating ? "翻訳中..." : translated ? "翻訳済み" : "英語翻訳"}
+                </button>
+
+                {/* Download */}
+                <button onClick={handleDownload} style={{
+                  display: "flex", alignItems: "center", gap: 7,
+                  padding: "11px 20px", borderRadius: 10, border: "1.5px solid #e2e8f0",
+                  background: "#fff", color: "#475569", fontSize: 12, fontWeight: 600,
+                  cursor: "pointer", transition: "all 0.25s", fontFamily: "inherit",
+                }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor="#0f172a"; e.currentTarget.style.color="#0f172a"; e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow="0 4px 12px rgba(0,0,0,0.08)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor="#e2e8f0"; e.currentTarget.style.color="#475569"; e.currentTarget.style.transform=""; e.currentTarget.style.boxShadow="none"; }}
+                >
+                  <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                  </svg>
+                  全件DL
+                </button>
+              </div>
+            )}
+          </div>
+
+        </section>
+
         {/* ── Hero (Desktop) ── */}
         {!isMobile && (
           <section style={{ minHeight: "100vh", display: "flex", alignItems: "flex-end",
             justifyContent: "center", padding: "0 48px 80px", position: "relative" }}>
             <div style={{ textAlign: "center", maxWidth: 900, width: "100%" }} />
-            <div style={{ position: "fixed", bottom: 36, left: "50%", transform: "translateX(-50%)",
-              display: "flex", flexDirection: "column", alignItems: "center", gap: 10, zIndex: 10,
-              animation: "fade-in 1s ease 1.4s both",
-              opacity: inHero ? 1 : 0, pointerEvents: inHero ? "auto" : "none",
-              transition: "opacity 0.4s ease" }}>
-              <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.35em",
-                color: "#94a3b8", textTransform: "uppercase" }}>Scroll</span>
-              <div style={{ position: "relative", width: 1, height: 64, overflow: "hidden",
-                background: "rgba(99,102,241,0.15)", borderRadius: 2 }}>
-                <div style={{ position: "absolute", top: 0, left: 0, width: "100%",
-                  background: "linear-gradient(to bottom, #6366f1, #a78bfa)",
-                  borderRadius: 2, animation: "scroll-bar 1.6s cubic-bezier(0.4,0,0.2,1) infinite" }} />
-              </div>
-            </div>
           </section>
         )}
+
+        {/* Fixed right-side scroll indicator */}
+        <div style={{
+          position: "fixed", right: isMobile ? 12 : 28, top: "50%", transform: "translateY(-50%)",
+          display: "flex", flexDirection: "column", alignItems: "center", gap: 12, zIndex: 50,
+          opacity: inHero ? 1 : 0, pointerEvents: "none",
+          transition: "opacity 0.4s ease",
+        }}>
+          <span style={{
+            fontSize: 9, fontWeight: 700, letterSpacing: "0.3em", color: "#94a3b8",
+            textTransform: "uppercase", writingMode: "vertical-rl",
+          }}>Scroll</span>
+          <div style={{
+            width: 1, height: 48, position: "relative", overflow: "hidden",
+            background: "rgba(99,102,241,0.15)", borderRadius: 2,
+          }}>
+            <div style={{
+              position: "absolute", top: 0, left: 0, width: "100%",
+              background: "linear-gradient(to bottom, #6366f1, #a78bfa)",
+              borderRadius: 2, animation: "scroll-bar 1.6s cubic-bezier(0.4,0,0.2,1) infinite",
+            }} />
+          </div>
+        </div>
 
         {/* ── Hero (Mobile) ── */}
         {isMobile && (
@@ -344,12 +776,12 @@ export default function Home() {
                 <span style={{
                   background: "linear-gradient(135deg, #6366f1, #a78bfa, #818cf8)",
                   WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-                }}>next.</span>
+                }}>NEXT.</span>
               </h1>
 
               <p style={{ fontSize: 14, color: "rgba(248,250,252,0.5)", lineHeight: 1.9, maxWidth: 300 }}>
-                人の知覚を、ソフトウェアで拡張する。<br />
-                AIで、ビジネスの次を共につくる。
+                テクノロジーで「次」をつくる。<br />
+                合同会社80のコーポレートサイト。
               </p>
             </div>
 
@@ -377,11 +809,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* scroll hint */}
-            <div style={{ position: "absolute", bottom: 12, left: "50%", transform: "translateX(-50%)",
-              display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-              <div className="mob-scroll-line" style={{ width: 1, height: 32, background: "linear-gradient(to bottom, rgba(99,102,241,0.6), transparent)", borderRadius: 1 }} />
-            </div>
           </section>
         )}
 

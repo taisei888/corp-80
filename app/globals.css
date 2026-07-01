@@ -89,3 +89,16 @@ body {
 .btn-outline-light:hover {
   border-color: #6366f1; color: #6366f1; background: rgba(238,242,255,0.8);
 }
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
