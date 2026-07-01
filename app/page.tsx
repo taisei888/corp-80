@@ -287,14 +287,14 @@ export default function Home() {
     return () => clearInterval(timer);
   }, [activeIndex, newsItems, newsLoading]);
 
-  // Auto-advance to next headline
+  // Auto-advance to next headline (pause when AI result is showing)
   useEffect(() => {
-    if (!typingDone || newsItems.length <= 1) return;
+    if (!typingDone || newsItems.length <= 1 || aiSummary || translated || summarizing || translating) return;
     const timer = setTimeout(() => {
       setActiveIndex(prev => (prev + 1) % newsItems.length);
     }, 6000);
     return () => clearTimeout(timer);
-  }, [typingDone, newsItems.length, activeIndex]);
+  }, [typingDone, newsItems.length, activeIndex, aiSummary, translated, summarizing, translating]);
 
   const handleTranslate = async () => {
     if (translating || newsItems.length === 0) return;
@@ -822,11 +822,38 @@ export default function Home() {
             <div style={{ height: 80, background: "linear-gradient(to bottom, #0f172a, #fff)", pointerEvents: "none" }} />
           )}
 
-        {/* ── Vision ── */}
+        {/* ── Vision & Mission ── */}
         <section id="vision" className="mob-section" style={{ background: "#fff", padding: "120px 64px 140px" }}>
           <div style={{ maxWidth: 1160, margin: "0 auto" }}>
 
-            {/* Editorial split layout */}
+            {/* Mission */}
+            <div className="sr" style={{ textAlign: "center", marginBottom: 120 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.22em", color: "#6366f1", textTransform: "uppercase", marginBottom: 32 }}>
+                Our Mission
+              </div>
+              <h2 style={{
+                fontSize: "clamp(28px, 4vw, 52px)", fontWeight: 900,
+                lineHeight: 1.5, letterSpacing: "-0.03em", color: "#0f172a",
+                marginBottom: 32,
+              }}>
+                人の知覚を、<br />ソフトウェアで拡張する。
+              </h2>
+              <p style={{ fontSize: 16, color: "#64748b", lineHeight: 2.0, maxWidth: 640, margin: "0 auto", marginBottom: 8 }}>
+                私たちは、人が持つ感覚・違和感・気づき・判断を、<br className="mob-hide" />
+                ソフトウェアの力でより見える形にし、企業や組織の意思決定を支えます。
+              </p>
+              <p style={{ fontSize: 16, color: "#64748b", lineHeight: 2.0, maxWidth: 640, margin: "0 auto" }}>
+                AIやテクノロジーを人の代わりにするのではなく、<br className="mob-hide" />
+                人の可能性を広げるために活用します。
+              </p>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "48px auto 0", maxWidth: 320 }}>
+                <div style={{ flex: 1, height: 1, background: "linear-gradient(90deg, transparent, #e2e8f0)" }} />
+                <div style={{ width: 5, height: 5, transform: "rotate(45deg)", background: "#6366f1" }} />
+                <div style={{ flex: 1, height: 1, background: "linear-gradient(90deg, #e2e8f0, transparent)" }} />
+              </div>
+            </div>
+
+            {/* Vision: Editorial split layout */}
             <div className="sr mob-grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1.8fr", gap: 80, alignItems: "flex-start", marginBottom: 100 }}>
               {/* Left: label + big English */}
               <div style={{ position: "sticky", top: 120 }}>
