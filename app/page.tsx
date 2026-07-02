@@ -460,11 +460,17 @@ export default function Home() {
                 {(() => { const d = new Date(); return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,"0")}.${String(d.getDate()).padStart(2,"0")}`; })()}
               </div>
               <h1 style={{
-                fontSize: isMobile ? "clamp(36px, 10vw, 52px)" : "clamp(48px, 5vw, 64px)",
-                fontWeight: 900, lineHeight: 1, letterSpacing: "-0.04em",
-                color: "#0f172a", marginBottom: 10,
+                fontSize: isMobile ? "clamp(44px, 12vw, 60px)" : "clamp(64px, 7vw, 96px)",
+                fontWeight: 900, lineHeight: 1, letterSpacing: "-0.05em",
+                color: "#0f172a", marginBottom: 14,
               }}>
-                Today&apos;s <span style={{ color: "#6366f1" }}>News</span>
+                Today&apos;s{!isMobile && " "}{isMobile && <br />}
+                <span style={{
+                  background: "linear-gradient(135deg, #6366f1, #8b5cf6, #6366f1)",
+                  backgroundSize: "200% 200%",
+                  animation: "shimmer 3s ease infinite",
+                  WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+                }}>News</span>
               </h1>
               <p style={{ fontSize: 12, color: "#94a3b8", fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase" }}>
                 AI &amp; Technology — 合同会社80
@@ -472,142 +478,157 @@ export default function Home() {
             </div>
 
             {/* ── Terminal Card ── */}
-            <div style={{
-              borderRadius: 16, overflow: "hidden",
+            <div className="terminal-glow" style={{
+              borderRadius: 20, overflow: "hidden",
               background: "#0f172a",
-              boxShadow: "0 8px 40px rgba(15,23,42,0.25), 0 0 0 1px rgba(99,102,241,0.1)",
-              marginBottom: 20,
+              boxShadow: "0 12px 60px rgba(99,102,241,0.15), 0 0 0 1px rgba(99,102,241,0.15)",
+              marginBottom: 20, position: "relative",
             }}>
-              {/* Terminal header */}
+              {/* Animated border glow */}
               <div style={{
-                padding: "12px 20px",
-                display: "flex", alignItems: "center", justifyContent: "space-between",
-                background: "#1e293b",
-                borderBottom: "1px solid rgba(255,255,255,0.06)",
-              }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <div style={{ display: "flex", gap: 6 }}>
-                    <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#ef4444" }} />
-                    <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#f59e0b" }} />
-                    <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#22c55e" }} />
-                  </div>
-                  <span style={{
-                    fontSize: 11, fontWeight: 500, color: "rgba(148,163,184,0.6)",
-                    fontFamily: "'SF Mono', 'Fira Code', Menlo, monospace", marginLeft: 6,
-                  }}>
-                    news.ai — headlines
-                  </span>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  {!newsLoading && newsItems.length > 0 && (
-                    <span style={{
-                      fontSize: 10, fontWeight: 800, color: "#6366f1",
-                      fontFamily: "'SF Mono', 'Fira Code', Menlo, monospace",
-                      letterSpacing: "0.1em",
-                    }}>
-                      {String(activeIndex + 1).padStart(2, "0")}/{String(newsItems.length).padStart(2, "0")}
-                    </span>
-                  )}
-                  <span style={{
-                    fontSize: 9, fontWeight: 700, color: "#22c55e",
-                    letterSpacing: "0.12em", textTransform: "uppercase",
-                    padding: "3px 10px", borderRadius: 100,
-                    background: "rgba(34,197,94,0.1)",
-                    border: "1px solid rgba(34,197,94,0.2)",
-                    display: "flex", alignItems: "center", gap: 5,
-                  }}>
-                    <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#22c55e", animation: "pulse-dot 2s ease-in-out infinite" }} />
-                    LIVE
-                  </span>
-                </div>
-              </div>
+                position: "absolute", inset: -1, borderRadius: 21, zIndex: 0, pointerEvents: "none",
+                background: "conic-gradient(from var(--angle, 0deg), transparent 40%, rgba(99,102,241,0.4) 50%, transparent 60%)",
+                animation: "rotate-border 4s linear infinite",
+              }} />
+              <div style={{ position: "relative", zIndex: 1, background: "#0f172a", borderRadius: 19, overflow: "hidden" }}>
 
-              {/* Terminal body */}
-              <div style={{ padding: isMobile ? "28px 20px 32px" : "36px 36px 40px" }}>
-                {newsLoading ? (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 14, alignItems: "flex-start" }}>
-                    {[85, 65, 45].map((w, i) => (
-                      <div key={i} style={{
-                        height: 16, borderRadius: 4,
-                        background: "linear-gradient(90deg, rgba(99,102,241,0.1) 25%, rgba(99,102,241,0.2) 50%, rgba(99,102,241,0.1) 75%)",
-                        backgroundSize: "200% 100%",
-                        animation: "shimmer 1.8s ease-in-out infinite",
-                        animationDelay: `${i * 0.15}s`,
-                        width: `${w}%`,
-                      }} />
+                {/* Terminal header */}
+                <div style={{
+                  padding: "12px 20px",
+                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                  background: "#1e293b",
+                  borderBottom: "1px solid rgba(255,255,255,0.06)",
+                }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <div style={{ display: "flex", gap: 6 }}>
+                      <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#ef4444" }} />
+                      <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#f59e0b" }} />
+                      <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#22c55e" }} />
+                    </div>
+                    <span style={{
+                      fontSize: 11, fontWeight: 500, color: "rgba(148,163,184,0.6)",
+                      fontFamily: "'SF Mono', 'Fira Code', Menlo, monospace", marginLeft: 6,
+                    }}>
+                      news.ai — headlines
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    {!newsLoading && newsItems.length > 0 && (
+                      <span style={{
+                        fontSize: 10, fontWeight: 800, color: "#6366f1",
+                        fontFamily: "'SF Mono', 'Fira Code', Menlo, monospace",
+                        letterSpacing: "0.1em",
+                      }}>
+                        {String(activeIndex + 1).padStart(2, "0")}/{String(newsItems.length).padStart(2, "0")}
+                      </span>
+                    )}
+                    <span style={{
+                      fontSize: 9, fontWeight: 700, color: "#22c55e",
+                      letterSpacing: "0.12em", textTransform: "uppercase",
+                      padding: "3px 10px", borderRadius: 100,
+                      background: "rgba(34,197,94,0.1)",
+                      border: "1px solid rgba(34,197,94,0.2)",
+                      display: "flex", alignItems: "center", gap: 5,
+                    }}>
+                      <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#22c55e", animation: "pulse-dot 2s ease-in-out infinite" }} />
+                      LIVE
+                    </span>
+                  </div>
+                </div>
+
+                {/* Scan line effect */}
+                <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 2, background: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.01) 2px, rgba(255,255,255,0.01) 4px)", mixBlendMode: "overlay" }} />
+
+                {/* Terminal body — fixed height */}
+                <div style={{ padding: isMobile ? "28px 20px 20px" : "36px 36px 28px", height: isMobile ? 180 : 200, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                  {newsLoading ? (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 14, alignItems: "flex-start" }}>
+                      {[85, 65, 45].map((w, i) => (
+                        <div key={i} style={{
+                          height: 16, borderRadius: 4,
+                          background: "linear-gradient(90deg, rgba(99,102,241,0.1) 25%, rgba(99,102,241,0.2) 50%, rgba(99,102,241,0.1) 75%)",
+                          backgroundSize: "200% 100%",
+                          animation: "shimmer 1.8s ease-in-out infinite",
+                          animationDelay: `${i * 0.15}s`,
+                          width: `${w}%`,
+                        }} />
+                      ))}
+                    </div>
+                  ) : newsItems.length === 0 ? (
+                    <div style={{ color: "#64748b", fontSize: 14, textAlign: "center" }}>
+                      ニュースを取得できませんでした
+                    </div>
+                  ) : (
+                    <>
+                      {/* Headline — 3 lines max */}
+                      <h2 style={{
+                        fontSize: isMobile ? 20 : 26,
+                        fontWeight: 700, lineHeight: 1.65, letterSpacing: "-0.01em",
+                        color: "#f1f5f9", marginBottom: 16,
+                        overflow: "hidden",
+                        display: "-webkit-box",
+                        WebkitLineClamp: 3,
+                        WebkitBoxOrient: "vertical" as const,
+                      }}>
+                        {typedText}
+                        {!typingDone && (
+                          <span style={{
+                            display: "inline-block", width: 3, height: "0.85em",
+                            background: "#6366f1", marginLeft: 3, verticalAlign: "text-bottom",
+                            animation: "cursor-blink 1s step-end infinite",
+                          }} />
+                        )}
+                      </h2>
+
+                      {/* Source + time + link */}
+                      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                        {newsItems[activeIndex]?.source && (
+                          <span style={{
+                            fontSize: 11, fontWeight: 600, color: "#a5b4fc",
+                            padding: "3px 10px", borderRadius: 100,
+                            background: "rgba(99,102,241,0.15)",
+                            border: "1px solid rgba(99,102,241,0.2)",
+                          }}>
+                            {newsItems[activeIndex].source}
+                          </span>
+                        )}
+                        {newsItems[activeIndex]?.pubDate && (
+                          <span style={{ fontSize: 11, color: "#64748b", fontFamily: "'SF Mono', 'Fira Code', Menlo, monospace" }}>
+                            {timeAgo(newsItems[activeIndex].pubDate)}
+                          </span>
+                        )}
+                        <a href={newsItems[activeIndex]?.link} target="_blank" rel="noopener noreferrer"
+                          style={{ fontSize: 11, color: "#6366f1", textDecoration: "none", fontWeight: 600, display: "flex", alignItems: "center", gap: 3, marginLeft: "auto" }}>
+                          記事を読む
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                            <path d="M7 17L17 7M17 7H7M17 7v10"/>
+                          </svg>
+                        </a>
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* Dot indicators inside terminal */}
+                {!newsLoading && newsItems.length > 0 && (
+                  <div style={{
+                    padding: "0 36px 18px",
+                    display: "flex", gap: 6, justifyContent: "center",
+                  }}>
+                    {newsItems.map((_, i) => (
+                      <button key={i} onClick={() => setActiveIndex(i)}
+                        style={{
+                          width: activeIndex === i ? 24 : 8, height: 6,
+                          borderRadius: 100, border: "none", cursor: "pointer",
+                          background: activeIndex === i ? "#6366f1" : "rgba(255,255,255,0.1)",
+                          transition: "all 0.3s cubic-bezier(0.16,1,0.3,1)",
+                          padding: 0,
+                        }}
+                      />
                     ))}
                   </div>
-                ) : newsItems.length === 0 ? (
-                  <div style={{ color: "#64748b", fontSize: 14, textAlign: "center", padding: "20px 0" }}>
-                    ニュースを取得できませんでした
-                  </div>
-                ) : (
-                  <>
-                    {/* Headline */}
-                    <h2 style={{
-                      fontSize: isMobile ? "clamp(20px, 5.5vw, 28px)" : "clamp(26px, 2.8vw, 34px)",
-                      fontWeight: 700, lineHeight: 1.65, letterSpacing: "-0.01em",
-                      color: "#f1f5f9", marginBottom: 20,
-                      minHeight: isMobile ? 90 : 110,
-                    }}>
-                      {typedText}
-                      {!typingDone && (
-                        <span style={{
-                          display: "inline-block", width: 3, height: "0.85em",
-                          background: "#6366f1", marginLeft: 3, verticalAlign: "text-bottom",
-                          animation: "cursor-blink 1s step-end infinite",
-                        }} />
-                      )}
-                    </h2>
-
-                    {/* Source + time + link */}
-                    <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-                      {newsItems[activeIndex]?.source && (
-                        <span style={{
-                          fontSize: 11, fontWeight: 600, color: "#a5b4fc",
-                          padding: "3px 10px", borderRadius: 100,
-                          background: "rgba(99,102,241,0.15)",
-                          border: "1px solid rgba(99,102,241,0.2)",
-                        }}>
-                          {newsItems[activeIndex].source}
-                        </span>
-                      )}
-                      {newsItems[activeIndex]?.pubDate && (
-                        <span style={{ fontSize: 11, color: "#64748b", fontFamily: "'SF Mono', 'Fira Code', Menlo, monospace" }}>
-                          {timeAgo(newsItems[activeIndex].pubDate)}
-                        </span>
-                      )}
-                      <a href={newsItems[activeIndex]?.link} target="_blank" rel="noopener noreferrer"
-                        style={{ fontSize: 11, color: "#6366f1", textDecoration: "none", fontWeight: 600, display: "flex", alignItems: "center", gap: 3, marginLeft: "auto" }}>
-                        記事を読む
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                          <path d="M7 17L17 7M17 7H7M17 7v10"/>
-                        </svg>
-                      </a>
-                    </div>
-                  </>
                 )}
               </div>
-
-              {/* Dot indicators inside terminal */}
-              {!newsLoading && newsItems.length > 0 && (
-                <div style={{
-                  padding: "0 36px 20px",
-                  display: "flex", gap: 6, justifyContent: "center",
-                }}>
-                  {newsItems.map((_, i) => (
-                    <button key={i} onClick={() => setActiveIndex(i)}
-                      style={{
-                        width: activeIndex === i ? 24 : 8, height: 6,
-                        borderRadius: 100, border: "none", cursor: "pointer",
-                        background: activeIndex === i ? "#6366f1" : "rgba(255,255,255,0.1)",
-                        transition: "all 0.3s cubic-bezier(0.16,1,0.3,1)",
-                        padding: 0,
-                      }}
-                    />
-                  ))}
-                </div>
-              )}
             </div>
 
             {/* AI result panels */}
