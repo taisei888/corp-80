@@ -280,10 +280,10 @@ export default function Home() {
     setAiSummary("");
     let i = 0;
     const timer = setInterval(() => {
-      i++;
+      i += 2;
+      if (i >= headline.length) { i = headline.length; clearInterval(timer); setTypedText(headline); setTypingDone(true); return; }
       setTypedText(headline.slice(0, i));
-      if (i >= headline.length) { clearInterval(timer); setTypingDone(true); }
-    }, 28);
+    }, 50);
     return () => clearInterval(timer);
   }, [activeIndex, newsItems, newsLoading]);
 
@@ -487,8 +487,9 @@ export default function Home() {
               {/* Animated border glow */}
               <div style={{
                 position: "absolute", inset: -1, borderRadius: 21, zIndex: 0, pointerEvents: "none",
-                background: "conic-gradient(from var(--angle, 0deg), transparent 40%, rgba(99,102,241,0.4) 50%, transparent 60%)",
-                animation: "rotate-border 4s linear infinite",
+                background: "conic-gradient(from 0deg, transparent 40%, rgba(99,102,241,0.4) 50%, transparent 60%)",
+                animation: "rotate-glow 4s linear infinite",
+                willChange: "transform",
               }} />
               <div style={{ position: "relative", zIndex: 1, background: "#0f172a", borderRadius: 19, overflow: "hidden" }}>
 
@@ -537,7 +538,7 @@ export default function Home() {
                 </div>
 
                 {/* Scan line effect */}
-                <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 2, background: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.01) 2px, rgba(255,255,255,0.01) 4px)", mixBlendMode: "overlay" }} />
+                <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 2, background: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.01) 2px, rgba(255,255,255,0.01) 4px)" }} />
 
                 {/* Terminal body — fixed height */}
                 <div style={{ padding: isMobile ? "28px 20px 20px" : "36px 36px 28px", height: isMobile ? 180 : 200, display: "flex", flexDirection: "column", justifyContent: "center" }}>
