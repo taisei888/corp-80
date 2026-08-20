@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { AgentCM } from "./AgentCM";
 
 function useScrollReveal() {
   useEffect(() => {
@@ -437,6 +438,21 @@ export default function AILabsPage() {
                 </div>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CM ── */}
+      <section style={{ padding: isMobile ? "64px 20px" : "96px 48px", background: "#fff" }}>
+        <div style={{ maxWidth: 880, margin: "0 auto" }}>
+          <div className="sr2" style={{ ...sr2, marginBottom: 32, textAlign: "center" }}>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.25em", color: accent, textTransform: "uppercase", marginBottom: 12 }}>Movie</div>
+            <h2 style={{ fontSize: "clamp(22px, 3.5vw, 34px)", fontWeight: 900, letterSpacing: "-0.03em", color: "#0f172a", lineHeight: 1.3 }}>
+              30秒でわかる、AIエージェント。
+            </h2>
+          </div>
+          <div className="sr2" style={{ ...sr2, transitionDelay: "0.1s" }}>
+            <AgentCM />
           </div>
         </div>
       </section>
