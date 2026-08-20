@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "AI Labs — AI導入支援・受託開発",
-  description: "LLM・RAG・業務自動化を軸としたAIシステムをオーダーメイドで開発。戦略策定から実装・定着まで一気通貫でサポートします。",
+  title: "AI Labs — AIエージェント開発・業務自動化",
+  description: "答えるAIから、仕事をやり切るAIエージェントへ。メール対応・経理・電話応対まで、御社の業務に合わせたAIエージェントをオーダーメイドで開発します。",
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {
