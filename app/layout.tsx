@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { Noto_Sans_JP } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
+
+// Google広告・GA4の計測タグ（環境変数があるときだけ出力）
+const GTAG_ID = process.env.NEXT_PUBLIC_GTAG_ID; // 例: AW-XXXXXXXXXX または G-XXXXXXX
 
 const noto = Noto_Sans_JP({
   subsets: ["latin"],
@@ -43,7 +47,25 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body className={noto.className}>{children}</body>
+      <body className={noto.className}>
+        {children}
+        {GTAG_ID && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GTAG_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="gtag-init" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${GTAG_ID}');
+              `}
+            </Script>
+          </>
+        )}
+      </body>
     </html>
   );
 }
