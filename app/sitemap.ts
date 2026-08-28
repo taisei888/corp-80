@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = "https://rng-labs.com";
+  const base = "https://www.rng-labs.com";
   return [
     { url: base, lastModified: new Date(), changeFrequency: "weekly", priority: 1.0 },
     { url: `${base}/company`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },

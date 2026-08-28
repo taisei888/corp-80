@@ -13,7 +13,7 @@ const noto = Noto_Sans_JP({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://rng-labs.com"),
+  metadataBase: new URL("https://www.rng-labs.com"),
   title: {
     default: "合同会社80 | 人の知覚を、ソフトウェアで拡張する。",
     template: "%s | 合同会社80",
