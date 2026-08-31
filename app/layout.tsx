@@ -21,8 +21,8 @@ export const metadata: Metadata = {
   description:
     "LENDS AIをはじめとする自社SaaS開発、AI受託開発、HP制作デザインを手がける合同会社80の公式サイトです。",
   icons: {
-    icon: "/7.png",
-    apple: "/7.png",
+    icon: "/logo-square.png",
+    apple: "/logo-square.png",
   },
   openGraph: {
     type: "website",
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     siteName: "合同会社80",
     title: "合同会社80 | 人の知覚を、ソフトウェアで拡張する。",
     description: "LENDS AIをはじめとする自社SaaS開発、AI受託開発、HP制作デザインを手がける合同会社80の公式サイトです。",
-    images: [{ url: "/7.png", width: 512, height: 512, alt: "合同会社80" }],
+    images: [{ url: "/logo-square.png", width: 512, height: 512, alt: "合同会社80" }],
   },
   twitter: {
     card: "summary",
