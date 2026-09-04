@@ -204,6 +204,13 @@ export default function StoryPage() {
   const [progress, setProgress] = useState(0);
   const [flat, setFlat] = useState(false); // ?flat=1: スクショ検証用（100vh無効化）
   const [picked, setPicked] = useState<number | null>(null); // 名鑑でタップされたキャラ
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const c = () => setIsMobile(window.innerWidth < 700);
+    c();
+    window.addEventListener("resize", c);
+    return () => window.removeEventListener("resize", c);
+  }, []);
   useEffect(() => { setFlat(new URLSearchParams(window.location.search).has("flat")); }, []);
   const walkTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -277,7 +284,7 @@ export default function StoryPage() {
       </nav>
 
       {/* ══ 1. ヒーロー ══ */}
-      <section data-scene={scene()} style={{ minHeight: flat ? undefined : "100vh", display: "flex", flexDirection: "column", justifyContent: "center", padding: "110px 40px 40px", position: "relative", background: "linear-gradient(180deg,#fff 0%,#f4f9fe 100%)" }}>
+      <section data-scene={scene()} className="sec" style={{ minHeight: flat ? undefined : "100vh", display: "flex", flexDirection: "column", justifyContent: "center", padding: isMobile ? "84px 18px 28px" : "110px 40px 40px", position: "relative", background: "linear-gradient(180deg,#fff 0%,#f4f9fe 100%)" }}>
         <div style={{ position: "absolute", inset: 0, opacity: 0.5, pointerEvents: "none", backgroundImage: "radial-gradient(circle,#dcebfa 1.5px,transparent 1.5px)", backgroundSize: "34px 34px" }} />
         <div style={{ maxWidth: 1120, margin: "0 auto", width: "100%", display: "grid", gridTemplateColumns: "1.05fr 1fr", gap: 64, alignItems: "center", position: "relative" }} className="hero-grid">
           <div>
@@ -289,13 +296,17 @@ export default function StoryPage() {
               <span style={{ color: BLUE }}>御社専用</span>の、<br />
               AIエージェント。
             </h1>
-            <p style={{ fontSize: 15, lineHeight: 2.1, color: MUTED, marginTop: 22, maxWidth: 440 }}>
-              メール、電話、経理、シフト表。毎日の「めんどうな仕事」を、御社の業務に合わせて育てたAIのチームが、受けわたしながら最後まで実行します。
-            </p>
-            <div style={{ display: "flex", alignItems: "center", gap: 18, marginTop: 30 }}>
-              <CTA />
-              <p style={{ fontSize: 12, color: MUTED, lineHeight: 1.7 }}>診断リスト進呈 ｜ 月数万円台〜<br />2〜4週間で導入</p>
-            </div>
+            {!isMobile && (
+              <p style={{ fontSize: 15, lineHeight: 2.1, color: MUTED, marginTop: 22, maxWidth: 440 }}>
+                メール、電話、経理、シフト表。毎日の「めんどうな仕事」を、御社の業務に合わせて育てたAIのチームが、受けわたしながら最後まで実行します。
+              </p>
+            )}
+            {!isMobile && (
+              <div style={{ display: "flex", alignItems: "center", gap: 18, marginTop: 30 }}>
+                <CTA />
+                <p style={{ fontSize: 12, color: MUTED, lineHeight: 1.7 }}>診断リスト進呈 ｜ 月数万円台〜<br />2〜4週間で導入</p>
+              </div>
+            )}
           </div>
           <div style={{ position: "relative" }}>
             <div style={{ position: "absolute", top: -34, right: 8, zIndex: 2, background: "#fff", border: "1.5px solid #e3edf7", borderRadius: 16, padding: "10px 16px", boxShadow: "0 8px 24px rgba(30,58,95,0.1)", animation: "bob 3.6s ease-in-out infinite" }}>
@@ -306,13 +317,18 @@ export default function StoryPage() {
               placeholder="例：毎日おなじ入力作業ばっかりで…" />
           </div>
         </div>
-        <p style={{ textAlign: "center", fontSize: 12, color: MUTED, marginTop: 46, position: "relative" }}>
+        {isMobile && (
+          <div style={{ textAlign: "center", marginTop: 22 }}>
+            <CTA />
+          </div>
+        )}
+        <p style={{ textAlign: "center", fontSize: 12, color: MUTED, marginTop: isMobile ? 20 : 46, position: "relative" }}>
           <span style={{ display: "inline-block", animation: "nudge 1.6s ease-in-out infinite" }}>▼</span>　スクロールして、エイトについていく
         </p>
       </section>
 
       {/* ══ 2. お悩み ══ */}
-      <section data-scene={scene()} style={{ padding: "110px 40px", background: "#fff" }}>
+      <section data-scene={scene()} className="sec" style={{ padding: "110px 40px", background: "#fff" }}>
         <div style={{ maxWidth: 1020, margin: "0 auto", textAlign: "center" }}>
           <div className="rv"><SectionLabel>Problem</SectionLabel>
           <h2 style={{ ...hf, fontSize: "clamp(26px, 3.2vw, 38px)", lineHeight: 1.6 }}>こんな毎日に、<br />心当たりはありませんか？</h2></div>
@@ -338,7 +354,7 @@ export default function StoryPage() {
       </section>
 
       {/* ══ 3. チーム紹介 ══ */}
-      <section data-scene={scene()} style={{ padding: "110px 40px", background: BG_ALT }}>
+      <section data-scene={scene()} className="sec" style={{ padding: "110px 40px", background: BG_ALT }}>
         <div style={{ maxWidth: 1080, margin: "0 auto", textAlign: "center" }}>
           <div className="rv"><SectionLabel>Team</SectionLabel>
           <h2 style={{ ...hf, fontSize: "clamp(26px, 3.2vw, 38px)", lineHeight: 1.6 }}>担当をご紹介します。</h2>
@@ -392,15 +408,16 @@ export default function StoryPage() {
       </section>
 
       {/* ══ 3b. チーム連携（事務所図×3） ══ */}
-      <section data-scene={scene()} style={{ padding: "110px 40px", background: "#fff" }}>
+      <section data-scene={scene()} className="sec" style={{ padding: "110px 40px", background: "#fff" }}>
         <div style={{ maxWidth: 1000, margin: "0 auto" }}>
           <div className="rv" style={{ textAlign: "center" }}><SectionLabel>Teamwork</SectionLabel>
           <h2 style={{ ...hf, fontSize: "clamp(26px, 3.2vw, 38px)", lineHeight: 1.6 }}>御社専用のAIエージェントは、<br /><span style={{ color: BLUE }}>チームで働く。</span></h2>
           <p style={{ fontSize: 14, color: MUTED, marginTop: 14, lineHeight: 2 }}>ひとつの仕事を、担当者どうしが受けわたして、最後まで完了させます。<br />たとえば、こんなふうに。</p></div>
           <div style={{ display: "flex", flexDirection: "column", gap: 26, marginTop: 50 }}>
             {FLOWS.map((f, fi) => (
-              <div key={f.title} className="rv" style={{ background: BG_ALT, borderRadius: 26, padding: "34px 40px 30px", transitionDelay: `${fi * 0.06}s` }}>
+              <div key={f.title} className="rv" style={{ background: BG_ALT, borderRadius: 26, padding: isMobile ? "22px 16px 18px" : "34px 40px 30px", transitionDelay: `${fi * 0.06}s` }}>
                 <p style={{ ...hf, fontSize: 17, color: NAVY, textAlign: "center" }}>{f.icon} {f.title}</p>
+                {!isMobile ? (
                 <div style={{ display: "flex", alignItems: "stretch", justifyContent: "center", gap: 0, marginTop: 26 }} className="flow-row">
                   {f.steps.map((st, si) => (
                     <div key={st.name} style={{ display: "flex", alignItems: "center" }}>
@@ -419,6 +436,22 @@ export default function StoryPage() {
                     </div>
                   ))}
                 </div>
+                ) : (
+                <div style={{ marginTop: 18, display: "flex", flexDirection: "column", gap: 6 }}>
+                  {f.steps.map((st, si) => (
+                    <div key={st.name}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 12, background: "#fff", borderRadius: 14, padding: "10px 14px" }}>
+                        <img src={st.img} alt={st.name} style={{ height: 56, flexShrink: 0 }} />
+                        <div>
+                          <p style={{ ...hf, fontSize: 12.5, color: NAVY }}>{st.name}</p>
+                          <p style={{ fontSize: 11.5, color: MUTED, lineHeight: 1.6 }}>{st.does}</p>
+                        </div>
+                      </div>
+                      {si < f.steps.length - 1 && <p style={{ textAlign: "center", fontSize: 14, color: BLUE, margin: "2px 0" }}>↓ {f.icon}</p>}
+                    </div>
+                  ))}
+                </div>
+                )}
                 <p style={{ ...hf, fontSize: 13.5, color: BLUE_DEEP, textAlign: "center", marginTop: 18, background: "#fff", borderRadius: 100, padding: "10px 24px", display: "table", marginLeft: "auto", marginRight: "auto" }}>→ {f.result}</p>
               </div>
             ))}
@@ -432,16 +465,24 @@ export default function StoryPage() {
           <div style={{ maxWidth: 1080, margin: "0 auto", display: "grid", gridTemplateColumns: "1.15fr 1fr", gap: 60, alignItems: "center", direction: i % 2 === 1 ? "rtl" : "ltr" }} className="show-grid">
             <div className="rv" style={{ direction: "ltr", position: "relative" }}>
               <img src={s.mock} alt="" style={{ width: "100%", filter: "drop-shadow(0 22px 48px rgba(30,58,95,0.16))" }} />
-              {/* 担当キャラが画面の横からひょっこり */}
-              <div style={{ position: "absolute", right: i % 2 === 1 ? "auto" : -14, left: i % 2 === 1 ? -14 : "auto", bottom: -58, textAlign: "center", zIndex: 2 }}>
-                <div style={{ position: "relative", marginBottom: 10, background: "#fff", border: "1.5px solid #e3edf7", borderRadius: 14, padding: "9px 14px", boxShadow: "0 8px 22px rgba(30,58,95,0.12)", maxWidth: 210 }}>
-                  <p style={{ ...hf, fontSize: 11.5, lineHeight: 1.6 }}>{s.say}</p>
-                  <span style={{ position: "absolute", left: "50%", bottom: -7, transform: "translateX(-50%) rotate(45deg)", width: 12, height: 12, background: "#fff", borderRight: "1.5px solid #e3edf7", borderBottom: "1.5px solid #e3edf7" }} />
+              {!isMobile ? (
+                <div style={{ position: "absolute", right: i % 2 === 1 ? "auto" : -14, left: i % 2 === 1 ? -14 : "auto", bottom: -58, textAlign: "center", zIndex: 2 }}>
+                  <div style={{ position: "relative", marginBottom: 10, background: "#fff", border: "1.5px solid #e3edf7", borderRadius: 14, padding: "9px 14px", boxShadow: "0 8px 22px rgba(30,58,95,0.12)", maxWidth: 210 }}>
+                    <p style={{ ...hf, fontSize: 11.5, lineHeight: 1.6 }}>{s.say}</p>
+                    <span style={{ position: "absolute", left: "50%", bottom: -7, transform: "translateX(-50%) rotate(45deg)", width: 12, height: 12, background: "#fff", borderRight: "1.5px solid #e3edf7", borderBottom: "1.5px solid #e3edf7" }} />
+                  </div>
+                  <div className="chara" style={{ display: "inline-block" }}>
+                    <img src={s.char} alt={s.cname} style={{ height: 142, animation: `bob 3.4s ease-in-out ${i * 0.4}s infinite` }} />
+                  </div>
                 </div>
-                <div className="chara" style={{ display: "inline-block" }}>
-                  <img src={s.char} alt={s.cname} style={{ height: 142, animation: `bob 3.4s ease-in-out ${i * 0.4}s infinite` }} />
+              ) : (
+                <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 12 }}>
+                  <img src={s.char} alt={s.cname} style={{ height: 74, flexShrink: 0 }} />
+                  <div style={{ position: "relative", background: "#fff", border: "1.5px solid #e3edf7", borderRadius: 12, padding: "8px 12px", boxShadow: "0 6px 16px rgba(30,58,95,0.1)" }}>
+                    <p style={{ ...hf, fontSize: 11.5, lineHeight: 1.6 }}>{s.say}</p>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
             <div className="rv" style={{ direction: "ltr" }}>
               <p style={{ fontSize: 11.5, fontWeight: 800, color: BLUE, background: "#ecf4fd", borderRadius: 100, padding: "5px 16px", display: "inline-block" }}>担当：{s.cname}（{s.crole}）</p>
@@ -463,7 +504,7 @@ export default function StoryPage() {
       ))}
 
       {/* ══ 10. もっとできる（マーキー） ══ */}
-      <section data-scene={scene()} style={{ padding: "100px 0 90px", background: "#fff", overflow: "hidden" }}>
+      <section data-scene={scene()} className="sec" style={{ padding: "100px 0 90px", background: "#fff", overflow: "hidden" }}>
         <div style={{ maxWidth: 1020, margin: "0 auto", textAlign: "center", padding: "0 40px" }}>
           <div className="rv"><SectionLabel>And more</SectionLabel>
           <h2 style={{ ...hf, fontSize: "clamp(26px, 3.2vw, 38px)", lineHeight: 1.6 }}>「うちのあの仕事も？」<br />──たぶん、できます。</h2>
@@ -486,6 +527,7 @@ export default function StoryPage() {
           <p style={{ fontSize: 13.5, color: MUTED, lineHeight: 2, marginTop: 10 }}>
             普段お使いのサービスとAPIで直接つながり、データを自動で取得します。
           </p>
+          {!isMobile ? (
           <div style={{ position: "relative", height: 440, maxWidth: 780, margin: "6px auto 0" }}>
             {/* 中心：EIGHT */}
             <div style={{ position: "absolute", left: "50%", top: 218, transform: "translate(-50%,-50%)", zIndex: 2 }}>
@@ -524,12 +566,26 @@ export default function StoryPage() {
               </div>
             ))}
           </div>
+          ) : (
+            <div style={{ marginTop: 18 }}>
+              <div style={{ textAlign: "center", marginBottom: 14 }}>
+                <img src="/chars/ball.png" alt="" style={{ height: 84, animation: "bob 3.2s ease-in-out infinite" }} />
+              </div>
+              <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 10 }}>
+                {["line","gmaps","gcal","freee","mf","excel","instagram","youtube","slack","salesforce","chatwork","kintone","zoom","notion","smaregi","shopify","stripe","dropbox","airregi","x"].map((logo) => (
+                  <span key={logo} style={{ width: 44, height: 44, borderRadius: "50%", background: "#fff", boxShadow: "0 4px 14px rgba(30,58,95,0.12)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <img src={`/logos/${logo}.png`} alt="" style={{ width: 24, height: 24, borderRadius: 5 }} />
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
           <p style={{ fontSize: 11.5, color: MUTED, marginTop: 8 }}>ほかにも、POSレジ・基幹システム・各種SaaSなど<br />※ ご利用中のシステムに合わせて接続方法をご提案します</p>
         </div>
       </section>
 
       {/* ══ 11. 業種別 ══ */}
-      <section data-scene={scene()} style={{ padding: "100px 40px", background: BG_ALT }}>
+      <section data-scene={scene()} className="sec" style={{ padding: "100px 40px", background: BG_ALT }}>
         <div style={{ maxWidth: 1080, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: 60, alignItems: "center" }} className="show-grid">
           <div className="rv">
             <SectionLabel>Industries</SectionLabel>
@@ -548,14 +604,14 @@ export default function StoryPage() {
             </div>
           </div>
           <div className="rv" style={{ display: "flex", gap: 16 }}>
-            <img src="/photos/industry-factory.jpg" alt="" style={{ width: "50%", borderRadius: 20, objectFit: "cover", aspectRatio: "3/4", boxShadow: "0 18px 40px rgba(30,58,95,0.14)", marginTop: 30 }} />
-            <img src="/photos/industry-restaurant.jpg" alt="" style={{ width: "50%", borderRadius: 20, objectFit: "cover", aspectRatio: "3/4", boxShadow: "0 18px 40px rgba(30,58,95,0.14)" }} />
+            <img src="/photos/industry-factory.jpg" alt="" style={{ width: isMobile ? "100%" : "50%", borderRadius: 20, objectFit: "cover", aspectRatio: isMobile ? "16/10" : "3/4", boxShadow: "0 18px 40px rgba(30,58,95,0.14)", marginTop: isMobile ? 0 : 30 }} />
+            {!isMobile && <img src="/photos/industry-restaurant.jpg" alt="" style={{ width: "50%", borderRadius: 20, objectFit: "cover", aspectRatio: "3/4", boxShadow: "0 18px 40px rgba(30,58,95,0.14)" }} />}
           </div>
         </div>
       </section>
 
       {/* ══ 12. Before/After ══ */}
-      <section data-scene={scene()} style={{ padding: "100px 40px", background: "#fff" }}>
+      <section data-scene={scene()} className="sec" style={{ padding: "100px 40px", background: "#fff" }}>
         <div style={{ maxWidth: 1080, margin: "0 auto" }}>
           <div className="rv" style={{ textAlign: "center" }}><SectionLabel>After</SectionLabel>
           <h2 style={{ ...hf, fontSize: "clamp(26px, 3.2vw, 38px)", lineHeight: 1.6 }}>「また入力作業か…」が、<br />なくなる。</h2></div>
@@ -591,7 +647,7 @@ export default function StoryPage() {
       </section>
 
       {/* ══ 13. 実績 ══ */}
-      <section data-scene={scene()} style={{ padding: "100px 40px", background: BG_ALT }}>
+      <section data-scene={scene()} className="sec" style={{ padding: "100px 40px", background: BG_ALT }}>
         <div style={{ maxWidth: 1080, margin: "0 auto", textAlign: "center" }}>
           <div className="rv"><SectionLabel>Works</SectionLabel>
           <h2 style={{ ...hf, fontSize: "clamp(26px, 3.2vw, 38px)", lineHeight: 1.6 }}>つくってきたもの。</h2>
@@ -617,7 +673,7 @@ export default function StoryPage() {
       </section>
 
       {/* ══ 14. 自社サービス ══ */}
-      <section data-scene={scene()} style={{ padding: "100px 40px", background: "#fff" }}>
+      <section data-scene={scene()} className="sec" style={{ padding: "100px 40px", background: "#fff" }}>
         <div style={{ maxWidth: 1080, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1.1fr", gap: 60, alignItems: "center" }} className="show-grid">
           <img className="rv" src="/photos/hero-owner.jpg" alt="" style={{ width: "100%", borderRadius: 22, boxShadow: "0 18px 44px rgba(30,58,95,0.14)" }} />
           <div className="rv">
@@ -635,7 +691,7 @@ export default function StoryPage() {
       </section>
 
       {/* ══ 15. 進め方 ══ */}
-      <section data-scene={scene()} style={{ padding: "100px 40px", background: BG_ALT }}>
+      <section data-scene={scene()} className="sec" style={{ padding: "100px 40px", background: BG_ALT }}>
         <div style={{ maxWidth: 1080, margin: "0 auto", display: "grid", gridTemplateColumns: "1.1fr 1fr", gap: 60, alignItems: "center" }} className="show-grid">
           <div className="rv">
             <SectionLabel>Process</SectionLabel>
@@ -662,7 +718,7 @@ export default function StoryPage() {
       </section>
 
       {/* ══ 16. 費用 ══ */}
-      <section data-scene={scene()} style={{ padding: "100px 40px", background: "#fff" }}>
+      <section data-scene={scene()} className="sec" style={{ padding: "100px 40px", background: "#fff" }}>
         <div style={{ maxWidth: 1020, margin: "0 auto" }}>
           <div className="rv" style={{ textAlign: "center" }}><SectionLabel>Cost</SectionLabel>
           <h2 style={{ ...hf, fontSize: "clamp(26px, 3.2vw, 38px)", lineHeight: 1.6 }}>「AI導入って、高そう…」<br />いいえ、<span style={{ color: BLUE }}>小さく安く</span>始められます。</h2></div>
@@ -698,7 +754,7 @@ export default function StoryPage() {
       </section>
 
       {/* ══ 17. プラン ══ */}
-      <section data-scene={scene()} style={{ padding: "100px 40px", background: BG_ALT }}>
+      <section data-scene={scene()} className="sec" style={{ padding: "100px 40px", background: BG_ALT }}>
         <div style={{ maxWidth: 1020, margin: "0 auto", textAlign: "center" }}>
           <div className="rv"><SectionLabel>Pricing</SectionLabel>
           <h2 style={{ ...hf, fontSize: "clamp(26px, 3.2vw, 38px)", lineHeight: 1.6 }}>御社に合う形で。</h2>
@@ -722,7 +778,7 @@ export default function StoryPage() {
       </section>
 
       {/* ══ 18. FAQ ══ */}
-      <section data-scene={scene()} style={{ padding: "100px 40px", background: "#fff" }}>
+      <section data-scene={scene()} className="sec" style={{ padding: "100px 40px", background: "#fff" }}>
         <div style={{ maxWidth: 880, margin: "0 auto" }}>
           <div className="rv" style={{ textAlign: "center" }}><SectionLabel>FAQ</SectionLabel>
           <h2 style={{ ...hf, fontSize: "clamp(26px, 3.2vw, 38px)", lineHeight: 1.6 }}>ご心配ごとには、<br />先にお答えします。</h2></div>
@@ -744,7 +800,7 @@ export default function StoryPage() {
       </section>
 
       {/* ══ 19. 最終CTA ══ */}
-      <section data-scene={scene()} style={{ padding: "110px 40px 90px", background: "linear-gradient(180deg,#f4f9fe, #e9f3fd)", textAlign: "center" }}>
+      <section data-scene={scene()} className="sec" style={{ padding: "110px 40px 90px", background: "linear-gradient(180deg,#f4f9fe, #e9f3fd)", textAlign: "center" }}>
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
           <h2 className="rv" style={{ ...hf, fontSize: "clamp(28px, 3.6vw, 44px)", lineHeight: 1.6 }}>どの仕事から、<br />任せてみますか？</h2>
           <p className="rv" style={{ fontSize: 14.5, color: MUTED, lineHeight: 2.1, marginTop: 16 }}>
@@ -768,19 +824,19 @@ export default function StoryPage() {
       {/* ── ガイド：エイト ── */}
       <div style={{ position: "fixed", left: "clamp(8px, 3.5vw, 56px)", bottom: 14, zIndex: 90, display: "flex", flexDirection: "column", alignItems: "center", pointerEvents: "none" }}>
         <div key={active} style={{
-          position: "relative", marginBottom: 12, maxWidth: 250,
+          position: "relative", marginBottom: 12, maxWidth: isMobile ? 168 : 250,
           background: "#fff", border: "1.5px solid #e3edf7", borderRadius: 16,
-          padding: "11px 16px", boxShadow: "0 10px 30px rgba(30,58,95,0.13)",
+          padding: isMobile ? "8px 12px" : "11px 16px", boxShadow: "0 10px 30px rgba(30,58,95,0.13)",
           animation: "bubbleIn 0.45s cubic-bezier(0.34,1.56,0.64,1) both",
         }}>
-          <p style={{ ...hf, fontSize: 12.5, lineHeight: 1.7 }}>{GUIDE_LINES[active] ?? GUIDE_LINES[0]}</p>
+          <p style={{ ...hf, fontSize: isMobile ? 10.5 : 12.5, lineHeight: 1.7 }}>{GUIDE_LINES[active] ?? GUIDE_LINES[0]}</p>
           <span style={{ position: "absolute", left: "50%", bottom: -8, transform: "translateX(-50%) rotate(45deg)", width: 13, height: 13, background: "#fff", borderRight: "1.5px solid #e3edf7", borderBottom: "1.5px solid #e3edf7" }} />
         </div>
         <div style={{ animation: walking ? "walkBob 0.4s ease-in-out infinite" : "bob 3s ease-in-out infinite" }}>
-          <img src="/chars/ball.png" alt="EIGHT" style={{ height: 134, display: "block" }} />
+          <img src="/chars/ball.png" alt="EIGHT" style={{ height: isMobile ? 72 : 134, display: "block" }} />
         </div>
-        <div style={{ width: 88, height: 12, borderRadius: "50%", background: "rgba(30,58,95,0.10)", marginTop: -4, filter: "blur(3px)", animation: walking ? "shadowWalk 0.4s ease-in-out infinite" : "shadowBob 3s ease-in-out infinite" }} />
-        <p style={{ ...hf, fontSize: 10.5, color: MUTED, marginTop: 5, background: "rgba(255,255,255,0.85)", borderRadius: 100, padding: "2px 12px" }}>案内係 EIGHT</p>
+        <div style={{ width: isMobile ? 52 : 88, height: 12, borderRadius: "50%", background: "rgba(30,58,95,0.10)", marginTop: -4, filter: "blur(3px)", animation: walking ? "shadowWalk 0.4s ease-in-out infinite" : "shadowBob 3s ease-in-out infinite" }} />
+        {!isMobile && <p style={{ ...hf, fontSize: 10.5, color: MUTED, marginTop: 5, background: "rgba(255,255,255,0.85)", borderRadius: 100, padding: "2px 12px" }}>案内係 EIGHT</p>}
       </div>
 
       <style>{`
@@ -811,6 +867,12 @@ export default function StoryPage() {
           .rv { animation: rvIn 1ms linear both; animation-timeline: view(); animation-range: entry 5% entry 34%; }
         }
         @keyframes rvIn { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 700px) {
+          .sec { padding-left: 18px !important; padding-right: 18px !important; padding-top: 56px !important; padding-bottom: 56px !important; }
+          .team-grid { grid-template-columns: 1fr !important; }
+          .lineup-row img { transform: scale(0.72); transform-origin: bottom; }
+          .lineup-row { gap: 0 !important; }
+        }
         @media (max-width: 980px) {
           .hero-grid, .show-grid { grid-template-columns: 1fr !important; direction: ltr !important; }
           .flow-row { flex-direction: column !important; }

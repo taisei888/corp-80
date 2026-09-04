@@ -224,12 +224,12 @@ export default function DemoLabPage() {
           </p>
 
           {/* ブース選択 */}
-          <div style={{ display: "flex", justifyContent: "center", gap: 18, marginTop: 36 }}>
+          <div style={{ display: "flex", justifyContent: "center", gap: 12, marginTop: 36, flexWrap: "wrap" }} className="booth-row">
             {(Object.keys(BOOTHS) as Booth[]).map((key) => {
               const bb = BOOTHS[key];
               const on = booth === key;
               return (
-                <button key={key} onClick={() => setBooth(key)} style={{
+                <button key={key} onClick={() => setBooth(key)} className="booth-btn" style={{
                   width: 190, background: on ? "#fff" : "rgba(255,255,255,0.08)",
                   border: on ? "2.5px solid #8cbeff" : "1.5px solid rgba(255,255,255,0.18)",
                   borderRadius: 20, padding: "18px 12px 14px", cursor: "pointer", fontFamily: "inherit",
@@ -417,6 +417,11 @@ export default function DemoLabPage() {
 
       <style>{`
         @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        @media (max-width: 700px) {
+          section { padding-left: 16px !important; padding-right: 16px !important; }
+          .booth-btn { width: 30% !important; min-width: 104px; padding: 12px 6px 10px !important; }
+          .booth-btn img { height: 58px !important; }
+        }
         @keyframes workBob { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-10px) rotate(2deg); } }
         @keyframes twinkle { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
         @keyframes blink { 0%,100% { opacity: 0.2; } 50% { opacity: 1; } }
