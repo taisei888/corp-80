@@ -1,120 +1,143 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AgentCM } from "./AgentCM";
+import { M_PLUS_Rounded_1c } from "next/font/google";
+import LeadChat from "./LeadChat";
 
-function useScrollReveal() {
-  useEffect(() => {
-    const els = document.querySelectorAll(".sr2");
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            (e.target as HTMLElement).style.opacity = "1";
-            (e.target as HTMLElement).style.transform = "translateY(0)";
-            io.unobserve(e.target);
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-    els.forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, []);
-}
+const rounded = M_PLUS_Rounded_1c({ subsets: ["latin"], weight: ["700", "800"] });
 
-function Counter({ to, suffix = "" }: { to: number; suffix?: string }) {
-  const [val, setVal] = useState(0);
-  const ref = useRef<HTMLSpanElement>(null);
-  useEffect(() => {
-    const io = new IntersectionObserver(
-      ([e]) => {
-        if (!e.isIntersecting) return;
-        io.disconnect();
-        let start = 0;
-        const step = Math.ceil(to / 60);
-        const id = setInterval(() => {
-          start = Math.min(start + step, to);
-          setVal(start);
-          if (start >= to) clearInterval(id);
-        }, 20);
-      },
-      { threshold: 0.5 }
-    );
-    if (ref.current) io.observe(ref.current);
-    return () => io.disconnect();
-  }, [to]);
-  return <span ref={ref}>{val}{suffix}</span>;
-}
+const NAVY = "#1e3a5f";
+const BLUE = "#3b82d6";
+const BLUE_DEEP = "#2563b8";
+const MUTED = "#64798f";
+const BG_ALT = "#f4f9fe";
 
-// ===== Icons =====
-const ICONS = {
-  factory: "M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25",
-  report: "M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z",
-  sales: "M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5",
-  doc: "M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15a2.25 2.25 0 012.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0118 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3l1.5 1.5 3-3.75",
-  faq: "M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z",
-  chat: "M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155",
-  people: "M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z",
-  chart: "M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z",
-  phone: "M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z",
-  archive: "M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z",
-  radar: "M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m-18.716-6.67A8.959 8.959 0 003 12c0 .778.099 1.533.284 2.253",
-  camera: "M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z",
-  calendar: "M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5",
-  yen: "M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
-};
+// ===== キャラクター名鑑（全員に担当業務） =====
+const TEAM = [
+  { img: "/chars/prop-routine.png", name: "POST", role: "文章生成AI", line: "メールも書類も、ぼくが書きます。",
+    intro: "文章づくりの担当だよ。メールの返信、見積書、SNSの投稿文まで、御社らしい言葉づかいで下書きします。よくある質問なら即答もできるよ。",
+    skills: ["問い合わせの一次対応", "返信文の自動下書き", "見積書・書類の送付"] },
+  { img: "/chars/drop.png", name: "DROP", role: "音声認識AI", line: "会議の一滴も、聞きのがしません。",
+    intro: "音声認識の担当だよ。会議でも電話でも、人の話を聴きとって文字にするのが得意。決定事項とTODOの整理までやっておくね。",
+    skills: ["議事録の自動作成", "TODOの整理と通知", "報告書・日報のまとめ"] },
+  { img: "/chars/prop-phone.png", name: "TELL", role: "音声対話AI", line: "自然な声で、会話ができます。",
+    intro: "音声で話す担当だよ。自然な声で電話に出て、用件を聞いて、予約ならカレンダーに登録。人と会話するAIの進化、体験してみて！",
+    skills: ["電話の自動応対", "予約のカレンダー登録", "担当者への即時通知"] },
+  { img: "/chars/prop-receipts.png", name: "DONA", role: "文字読み取りAI", line: "手書きもレシートも、読みとります。",
+    intro: "文字の読み取り（OCR）担当だよ。レシートも手書きのFAXも、写真から文字を読みとってデータにします。仕訳して会計ソフトへの登録まで！",
+    skills: ["領収書・請求書の読み取り", "勘定科目の自動仕訳", "会計ソフトへの登録"] },
+  { img: "/chars/star.png", name: "STAR", role: "業務最適化AI", line: "むずかしいパズルほど、燃えるんだ。",
+    intro: "最適化の担当だよ。たくさんの条件からいちばんいい答えを見つけるのが得意。シフト表も配送ルートも、パズルみたいに解いちゃう。",
+    skills: ["シフト表の自動作成", "希望休・法令チェック", "人件費の最適化"] },
+  { img: "/chars/prop-custom.png", name: "GEMBA", role: "画像認識AI", line: "写真1枚から、報告書がつくれるよ。",
+    intro: "画像認識の担当だよ。現場の写真から状況を読みとって、日報や報告書にするのが得意。目で見る仕事は、ぼくにまかせて。",
+    skills: ["現場写真→日報の自動作成", "FAX・手書き書類のデータ化", "工程・点検記録の管理"] },
+  { img: "/chars/prop-grow.png", name: "NYOKI", role: "学習AI", line: "使うほど、御社の仕事を覚えます。",
+    intro: "学習の担当だよ。使ってもらうほど、御社の言葉づかいや仕事のクセを覚えて賢くなります。AIチームを育てるのがぼくの役目。",
+    skills: ["導入プランの設計", "効果測定と改善", "専任担当との伴走サポート"] },
+  { img: "/chars/cloud.png", name: "COO", role: "会話AI", line: "心配ごとは、ふんわり聞かせてください。",
+    intro: "対話の担当だよ。チャットで質問に答えたり、社内マニュアルを検索したり。このページのチャットも、ぼくの仲間が動かしてるよ。",
+    skills: ["導入前の疑問にお答え", "セキュリティ方針のご説明", "無料相談の受付"] },
+];
 
-// ===== Data =====
-// AIエージェントにできること（営業資料と同じ3分類）
-const AGENT_GROUPS = [
+// ── チーム連携の3つのシーン（事務所図） ──
+const FLOWS = [
   {
-    num: "1",
-    title: "どの会社にもある業務",
-    sub: "業種を問わず毎日発生する定型業務。ここが一番はやく効果が出ます。",
-    color: "#6366f1",
-    items: [
-      { id: "support", tag: "MAIL / INQUIRY", title: "メール・問い合わせ一次対応AI", desc: "受信内容を読み取り、返信文を自動作成。よくある質問には即時回答します。", icon: ICONS.chat },
-      { id: "report", tag: "MINUTES / REPORT", title: "議事録・報告書AI", desc: "会議を録音するだけで、議事録とTODO一覧が完成します。", icon: ICONS.report },
-      { id: "doc", tag: "DOCUMENT", title: "見積書・書類ドラフトAI", desc: "過去の文書からひな形を引用し、見積書・提案書の下書きを自動生成。", icon: ICONS.doc },
-      { tag: "ACCOUNTING", title: "経理・領収書読み取りAI", desc: "領収書を撮影するだけで、読み取り・仕訳・会計ソフト登録まで自動化。", icon: ICONS.yen },
-      { tag: "SNS / REVIEW", title: "SNS投稿・口コミ返信AI", desc: "投稿の下書きを毎日自動生成。口コミには24時間以内に返信案を用意。", icon: ICONS.camera },
-      { id: "faq", tag: "FAQ / MANUAL", title: "社内FAQ・マニュアル検索AI", desc: "規程やマニュアルをAIが学習し、チャットで即座に回答します。", icon: ICONS.faq },
+    title: "請求書が届いたら",
+    icon: "📄",
+    steps: [
+      { img: "/chars/prop-routine.png", name: "POST", does: "メールで届いた請求書をキャッチ" },
+      { img: "/chars/prop-receipts.png", name: "DONA", does: "読み取って仕訳、会計ソフトへ登録" },
+      { img: "/chars/prop-chart.png", name: "EIGHT", does: "ダッシュボードの数字に反映" },
     ],
+    result: "経理の入力作業はゼロ。数字はいつでも最新です。",
   },
   {
-    num: "2",
-    title: "御社ならではの業務",
-    sub: "「うちは特殊だから」――だからこそ、御社の業務に合わせてゼロから開発します。",
-    color: "#0ea5e9",
-    items: [
-      { id: "manufacturing", tag: "MANUFACTURING", title: "製造管理AI", desc: "工程進捗・不具合報告・点検記録を一元管理。現場の今が見えます。", icon: ICONS.factory },
-      { tag: "FAX / OCR", title: "FAX・手書き書類のデータ化AI", desc: "手書きの注文書を読み取り、基幹システムへ自動入力します。", icon: ICONS.doc },
-      { tag: "FIELD REPORT", title: "現場写真→日報AI", desc: "現場の写真を送るだけで、日報・報告書ができあがります。", icon: ICONS.camera },
-      { tag: "SHIFT", title: "シフト自動作成AI", desc: "希望・条件・法令を踏まえて、来月のシフト表を数分で作成。", icon: ICONS.calendar },
-      { id: "sales", tag: "SALES SUPPORT", title: "営業支援AI", desc: "商談管理と訪問履歴から、次のアクションを自動提案します。", icon: ICONS.sales },
-      { id: "hr", tag: "HR / RECRUITMENT", title: "採用・人事サポートAI", desc: "応募者への一次対応、面接日程調整、求人票の改善まで対応。", icon: ICONS.people },
+    title: "予約の電話が鳴ったら",
+    icon: "📞",
+    steps: [
+      { img: "/chars/prop-phone.png", name: "TELL", does: "電話に出て、予約を受け付け" },
+      { img: "/chars/star.png", name: "STAR", does: "空き状況を確認してカレンダーに登録" },
+      { img: "/chars/prop-routine.png", name: "POST", does: "お客様へ確認の連絡を送信" },
     ],
+    result: "手が離せなくても、予約は取りこぼしません。",
   },
   {
-    num: "3",
-    title: "「え、こんなことまで？」",
-    sub: "AIエージェントの本領はここから。人にしかできないと思っていた仕事も任せられます。",
-    color: "#f59e0b",
-    items: [
-      { tag: "PHONE", title: "電話に出るAI", desc: "応対して用件を聞き、予約をカレンダーに登録、確認連絡まで自動で完了。", icon: ICONS.phone },
-      { tag: "ARCHIVE", title: "紙の山→データベース化", desc: "何十年分の台帳・名簿・領収書を、検索できるデータに変えます。", icon: ICONS.archive },
-      { tag: "WATCH", title: "毎朝の自動巡回レポート", desc: "競合の価格・口コミ・補助金情報を毎朝巡回し、変化だけ要約して通知。", icon: ICONS.radar },
-      { tag: "SALES AGENT", title: "24時間働く営業アシスタント", desc: "見込み客のリストアップ・下調べ・提案書ドラフトまでAIが準備します。", icon: ICONS.chart },
+    title: "現場の1日が終わったら",
+    icon: "📷",
+    steps: [
+      { img: "/chars/prop-custom.png", name: "GEMBA", does: "現場写真から日報を自動作成" },
+      { img: "/chars/drop.png", name: "DROP", does: "週次の報告書にまとめる" },
+      { img: "/chars/prop-chart.png", name: "EIGHT", does: "進捗をダッシュボードへ反映" },
     ],
+    result: "事務所に戻ってからの報告作業がなくなります。",
   },
 ];
 
+// ===== 6つのショーケース =====
+const SHOWCASES = [
+  {
+    id: "mail", mock: "/mocks/agent.png", char: "/chars/prop-routine.png", cname: "POST", crole: "文章生成AI",
+    say: "届いたメール、読んで下書きしておきました！",
+    title: <>メールの返信が、<br />確認するだけになる。</>,
+    body: "届いた問い合わせを読み、過去のやり取りや在庫を確認して、返信文までご用意。あなたは最後に「送信」を押すだけです。",
+    points: ["受信内容を読み取り、要件を整理", "履歴・データを参照して回答を作成", "ワンクリックで送信完了"],
+  },
+  {
+    id: "minutes", mock: "/mocks/minutes.png", char: "/chars/drop.png", cname: "DROP", crole: "音声認識AI",
+    say: "会議おつかれさま！一滴ものがさずメモしたよ。",
+    title: <>会議が終わった瞬間、<br />議事録も終わっている。</>,
+    body: "録音するだけで、決定事項とTODOを整理して担当者へ通知まで。「議事録まとめといて」という仕事が消えます。",
+    points: ["録音から議事録を自動生成", "決定事項・TODOを自動整理", "担当者へそのまま通知"],
+  },
+  {
+    id: "phone", mock: "/mocks/phone.png", char: "/chars/prop-phone.png", cname: "TELL", crole: "音声対話AI",
+    say: "さっきの予約のお電話、ぼくが承りました！",
+    title: <>忙しい時間の電話に、<br />AIが出てくれる。</>,
+    body: "用件を聞いて、予約ならカレンダーに登録、確認の連絡まで自動で完了。仕込み中も接客中も、電話で手が止まりません。",
+    points: ["自然な会話で用件をヒアリング", "予約をカレンダーへ自動登録", "担当者のLINEへ即通知"],
+  },
+  {
+    id: "keihi", mock: "/mocks/keihi.png", char: "/chars/prop-receipts.png", cname: "DONA", crole: "文字読み取りAI",
+    say: "領収書142枚、ぜんぶ仕訳しておきました！",
+    title: <>領収書は、<br />撮るだけでいい。</>,
+    body: "スマホで撮影するだけで、読み取り・勘定科目の仕訳・会計ソフトへの登録まで自動化。月末の憂鬱がなくなります。",
+    points: ["写真から日付・金額・摘要を読み取り", "勘定科目をAIが自動で仕訳", "freee・マネーフォワードへ自動登録"],
+  },
+  {
+    id: "shift", mock: "/mocks/shift.png", char: "/chars/star.png", cname: "STAR", crole: "業務最適化AI",
+    say: "来月のシフト、星ぞろいにしといたよ！",
+    title: <>来月のシフトが、<br />3分で組み上がる。</>,
+    body: "スタッフの希望・労働時間のルール・人件費の予算を全部ふまえて、AIがシフト表を自動作成。毎月の頭痛が消えます。",
+    points: ["希望休を全員分反映", "労働時間・法令を自動チェック", "人件費も予算内に最適化"],
+  },
+  {
+    id: "numbers", mock: "/mocks/dashboard.png", char: "/chars/prop-chart.png", cname: "EIGHT", crole: "データ分析AI",
+    say: "今朝の数字、そろえておきました！",
+    title: <>「今どうなってる？」に、<br />即答できる会社になる。</>,
+    body: "GoogleマップやLINE、会計ソフトなど、普段お使いのサービスとAPIで直接つながり、数字を毎日自動で取得。バラバラだったデータが、ひと目でわかる画面にそろいます。",
+    points: ["Google・LINE・会計ソフト等とAPI連携", "散らばった数字を毎日自動で収集", "AIが「次の一手」まで提案"],
+  },
+];
+
+const CAPABILITIES = [
+  "見積書・書類ドラフト", "SNS投稿・口コミ返信", "社内FAQ・マニュアル検索", "製造管理",
+  "FAX・手書き書類のデータ化", "現場写真→日報", "営業支援", "採用・人事サポート",
+  "紙の山→データベース化", "毎朝の自動巡回レポート", "24時間働く営業アシスタント", "在庫の見える化",
+  "顧客対応の記録・引き継ぎ", "補助金情報のウォッチ", "予約サイトの構築", "ホームページ制作",
+];
+
 const WORKS = [
-  { tag: "飲食店（愛知県）", title: "集客×売上ダッシュボード", desc: "Googleマップの表示・電話・予約と売上を毎日自動集計。口コミ返信やSNS運用もAIが支援します。", color: "#6366f1" },
-  { tag: "地域団体", title: "コミュニティアプリ（会報AI・見守り）", desc: "写真を選ぶだけでAIが会報を自動レイアウト。お知らせはアプリ配信と印刷用PDFを同時作成。", color: "#0ea5e9" },
-  { tag: "自社サービス", title: "組織分析AI「LENDS AI」", desc: "アンケートから組織の状態をAIが診断し、改善レポートを自動生成します。", color: "#10b981", href: "https://www.lens-ai.jp" },
-  { tag: "自社ツール", title: "経費の自動読み取りツール", desc: "領収書をスキャンするだけで一覧データ化。経理作業の時間を大幅に削減。", color: "#f59e0b" },
+  { tag: "飲食店（愛知県）", title: "集客×売上ダッシュボード", desc: "Googleマップの数字と売上を毎日自動集計。口コミ返信もAIが支援。", img: "/mocks/dashboard.png" },
+  { tag: "地域団体", title: "コミュニティアプリ", desc: "写真を選ぶだけでAIが会報を自動レイアウト。見守り機能も。", img: "/mocks/community.png" },
+  { tag: "自社サービス", title: "組織分析AI「LENDS AI」", desc: "アンケートから組織の状態を診断し、改善レポートを自動生成。", img: "/mocks/lends.png", href: "https://www.lens-ai.jp" },
+  { tag: "自社ツール", title: "経費の自動読み取り", desc: "領収書をスキャンするだけで一覧データ化。自社でも毎日使っています。", img: "/mocks/keihi.png" },
+];
+
+const PLANS = [
+  { label: "Plan A", name: "受注開発", desc: "御社専用にゼロから構築する開発型プラン", popular: false },
+  { label: "Plan B", name: "月額サブスク", desc: "初期費用を抑えて、月額ですぐ始めるプラン", popular: true },
+  { label: "Plan C", name: "買取予定サブスク", desc: "月額で始めて、将来は自社資産にできるプラン", popular: false },
 ];
 
 const FAQS = [
@@ -124,768 +147,678 @@ const FAQS = [
   { q: "途中でやめられますか？", a: "月額プランは解約自由です。小さく試してから、続けるかご判断ください。" },
 ];
 
-const processSteps = [
-  { step: "01", title: "無料相談", body: "業務内容を伺い、「自動化できる業務の診断リスト」をその場でお渡しします" },
-  { step: "02", title: "小さく試す", body: "効果が出やすい業務ひとつから、2〜4週間で開発してお試しいただきます" },
-  { step: "03", title: "広げる", body: "効果を確認しながら、自動化の範囲を少しずつ広げていきます" },
-];
+const LINEUP = [
+  ["/chars/star.png", 84], ["/chars/drop.png", 106], ["/chars/capsule.png", 122],
+  ["/chars/longlegs.png", 156], ["/chars/ball.png", 138], ["/chars/cyclops.png", 126],
+  ["/chars/capsule2.png", 116], ["/chars/cloud.png", 102], ["/chars/donut.png", 110],
+] as const;
 
-const plans = [
-  {
-    name: "受注開発プラン",
-    planLabel: "Plan A",
-    desc: "貴社の業務に合わせてシステムを一から構築する開発型プラン",
-    features: ["貴社専用のシステム設計・開発", "業務フローに完全対応", "月10時間以上の直接サポート", "慣れるまで専任担当が伴走"],
-    popular: false,
-  },
-  {
-    name: "月額サブスクプラン",
-    planLabel: "Plan B",
-    desc: "初期費用を抑えて、月額利用ですぐに始められるプラン",
-    features: ["全機能を月額で利用可能", "段階的に機能を追加できる", "月10時間以上の直接サポート", "慣れるまで専任担当が伴走"],
-    popular: true,
-  },
-  {
-    name: "買取予定サブスクプラン",
-    planLabel: "Plan C",
-    desc: "月額で利用開始し、将来的にシステムを買い取れるプラン",
-    features: ["まずは月額でリスクなく開始", "合わなければ解約も可能", "自社管理へ移行時に買取可", "月10時間以上の直接サポート"],
-    popular: false,
-  },
-];
+// ガイド（エイト）のセリフ：セクションindex → セリフ
+const GUIDE_LINES: Record<number, string> = {
+  0: "こんにちは！ぼくはEIGHT。案内するね！",
+  1: "こういうの、身に覚えありませんか…？",
+  2: "気になる子、タップしてみて！",
+  3: "ぼくら、連係プレーが得意なんだ！",
+  4: "POSTは文章を書くのが得意なんだ！",
+  5: "DROPは音を聴きとる名人だよ。",
+  6: "TELLは声でおしゃべりできるんだ。",
+  7: "DONAはどんな文字でも読めるんだ。",
+  8: "STARは最適化のパズル名人！",
+  9: "ぼくの得意分野！データの見える化！",
+  10: "APIでつながるほど、賢くなるよ。",
+  11: "GEMBAは写真を見て理解するよ！",
+  12: "導入したら、こんな毎日になります。",
+  13: "実際につくったものも見てって！",
+  14: "自分たちのサービスも育ててます。",
+  15: "NYOKIは使うほど賢くなるんだ。",
+  16: "お金の話も、ちゃんとします。",
+  17: "プランは3つ。あとから変えられるよ。",
+  18: "COOはおしゃべりが上手なんだ。",
+  19: "最後まで見てくれてありがとう！",
+};
 
-const benefits = [
-  { label: "紙・Excel業務", before: "手書き → 転記 → 集計", after: "入力 → 自動集計 → 即共有", metric: "80", metricLabel: "作業時間削減" },
-  { label: "ノウハウ共有", before: "聞かないとわからない", after: "検索すれば出てくる", metric: "90", metricLabel: "問い合わせ削減" },
-  { label: "経営状況の把握", before: "各部署に確認 → 集計", after: "ダッシュボードで即確認", metric: "30", metricLabel: "秒で状況把握" },
-];
+function Counter({ to, suffix = "" }: { to: number; suffix?: string }) {
+  const [val, setVal] = useState(0);
+  const ref = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      let start = 0;
+      const step = Math.max(1, Math.ceil(to / 50));
+      const id = setInterval(() => {
+        start = Math.min(start + step, to);
+        setVal(start);
+        if (start >= to) clearInterval(id);
+      }, 24);
+    }, { threshold: 0.5 });
+    if (ref.current) io.observe(ref.current);
+    return () => io.disconnect();
+  }, [to]);
+  return <span ref={ref}>{val}{suffix}</span>;
+}
 
-const useCases = [
-  { industry: "製造業", challenge: "紙の日報・進捗が見えない・世代交代", uses: ["製造管理AI", "日報生成AI", "教育管理"] },
-  { industry: "建設業", challenge: "現場報告のバラつき・安全管理・技術継承", uses: ["報告書AI", "ダッシュボード", "ナレッジ共有"] },
-  { industry: "物流・倉庫", challenge: "在庫Excel管理・配送状況の把握", uses: ["在庫デジタル化", "見える化", "チェックリスト"] },
-  { industry: "飲食・小売", challenge: "シフト管理・在庫確認・本部報告", uses: ["日報デジタル化", "店舗可視化", "社内FAQ"] },
-  { industry: "サービス業", challenge: "顧客対応の属人化・社内ルール周知・採用難", uses: ["ナレッジ共有", "採用支援AI", "ダッシュボード"] },
-];
-
-// ===== Main Component =====
-export default function AILabsPage() {
-  useScrollReveal();
-  const [isMobile, setIsMobile] = useState(false);
-  const [visibleCards, setVisibleCards] = useState(0);
-  const [typingIdx, setTypingIdx] = useState(0);
-  const [liveResult, setLiveResult] = useState("");
-  const [liveTyped, setLiveTyped] = useState("");
-  const liveRequested = useRef(false);
+export default function StoryPage() {
+  const [active, setActive] = useState(0);
+  const [walking, setWalking] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [flat, setFlat] = useState(false); // ?flat=1: スクショ検証用（100vh無効化）
+  const [picked, setPicked] = useState<number | null>(null); // 名鑑でタップされたキャラ
+  useEffect(() => { setFlat(new URLSearchParams(window.location.search).has("flat")); }, []);
+  const walkTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768);
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
+    const els = document.querySelectorAll("[data-scene]");
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) setActive(Number((e.target as HTMLElement).dataset.scene));
+      });
+    }, { threshold: 0.25 });
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
   }, []);
 
-  const sr2: React.CSSProperties = {
-    opacity: 0,
-    transform: "translateY(32px)",
-    transition: "opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1)",
-  };
-
-  const accent = "#6366f1";
-  const accentLight = "#eef2ff";
-
-  const timelineTasks = [
-    { label: "メール下書き", icon: "M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75", result: "件名：先日のお打ち合わせの御礼\n\nお世話になっております。先日はお忙しい中お時間をいただき、誠にありがとうございました。ご提案内容について社内で検討を進めております。来週中に改めてご連絡差し上げます。", color: "#6366f1" },
-    { label: "議事録を要約", icon: "M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z", result: "【決定事項】\n・新システムは9月導入で確定\n・予算上限は500万円\n【TODO】\n・田中：要件定義書を金曜までに提出\n・佐藤：ベンダー3社に見積もり依頼", color: "#0ea5e9" },
-    { label: "英語に翻訳", icon: "M10.5 21l5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 016-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 01-3.827-5.802", result: "Original：弊社のAIソリューションは業務効率を劇的に改善します。\n\nTranslation：Our AI solutions dramatically improve operational efficiency across your entire organization.", color: "#10b981" },
-    { label: "売上データ分析", icon: "M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z", result: "前月比 +12.3%（¥18.4M → ¥20.7M）\n好調要因：新規顧客5社獲得、リピート率が82%→89%に改善\n注意：広告費が予算を15%超過。ROI要確認。", color: "#f59e0b" },
-    { label: "AIがリアルタイムで回答", icon: "M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z", result: "", color: "#ec4899", live: true },
-  ];
-
-  // Auto-reveal cards one by one
   useEffect(() => {
-    if (visibleCards >= timelineTasks.length) return;
-    const timer = setTimeout(() => setVisibleCards(v => v + 1), visibleCards === 0 ? 800 : 1800);
-    return () => clearTimeout(timer);
-  }, [visibleCards, timelineTasks.length]);
+    const onScroll = () => {
+      setWalking(true);
+      if (walkTimer.current) clearTimeout(walkTimer.current);
+      walkTimer.current = setTimeout(() => setWalking(false), 180);
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      setProgress(max > 0 ? window.scrollY / max : 0);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
-  // Typing effect for each card
-  useEffect(() => {
-    if (typingIdx >= visibleCards) return;
-    const timer = setTimeout(() => setTypingIdx(t => t + 1), 600);
-    return () => clearTimeout(timer);
-  }, [visibleCards, typingIdx]);
+  const hf: React.CSSProperties = { fontFamily: rounded.style.fontFamily, fontWeight: 800 };
+  let sceneIdx = -1;
+  const scene = () => { sceneIdx += 1; return sceneIdx; };
 
-  // Live API call for the last card
-  useEffect(() => {
-    if (visibleCards < timelineTasks.length) return;
-    if (liveRequested.current) return;
-    liveRequested.current = true;
-    fetch("/api/ai-chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: "日本の面白い雑学を1つ教えて。短く。" }),
-    })
-      .then(r => r.json())
-      .then(d => setLiveResult(d.reply || ""))
-      .catch(() => setLiveResult("AIが考え中..."));
-  }, [visibleCards, timelineTasks.length]);
+  const SectionLabel = ({ children }: { children: React.ReactNode }) => (
+    <p style={{ fontSize: 12, fontWeight: 800, letterSpacing: "0.28em", color: BLUE, marginBottom: 16, textTransform: "uppercase" }}>{children}</p>
+  );
 
-  // Typewriter for live result
-  useEffect(() => {
-    if (!liveResult) return;
-    let i = 0;
-    setLiveTyped("");
-    const id = setInterval(() => {
-      i++;
-      setLiveTyped(liveResult.slice(0, i));
-      if (i >= liveResult.length) clearInterval(id);
-    }, 25);
-    return () => clearInterval(id);
-  }, [liveResult]);
-
+  const CTA = ({ big = false }: { big?: boolean }) => (
+    <a href="/contact" className="cta" style={{
+      ...hf, fontSize: big ? 16 : 14, color: "#fff", background: BLUE, textDecoration: "none",
+      padding: big ? "18px 46px" : "14px 34px", borderRadius: 100, display: "inline-flex", alignItems: "center", gap: 10,
+      boxShadow: "0 10px 28px rgba(59,130,214,0.32)",
+    }}>
+      無料相談してみる
+      <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.6}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+      </svg>
+    </a>
+  );
 
   return (
-    <div style={{ fontFamily: "inherit", background: "#fff", color: "#1e293b", overflowX: "hidden" }}>
+    <div style={{ background: "#fff", color: NAVY, fontFamily: "inherit", overflowX: "hidden" }}>
+      {/* 進行バー */}
+      <div style={{ position: "fixed", top: 0, left: 0, height: 3, width: `${progress * 100}%`, background: BLUE, zIndex: 200, transition: "width 0.1s" }} />
 
-      {/* ── Nav ── */}
+      {/* ナビ */}
       <nav style={{
         position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
-        background: "rgba(255,255,255,0.92)", backdropFilter: "blur(20px)",
-        borderBottom: "1px solid #f1f5f9",
+        background: "rgba(255,255,255,0.92)", backdropFilter: "blur(16px)",
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: isMobile ? "0 20px" : "0 48px", height: 64,
+        padding: "0 32px", height: 62, borderBottom: "1px solid #eef3f9",
       }}>
-        <a href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 10 }}>
-          <img src="/7.png" alt="80" style={{ height: 48, display: "block" }} />
-          <span style={{ width: 1, height: 16, background: "#e2e8f0" }} />
-          <span style={{ fontSize: 13, fontWeight: 700, color: accent, letterSpacing: "0.1em", textTransform: "uppercase" }}>AI Labs</span>
+        <a href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
+          <img src="/logo-mark.png" alt="" style={{ height: 42 }} />
+          <span style={{ ...hf, fontSize: 13.5, color: NAVY }}>AI Labs ─ 合同会社80</span>
         </a>
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <a href="/demo" style={{
-            fontSize: 12, fontWeight: 600, color: "#475569", textDecoration: "none",
-            padding: "8px 16px", borderRadius: 100, border: "1px solid #e2e8f0",
-            transition: "all 0.2s",
-          }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = accent; e.currentTarget.style.color = accent; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = "#e2e8f0"; e.currentTarget.style.color = "#475569"; }}
-          >
-            デモを試す
-          </a>
-          <a href="/contact" style={{
-            fontSize: 12, fontWeight: 600, color: "#fff", textDecoration: "none",
-            padding: "8px 20px", borderRadius: 100, background: accent,
-            transition: "all 0.2s",
-          }}
-            onMouseEnter={e => { e.currentTarget.style.background = "#4f46e5"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = accent; }}
-          >
-            無料相談
-          </a>
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <a href="/demo" style={{ fontSize: 13, fontWeight: 700, color: MUTED, textDecoration: "none" }}>デモ</a>
+          <a href="/contact" className="cta" style={{
+            fontSize: 13, fontWeight: 800, color: "#fff", textDecoration: "none",
+            background: BLUE, padding: "10px 26px", borderRadius: 100,
+          }}>無料相談</a>
         </div>
       </nav>
 
-      {/* ── 01. Hero ── */}
-      <section style={{
-        minHeight: "100vh", display: "flex", flexDirection: "column",
-        justifyContent: "center",
-        padding: isMobile ? "100px 20px 60px" : "120px 48px 80px",
-        background: "#fff", position: "relative", overflow: "hidden",
-      }}>
-        {/* Subtle dot background */}
-        <div style={{ position: "absolute", inset: 0, opacity: 0.3, pointerEvents: "none",
-          backgroundImage: "radial-gradient(circle, #e2e8f0 1px, transparent 1px)",
-          backgroundSize: "32px 32px" }} />
-
-        <div style={{ maxWidth: 1100, margin: "0 auto", position: "relative", width: "100%",
-          display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 40 : 60, alignItems: "center",
-        }}>
-          {/* Left: Copy */}
+      {/* ══ 1. ヒーロー ══ */}
+      <section data-scene={scene()} style={{ minHeight: flat ? undefined : "100vh", display: "flex", flexDirection: "column", justifyContent: "center", padding: "110px 40px 40px", position: "relative", background: "linear-gradient(180deg,#fff 0%,#f4f9fe 100%)" }}>
+        <div style={{ position: "absolute", inset: 0, opacity: 0.5, pointerEvents: "none", backgroundImage: "radial-gradient(circle,#dcebfa 1.5px,transparent 1.5px)", backgroundSize: "34px 34px" }} />
+        <div style={{ maxWidth: 1120, margin: "0 auto", width: "100%", display: "grid", gridTemplateColumns: "1.05fr 1fr", gap: 64, alignItems: "center", position: "relative" }} className="hero-grid">
           <div>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 8,
-              fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", color: accent,
-              textTransform: "uppercase", marginBottom: 24,
-              padding: "6px 16px", borderRadius: 100,
-              border: `1.5px solid ${accentLight}`, background: accentLight,
-            }}>
-              <span style={{ width: 6, height: 6, borderRadius: "50%", background: accent, animation: "pulse 2s infinite" }} />
-              AI Labs
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 12, fontWeight: 800, color: BLUE, background: "#fff", border: "1.5px solid #d8e8fa", borderRadius: 100, padding: "7px 18px", marginBottom: 26, boxShadow: "0 2px 12px rgba(59,130,214,0.08)" }}>
+              <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#39c26d" }} />
+              中小企業のためのAIエージェント開発
             </div>
-
-            <h1 style={{
-              fontSize: isMobile ? "clamp(26px, 8vw, 38px)" : "clamp(32px, 3.5vw, 48px)",
-              fontWeight: 900, letterSpacing: "-0.04em", color: "#0f172a", lineHeight: 1.25, marginBottom: 20,
-            }}>
-              AIエージェントという、<br />
-              <span style={{ color: accent }}>新しい働き手。</span>
+            <h1 style={{ ...hf, fontSize: "clamp(34px, 3.8vw, 52px)", lineHeight: 1.45, letterSpacing: "0.01em" }}>
+              <span style={{ color: BLUE }}>御社専用</span>の、<br />
+              AIエージェント。
             </h1>
-
-            <p style={{ fontSize: isMobile ? 14 : 15, color: "#64748b", lineHeight: 1.9, marginBottom: 32, maxWidth: 420 }}>
-              答えるAIから、仕事を『やり切る』AIへ ─<br />
-              メール対応も、経理も、電話も。人がやっていた一連の業務を、AIが最後まで実行します。
+            <p style={{ fontSize: 15, lineHeight: 2.1, color: MUTED, marginTop: 22, maxWidth: 440 }}>
+              メール、電話、経理、シフト表。毎日の「めんどうな仕事」を、御社の業務に合わせて育てたAIのチームが、受けわたしながら最後まで実行します。
             </p>
-
-            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-              <a href="/demo" style={{
-                display: "inline-flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 700,
-                color: "#fff", background: accent, padding: "14px 28px", borderRadius: 100,
-                textDecoration: "none", transition: "all 0.3s",
-                boxShadow: "0 6px 24px rgba(99,102,241,0.25)",
-              }}
-                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; }}
-              >
-                デモを体験する
-                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                </svg>
-              </a>
-              <a href="/contact" style={{
-                display: "inline-flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 600,
-                color: "#475569", background: "transparent", padding: "14px 28px", borderRadius: 100,
-                textDecoration: "none", border: "1.5px solid #e2e8f0", transition: "all 0.3s",
-              }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = accent; e.currentTarget.style.color = accent; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = "#e2e8f0"; e.currentTarget.style.color = "#475569"; }}
-              >
-                無料相談
-              </a>
+            <div style={{ display: "flex", alignItems: "center", gap: 18, marginTop: 30 }}>
+              <CTA />
+              <p style={{ fontSize: 12, color: MUTED, lineHeight: 1.7 }}>診断リスト進呈 ｜ 月数万円台〜<br />2〜4週間で導入</p>
             </div>
           </div>
+          <div style={{ position: "relative" }}>
+            <div style={{ position: "absolute", top: -34, right: 8, zIndex: 2, background: "#fff", border: "1.5px solid #e3edf7", borderRadius: 16, padding: "10px 16px", boxShadow: "0 8px 24px rgba(30,58,95,0.1)", animation: "bob 3.6s ease-in-out infinite" }}>
+              <p style={{ ...hf, fontSize: 12.5, color: NAVY }}>💬 グチみたいな一言でOKです</p>
+            </div>
+            <LeadChat headFont={hf}
+              greeting={"こんにちは！ぼくはAIエージェントのエイトです🤖\nお仕事、なにが一番めんどうですか？\n「請求書の入力がつらい」「電話が多すぎる」——そんなグチみたいな一言で大丈夫です。どう自動化できるか、その場でお答えします！"}
+              placeholder="例：毎日おなじ入力作業ばっかりで…" />
+          </div>
+        </div>
+        <p style={{ textAlign: "center", fontSize: 12, color: MUTED, marginTop: 46, position: "relative" }}>
+          <span style={{ display: "inline-block", animation: "nudge 1.6s ease-in-out infinite" }}>▼</span>　スクロールして、エイトについていく
+        </p>
+      </section>
 
-          {/* Right: AI Timeline */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 12, position: "relative" }}>
-            {/* Timeline line */}
-            <div style={{
-              position: "absolute", left: 19, top: 0, bottom: 0, width: 2,
-              background: `linear-gradient(to bottom, ${accent}20, ${accent}05)`,
-              zIndex: 0,
-            }} />
+      {/* ══ 2. お悩み ══ */}
+      <section data-scene={scene()} style={{ padding: "110px 40px", background: "#fff" }}>
+        <div style={{ maxWidth: 1020, margin: "0 auto", textAlign: "center" }}>
+          <div className="rv"><SectionLabel>Problem</SectionLabel>
+          <h2 style={{ ...hf, fontSize: "clamp(26px, 3.2vw, 38px)", lineHeight: 1.6 }}>こんな毎日に、<br />心当たりはありませんか？</h2></div>
+          <div style={{ display: "flex", justifyContent: "center", gap: 44, marginTop: 56, flexWrap: "wrap" }}>
+            {[
+              { img: "/photos/pain-paperwork.jpg", t: "入力と転記だけで、\n1日が終わる…" },
+              { img: "/photos/pain-phone.jpg", t: "電話のたびに、\n仕事の手が止まる…" },
+              { img: "/photos/pain-latenight.jpg", t: "気づけばまた、\n夜まで書類づくり…" },
+            ].map((p, i) => (
+              <div key={i} className="rv" style={{ width: 250 }}>
+                <div style={{ position: "relative", background: BG_ALT, borderRadius: 18, padding: "14px 16px", marginBottom: 24 }}>
+                  <p style={{ ...hf, fontSize: 14, lineHeight: 1.8, whiteSpace: "pre-line" }}>{p.t}</p>
+                  <span style={{ position: "absolute", left: "50%", bottom: -8, transform: "translateX(-50%) rotate(45deg)", width: 14, height: 14, background: BG_ALT }} />
+                </div>
+                <img src={p.img} alt="" style={{ width: 188, height: 188, borderRadius: "50%", objectFit: "cover", border: "6px solid #fff", boxShadow: "0 16px 36px rgba(30,58,95,0.16)" }} />
+              </div>
+            ))}
+          </div>
+          <p className="rv" style={{ ...hf, fontSize: "clamp(20px, 2.6vw, 28px)", marginTop: 64, lineHeight: 1.7 }}>
+            その仕事、ぜんぶ<span style={{ color: BLUE }}>ぼくらの得意分野</span>です。
+          </p>
+        </div>
+      </section>
 
-            {timelineTasks.map((task, i) => {
-              const visible = i < visibleCards;
-              const typed = i < typingIdx;
-              const isLive = task.live;
-              const content = isLive ? (liveTyped || null) : task.result;
+      {/* ══ 3. チーム紹介 ══ */}
+      <section data-scene={scene()} style={{ padding: "110px 40px", background: BG_ALT }}>
+        <div style={{ maxWidth: 1080, margin: "0 auto", textAlign: "center" }}>
+          <div className="rv"><SectionLabel>Team</SectionLabel>
+          <h2 style={{ ...hf, fontSize: "clamp(26px, 3.2vw, 38px)", lineHeight: 1.6 }}>担当をご紹介します。</h2>
+          <p style={{ fontSize: 14, color: MUTED, marginTop: 14, lineHeight: 2 }}>それぞれ得意な仕事があります。気になる子をタップすると、自己紹介してくれます。</p></div>
+          {/* 横一列のコンパクト名鑑（タップで下のパネルに詳細） */}
+          <div style={{ display: "flex", justifyContent: "center", gap: 12, marginTop: 44, flexWrap: "wrap" }} className="team-row">
+            {TEAM.map((c, i) => (
+              <button key={c.name} onClick={() => setPicked(picked === i ? null : i)} className="rv chara-card" style={{
+                background: "#fff", borderRadius: 18, padding: "16px 8px 12px", width: 118,
+                border: picked === i ? `2.5px solid ${BLUE}` : "1.5px solid #e8f0f9",
+                boxShadow: picked === i ? "0 14px 34px rgba(59,130,214,0.18)" : undefined,
+                transform: picked === i ? "translateY(-6px)" : undefined,
+                transitionDelay: `${i * 0.03}s`, cursor: "pointer", fontFamily: "inherit", textAlign: "center",
+              }}>
+                <div className="chara" style={{ height: 92, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+                  <img src={c.img} alt={c.name} style={{ maxHeight: 90, maxWidth: "86%" }} />
+                </div>
+                <p style={{ ...hf, fontSize: 13, marginTop: 8, color: NAVY }}>{c.name}</p>
+                <p style={{ fontSize: 10, fontWeight: 800, color: BLUE, background: "#ecf4fd", borderRadius: 100, padding: "3px 10px", display: "inline-block", marginTop: 4 }}>{c.role}</p>
+              </button>
+            ))}
+          </div>
 
-              return (
-                <div key={i} style={{
-                  opacity: visible ? 1 : 0,
-                  transform: visible ? "translateY(0)" : "translateY(20px)",
-                  transition: "all 0.6s cubic-bezier(0.16,1,0.3,1)",
-                  display: "flex", gap: 14, alignItems: "flex-start", position: "relative", zIndex: 1,
-                }}>
-                  {/* Dot */}
-                  <div style={{
-                    width: 40, height: 40, borderRadius: "50%", flexShrink: 0,
-                    background: `${task.color}12`, border: `2px solid ${task.color}30`,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    transition: "all 0.3s",
-                    ...(visible && typed ? { background: task.color, borderColor: task.color } : {}),
-                  }}>
-                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24"
-                      stroke={visible && typed ? "#fff" : task.color} strokeWidth={1.8}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d={task.icon} />
-                    </svg>
-                  </div>
+          {/* タップで自己紹介パネル（初期はPOST） */}
+          {(() => { const sel = picked ?? 0; return (
+            <div key={sel} style={{
+              marginTop: 24, background: "#fff", borderRadius: 24, border: `2px solid ${BLUE}30`,
+              padding: "26px 34px", display: "flex", alignItems: "center", gap: 34, textAlign: "left",
+              boxShadow: "0 18px 44px rgba(30,58,95,0.1)", animation: "bubbleIn 0.45s cubic-bezier(0.34,1.56,0.64,1) both",
+            }} className="pick-panel">
+              <div className="chara" style={{ flexShrink: 0 }}>
+                <img src={TEAM[sel].img} alt="" style={{ height: 180, animation: "bob 3.2s ease-in-out infinite" }} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <p style={{ ...hf, fontSize: 19, color: NAVY }}>
+                  {TEAM[sel].name}
+                  <span style={{ fontSize: 12, fontWeight: 800, color: BLUE, background: "#ecf4fd", borderRadius: 100, padding: "4px 14px", marginLeft: 12, verticalAlign: "middle" }}>{TEAM[sel].role}</span>
+                </p>
+                <div style={{ position: "relative", background: BG_ALT, borderRadius: 16, padding: "16px 20px", marginTop: 14 }}>
+                  <p style={{ fontSize: 13.5, lineHeight: 2, color: NAVY, fontWeight: 700 }}>「{TEAM[sel].intro}」</p>
+                </div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 14 }}>
+                  {TEAM[sel].skills.map((sk) => (
+                    <span key={sk} style={{ fontSize: 12, fontWeight: 800, color: BLUE_DEEP, background: "#ecf4fd", borderRadius: 100, padding: "7px 16px" }}>✓ {sk}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ); })()}
+        </div>
+      </section>
 
-                  {/* Card */}
-                  <div style={{
-                    flex: 1, padding: "14px 18px", borderRadius: 14,
-                    background: "#fff", border: "1px solid #f1f5f9",
-                    boxShadow: visible ? "0 2px 12px rgba(0,0,0,0.04)" : "none",
-                    transition: "all 0.3s",
-                  }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: typed && content ? 8 : 0 }}>
-                      <span style={{ fontSize: 12, fontWeight: 700, color: task.color }}>{task.label}</span>
-                      {visible && !typed && (
-                        <span style={{ fontSize: 10, color: "#94a3b8", display: "inline-flex", gap: 3 }}>
-                          <span style={{ animation: "blink 1.4s infinite" }}>.</span>
-                          <span style={{ animation: "blink 1.4s infinite", animationDelay: "0.2s" }}>.</span>
-                          <span style={{ animation: "blink 1.4s infinite", animationDelay: "0.4s" }}>.</span>
-                        </span>
-                      )}
-                      {typed && !isLive && (
-                        <span style={{ fontSize: 9, fontWeight: 600, color: "#10b981", background: "#f0fdf4", padding: "2px 8px", borderRadius: 100 }}>完了</span>
-                      )}
-                      {isLive && liveTyped && !liveResult.length ? null : isLive && liveTyped && liveTyped.length >= liveResult.length && (
-                        <span style={{ fontSize: 9, fontWeight: 600, color: "#ec4899", background: "#fdf2f8", padding: "2px 8px", borderRadius: 100 }}>LIVE</span>
+      {/* ══ 3b. チーム連携（事務所図×3） ══ */}
+      <section data-scene={scene()} style={{ padding: "110px 40px", background: "#fff" }}>
+        <div style={{ maxWidth: 1000, margin: "0 auto" }}>
+          <div className="rv" style={{ textAlign: "center" }}><SectionLabel>Teamwork</SectionLabel>
+          <h2 style={{ ...hf, fontSize: "clamp(26px, 3.2vw, 38px)", lineHeight: 1.6 }}>御社専用のAIエージェントは、<br /><span style={{ color: BLUE }}>チームで働く。</span></h2>
+          <p style={{ fontSize: 14, color: MUTED, marginTop: 14, lineHeight: 2 }}>ひとつの仕事を、担当者どうしが受けわたして、最後まで完了させます。<br />たとえば、こんなふうに。</p></div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 26, marginTop: 50 }}>
+            {FLOWS.map((f, fi) => (
+              <div key={f.title} className="rv" style={{ background: BG_ALT, borderRadius: 26, padding: "34px 40px 30px", transitionDelay: `${fi * 0.06}s` }}>
+                <p style={{ ...hf, fontSize: 17, color: NAVY, textAlign: "center" }}>{f.icon} {f.title}</p>
+                <div style={{ display: "flex", alignItems: "stretch", justifyContent: "center", gap: 0, marginTop: 26 }} className="flow-row">
+                  {f.steps.map((st, si) => (
+                    <div key={st.name} style={{ display: "flex", alignItems: "center" }}>
+                      <div style={{ width: 214, textAlign: "center" }}>
+                        <div className="chara" style={{ height: 118, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+                          <img src={st.img} alt={st.name} style={{ maxHeight: 114, animation: `bob 3.4s ease-in-out ${si * 0.5}s infinite` }} />
+                        </div>
+                        <p style={{ ...hf, fontSize: 13.5, color: NAVY, marginTop: 10 }}>{st.name}</p>
+                        <p style={{ fontSize: 12, color: MUTED, lineHeight: 1.8, marginTop: 5 }}>{st.does}</p>
+                      </div>
+                      {si < f.steps.length - 1 && (
+                        <div style={{ width: 84, position: "relative", height: 3, background: "repeating-linear-gradient(90deg, #b9d4f2 0 8px, transparent 8px 16px)", borderRadius: 2, margin: "0 4px", marginBottom: 58, flexShrink: 0 }}>
+                          <span style={{ position: "absolute", top: -15, left: 0, fontSize: 17, animation: `flowMove 2.4s ease-in-out ${fi * 0.5}s infinite` }}>{f.icon}</span>
+                        </div>
                       )}
                     </div>
-                    {typed && content && (
-                      <div style={{
-                        fontSize: 11, color: "#475569", lineHeight: 1.7,
-                        whiteSpace: "pre-wrap",
-                        animation: isLive ? "none" : "fadeIn 0.4s ease",
-                      }}>
-                        {isLive ? liveTyped : content}
-                        {isLive && liveTyped.length < (liveResult?.length || 999) && (
-                          <span style={{ animation: "blink 0.8s infinite", color: accent }}>|</span>
-                        )}
-                      </div>
-                    )}
-                    {isLive && typed && !liveResult && (
-                      <div style={{ fontSize: 11, color: "#94a3b8", display: "flex", alignItems: "center", gap: 6, marginTop: 4 }}>
-                        <span style={{ display: "inline-flex", gap: 3 }}>
-                          <span style={{ animation: "blink 1.4s infinite" }}>.</span>
-                          <span style={{ animation: "blink 1.4s infinite", animationDelay: "0.2s" }}>.</span>
-                          <span style={{ animation: "blink 1.4s infinite", animationDelay: "0.4s" }}>.</span>
-                        </span>
-                        {" "}AIがリアルタイムで生成中
-                      </div>
-                    )}
+                  ))}
+                </div>
+                <p style={{ ...hf, fontSize: 13.5, color: BLUE_DEEP, textAlign: "center", marginTop: 18, background: "#fff", borderRadius: 100, padding: "10px 24px", display: "table", marginLeft: "auto", marginRight: "auto" }}>→ {f.result}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══ 4-9. ショーケース ══ */}
+      {SHOWCASES.map((s, i) => (
+        <section key={s.id} data-scene={scene()} style={{ padding: "100px 40px 150px", background: i % 2 === 0 ? "#fff" : BG_ALT }}>
+          <div style={{ maxWidth: 1080, margin: "0 auto", display: "grid", gridTemplateColumns: "1.15fr 1fr", gap: 60, alignItems: "center", direction: i % 2 === 1 ? "rtl" : "ltr" }} className="show-grid">
+            <div className="rv" style={{ direction: "ltr", position: "relative" }}>
+              <img src={s.mock} alt="" style={{ width: "100%", filter: "drop-shadow(0 22px 48px rgba(30,58,95,0.16))" }} />
+              {/* 担当キャラが画面の横からひょっこり */}
+              <div style={{ position: "absolute", right: i % 2 === 1 ? "auto" : -14, left: i % 2 === 1 ? -14 : "auto", bottom: -58, textAlign: "center", zIndex: 2 }}>
+                <div style={{ position: "relative", marginBottom: 10, background: "#fff", border: "1.5px solid #e3edf7", borderRadius: 14, padding: "9px 14px", boxShadow: "0 8px 22px rgba(30,58,95,0.12)", maxWidth: 210 }}>
+                  <p style={{ ...hf, fontSize: 11.5, lineHeight: 1.6 }}>{s.say}</p>
+                  <span style={{ position: "absolute", left: "50%", bottom: -7, transform: "translateX(-50%) rotate(45deg)", width: 12, height: 12, background: "#fff", borderRight: "1.5px solid #e3edf7", borderBottom: "1.5px solid #e3edf7" }} />
+                </div>
+                <div className="chara" style={{ display: "inline-block" }}>
+                  <img src={s.char} alt={s.cname} style={{ height: 142, animation: `bob 3.4s ease-in-out ${i * 0.4}s infinite` }} />
+                </div>
+              </div>
+            </div>
+            <div className="rv" style={{ direction: "ltr" }}>
+              <p style={{ fontSize: 11.5, fontWeight: 800, color: BLUE, background: "#ecf4fd", borderRadius: 100, padding: "5px 16px", display: "inline-block" }}>担当：{s.cname}（{s.crole}）</p>
+              <h2 style={{ ...hf, fontSize: "clamp(24px, 2.8vw, 33px)", lineHeight: 1.55, marginTop: 16 }}>{s.title}</h2>
+              <p style={{ fontSize: 14, lineHeight: 2.1, color: MUTED, marginTop: 16 }}>{s.body}</p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 20 }}>
+                {s.points.map((pt) => (
+                  <div key={pt} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, fontWeight: 700 }}>
+                    <span style={{ width: 21, height: 21, borderRadius: "50%", background: BLUE, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+                    </span>
+                    {pt}
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ── CM ── */}
-      <section style={{ padding: isMobile ? "64px 20px" : "96px 48px", background: "#fff" }}>
-        <div style={{ maxWidth: 880, margin: "0 auto" }}>
-          <div className="sr2" style={{ ...sr2, marginBottom: 32, textAlign: "center" }}>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.25em", color: accent, textTransform: "uppercase", marginBottom: 12 }}>Movie</div>
-            <h2 style={{ fontSize: "clamp(22px, 3.5vw, 34px)", fontWeight: 900, letterSpacing: "-0.03em", color: "#0f172a", lineHeight: 1.3 }}>
-              30秒でわかる、AIエージェント。
-            </h2>
-          </div>
-          <div className="sr2" style={{ ...sr2, transitionDelay: "0.1s" }}>
-            <AgentCM />
-          </div>
-        </div>
-      </section>
-
-      {/* ── 02. What is AI Agent ── */}
-      <section style={{ padding: isMobile ? "80px 20px" : "120px 48px", background: "#f8fafc" }}>
-        <div style={{ maxWidth: 1000, margin: "0 auto" }}>
-          <div className="sr2" style={{ ...sr2, marginBottom: 48, textAlign: "center" }}>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.25em", color: accent, textTransform: "uppercase", marginBottom: 12 }}>AI Agent</div>
-            <h2 style={{ fontSize: "clamp(24px, 4vw, 40px)", fontWeight: 900, letterSpacing: "-0.03em", color: "#0f172a", lineHeight: 1.3 }}>
-              『答えるAI』と『やり切るAI』は、<br />別物です。
-            </h2>
-          </div>
-          <div className="al-agent-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 20 }}>
-            <div className="sr2" style={{ ...sr2, padding: "32px 28px", borderRadius: 20, background: "#fff", border: "1.5px solid #f1f5f9" }}>
-              <div style={{ fontSize: 12, fontWeight: 800, color: "#94a3b8", letterSpacing: "0.1em", marginBottom: 12 }}>これまでのチャットAI</div>
-              <div style={{ fontSize: 20, fontWeight: 900, color: "#475569", marginBottom: 12 }}>質問に「答える」</div>
-              <p style={{ fontSize: 13, color: "#94a3b8", lineHeight: 1.9 }}>
-                聞けば教えてくれる、頼れる相談相手。<br />
-                ただし実際の作業は、結局人がやることになります。
-              </p>
-            </div>
-            <div className="sr2" style={{ ...sr2, transitionDelay: "0.1s", padding: "32px 28px", borderRadius: 20, background: "#fff", border: `2px solid ${accent}`, position: "relative", boxShadow: "0 12px 40px rgba(99,102,241,0.08)" }}>
-              <div style={{ position: "absolute", top: -1, left: "50%", transform: "translateX(-50%) translateY(-50%)", fontSize: 10, fontWeight: 700, padding: "4px 18px", borderRadius: 100, background: accent, color: "#fff", letterSpacing: "0.1em" }}>私たちが作るもの</div>
-              <div style={{ fontSize: 12, fontWeight: 800, color: accent, letterSpacing: "0.1em", marginBottom: 12 }}>AIエージェント</div>
-              <div style={{ fontSize: 20, fontWeight: 900, color: "#0f172a", marginBottom: 12 }}>業務を「やり切る」</div>
-              <p style={{ fontSize: 13, color: "#64748b", lineHeight: 1.9 }}>
-                読む・判断する・入力する・送る、まで自動で完了。<br />
-                人がやっていた一連の流れを、丸ごと任せられます。
-              </p>
+                ))}
+              </div>
             </div>
           </div>
+        </section>
+      ))}
+
+      {/* ══ 10. もっとできる（マーキー） ══ */}
+      <section data-scene={scene()} style={{ padding: "100px 0 90px", background: "#fff", overflow: "hidden" }}>
+        <div style={{ maxWidth: 1020, margin: "0 auto", textAlign: "center", padding: "0 40px" }}>
+          <div className="rv"><SectionLabel>And more</SectionLabel>
+          <h2 style={{ ...hf, fontSize: "clamp(26px, 3.2vw, 38px)", lineHeight: 1.6 }}>「うちのあの仕事も？」<br />──たぶん、できます。</h2>
+          <p style={{ fontSize: 14, color: MUTED, marginTop: 14, lineHeight: 2 }}>ここに載っていない業務も、まずは聞かせてください。<br />「それ、自動化できます」とお答えできるケースがほとんどです。</p></div>
         </div>
-      </section>
-
-      {/* ── 03. Agent Capabilities (3分類) ── */}
-      <section id="services" style={{ padding: isMobile ? "80px 20px" : "120px 48px", background: "#fff" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-          <div className="sr2" style={{ ...sr2, marginBottom: 56, textAlign: "center" }}>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.25em", color: accent, textTransform: "uppercase", marginBottom: 12 }}>Services</div>
-            <h2 style={{ fontSize: "clamp(24px, 4vw, 40px)", fontWeight: 900, letterSpacing: "-0.03em", color: "#0f172a", lineHeight: 1.3 }}>
-              AIエージェントにできること
-            </h2>
-            <p style={{ fontSize: 14, color: "#64748b", marginTop: 12, lineHeight: 1.8 }}>「どの会社にもある業務」から「え、こんなことまで？」まで。3つに分けてご紹介します。</p>
-          </div>
-
-          {AGENT_GROUPS.map((g, gi) => (
-            <div key={gi} style={{ marginBottom: gi < AGENT_GROUPS.length - 1 ? 72 : 0 }}>
-              <div className="sr2" style={{ ...sr2, display: "flex", alignItems: "flex-start", gap: 16, marginBottom: 24 }}>
-                <div style={{ width: 44, height: 44, borderRadius: "50%", background: g.color, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 900, flexShrink: 0 }}>{g.num}</div>
-                <div>
-                  <div style={{ fontSize: "clamp(18px, 2.5vw, 24px)", fontWeight: 900, color: "#0f172a", lineHeight: 1.4 }}>{g.title}</div>
-                  <div style={{ fontSize: 13, color: "#64748b", marginTop: 4, lineHeight: 1.7 }}>{g.sub}</div>
-                </div>
-              </div>
-              <div className="al-services-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
-                {g.items.map((item, i) => {
-                  const href = item.id ? `/demo?s=${item.id}` : "/contact";
-                  return (
-                    <a key={i} href={href}
-                      className="sr2" style={{ ...sr2, transitionDelay: `${i * 0.05}s`,
-                      padding: "28px 24px", borderRadius: 16, background: "#fff",
-                      border: "1.5px solid #f1f5f9", textDecoration: "none",
-                      transition: "all 0.25s", display: "block", cursor: "pointer",
-                    }}
-                      onMouseEnter={e => { e.currentTarget.style.borderColor = g.color; e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = `0 12px 40px ${g.color}18`; }}
-                      onMouseLeave={e => { e.currentTarget.style.borderColor = "#f1f5f9"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
-                    >
-                      <div style={{ width: 40, height: 40, borderRadius: 10, background: `${g.color}12`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
-                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke={g.color} strokeWidth={1.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
-                        </svg>
-                      </div>
-                      <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", color: g.color, textTransform: "uppercase", marginBottom: 8 }}>{item.tag}</div>
-                      <div style={{ fontSize: 15, fontWeight: 800, color: "#0f172a", marginBottom: 8, lineHeight: 1.4 }}>{item.title}</div>
-                      <div style={{ fontSize: 12, color: "#94a3b8", lineHeight: 1.7 }}>{item.desc}</div>
-                      <div style={{ marginTop: 16, fontSize: 11, fontWeight: 700, color: g.color, display: "flex", alignItems: "center", gap: 4 }}>
-                        {item.id ? "デモを見る" : "相談してみる"}
-                        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                        </svg>
-                      </div>
-                    </a>
-                  );
-                })}
-              </div>
+        <div style={{ marginTop: 44, display: "flex", flexDirection: "column", gap: 14 }}>
+          {[0, 1].map((row) => (
+            <div key={row} style={{ display: "flex", gap: 12, width: "max-content", animation: `${row === 0 ? "marqueeL" : "marqueeR"} 46s linear infinite` }}>
+              {[...CAPABILITIES, ...CAPABILITIES].map((c, j) => (
+                <span key={j} style={{ fontSize: 13, fontWeight: 700, color: NAVY, background: BG_ALT, border: "1.5px solid #e3edf7", borderRadius: 100, padding: "11px 22px", whiteSpace: "nowrap" }}>{c}</span>
+              ))}
             </div>
           ))}
+        </div>
+        {/* API連携（中央ハブから散らばるロゴ） */}
+        <div className="rv" style={{ maxWidth: 900, margin: "70px auto 0", padding: "0 40px", textAlign: "center" }}>
+          <h3 style={{ ...hf, fontSize: "clamp(19px, 2.2vw, 25px)", lineHeight: 1.6 }}>
+            つながるほど、<span style={{ color: BLUE }}>賢くなる。</span>
+          </h3>
+          <p style={{ fontSize: 13.5, color: MUTED, lineHeight: 2, marginTop: 10 }}>
+            普段お使いのサービスとAPIで直接つながり、データを自動で取得します。
+          </p>
+          <div style={{ position: "relative", height: 440, maxWidth: 780, margin: "6px auto 0" }}>
+            {/* 中心：EIGHT */}
+            <div style={{ position: "absolute", left: "50%", top: 218, transform: "translate(-50%,-50%)", zIndex: 2 }}>
+              <div className="chara"><img src="/chars/ball.png" alt="" style={{ height: 132, animation: "bob 3.2s ease-in-out infinite" }} /></div>
+            </div>
+            {/* 散らばるロゴ（大きさ＝連携の定番度） */}
+            {([
+              ["line", 468, 64, 45, "0s"],
+              ["gmaps", 236, 78, 50, "0.3s"],
+              ["gcal", 352, 36, 47, "0.6s"],
+              ["freee", 604, 128, 53, "0.9s"],
+              ["mf", 120, 160, 59, "1.2s"],
+              ["excel", 196, 300, 50, "1.5s"],
+              ["instagram", 556, 300, 47, "1.8s"],
+              ["youtube", 680, 220, 60, "2.1s"],
+              ["slack", 96, 262, 61, "2.4s"],
+              ["salesforce", 636, 356, 59, "2.7s"],
+              ["chatwork", 140, 66, 61, "3.0s"],
+              ["kintone", 60, 356, 69, "0.5s"],
+              ["zoom", 300, 388, 47, "1.0s"],
+              ["notion", 448, 400, 47, "1.4s"],
+              ["smaregi", 716, 120, 67, "1.9s"],
+              ["shopify", 40, 120, 70, "2.2s"],
+              ["stripe", 540, 168, 43, "2.6s"],
+              ["dropbox", 388, 128, 34, "2.9s"],
+              ["airregi", 720, 306, 67, "0.7s"],
+              ["x", 168, 396, 60, "1.7s"],
+            ] as [string, number, number, number, string][]).map(([logo, x, y, size, d]) => (
+              <div key={logo} style={{
+                position: "absolute", left: x, top: y, transform: "translate(-50%,-50%)",
+                width: size, height: size, borderRadius: "50%", background: "#fff",
+                boxShadow: "0 8px 22px rgba(30,58,95,0.13)", display: "flex", alignItems: "center", justifyContent: "center",
+                animation: `bob 3.8s ease-in-out ${d} infinite`,
+              }}>
+                <img src={`/logos/${logo}.png`} alt={logo} style={{ width: size * 0.56, height: size * 0.56, borderRadius: 6 }} />
+              </div>
+            ))}
+          </div>
+          <p style={{ fontSize: 11.5, color: MUTED, marginTop: 8 }}>ほかにも、POSレジ・基幹システム・各種SaaSなど<br />※ ご利用中のシステムに合わせて接続方法をご提案します</p>
+        </div>
+      </section>
 
-          <div className="sr2" style={{ ...sr2, marginTop: 48, textAlign: "center" }}>
-            <p style={{ fontSize: 13, color: "#64748b", lineHeight: 1.8, marginBottom: 16 }}>
-              ここに載っていない業務も、まずは聞かせてください。<br />
-              「それ、自動化できます」とお答えできるケースがほとんどです。
-            </p>
-            <a href="/contact" style={{
-              display: "inline-flex", alignItems: "center", gap: 6,
-              fontSize: 13, fontWeight: 700, color: accent, textDecoration: "none",
-            }}>
-              「こんなこともできる？」まずはご相談ください
-              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-              </svg>
-            </a>
+      {/* ══ 11. 業種別 ══ */}
+      <section data-scene={scene()} style={{ padding: "100px 40px", background: BG_ALT }}>
+        <div style={{ maxWidth: 1080, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: 60, alignItems: "center" }} className="show-grid">
+          <div className="rv">
+            <SectionLabel>Industries</SectionLabel>
+            <h2 style={{ ...hf, fontSize: "clamp(24px, 2.8vw, 33px)", lineHeight: 1.55 }}>現場のある仕事にこそ、<br />効きます。</h2>
+            <p style={{ fontSize: 14, lineHeight: 2.1, color: MUTED, marginTop: 16 }}>製造、建設、物流、飲食、サービス業。紙とExcelと電話で回っている現場ほど、AIエージェントの効果は大きくなります。</p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 20 }}>
+              {["製造業", "建設業", "物流・倉庫", "飲食・小売", "サービス業"].map((u) => (
+                <span key={u} style={{ fontSize: 12.5, fontWeight: 800, color: BLUE_DEEP, background: "#fff", border: "1.5px solid #d8e8fa", borderRadius: 100, padding: "8px 18px" }}>{u}</span>
+              ))}
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 28 }}>
+              <div className="chara"><img src="/chars/prop-custom.png" alt="GEMBA" style={{ height: 128 }} /></div>
+              <div style={{ position: "relative", background: "#fff", border: "1.5px solid #e3edf7", borderRadius: 14, padding: "10px 15px" }}>
+                <p style={{ ...hf, fontSize: 12 }}>画像認識AIのGEMBAです。<br />写真から日報、つくります！</p>
+              </div>
+            </div>
+          </div>
+          <div className="rv" style={{ display: "flex", gap: 16 }}>
+            <img src="/photos/industry-factory.jpg" alt="" style={{ width: "50%", borderRadius: 20, objectFit: "cover", aspectRatio: "3/4", boxShadow: "0 18px 40px rgba(30,58,95,0.14)", marginTop: 30 }} />
+            <img src="/photos/industry-restaurant.jpg" alt="" style={{ width: "50%", borderRadius: 20, objectFit: "cover", aspectRatio: "3/4", boxShadow: "0 18px 40px rgba(30,58,95,0.14)" }} />
           </div>
         </div>
       </section>
 
-      {/* ── 04. Works (開発実績) ── */}
-      <section style={{ padding: isMobile ? "80px 20px" : "120px 48px", background: "#f8fafc" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-          <div className="sr2" style={{ ...sr2, marginBottom: 56, textAlign: "center" }}>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.25em", color: accent, textTransform: "uppercase", marginBottom: 12 }}>Works</div>
-            <h2 style={{ fontSize: "clamp(24px, 4vw, 40px)", fontWeight: 900, letterSpacing: "-0.03em", color: "#0f172a", lineHeight: 1.3 }}>
-              私たちがつくってきたもの
-            </h2>
-            <p style={{ fontSize: 14, color: "#64748b", marginTop: 12 }}>企画からデザイン・開発・運用まで、すべて自社で行っています。</p>
-          </div>
-          <div className="al-combos-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 20 }}>
-            {WORKS.map((w, i) => {
-              const inner = (
-                <>
-                  <div style={{ height: 4, background: w.color }} />
-                  <div style={{ padding: "28px 24px" }}>
-                    <div style={{ display: "inline-block", fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", color: w.color, background: `${w.color}12`, padding: "4px 12px", borderRadius: 100, marginBottom: 12 }}>{w.tag}</div>
-                    <div style={{ fontSize: 18, fontWeight: 900, color: "#0f172a", marginBottom: 8 }}>{w.title}</div>
-                    <div style={{ fontSize: 13, color: "#64748b", lineHeight: 1.8 }}>{w.desc}</div>
-                    {"href" in w && (
-                      <div style={{ marginTop: 16, fontSize: 12, fontWeight: 700, color: w.color, display: "flex", alignItems: "center", gap: 4 }}>
-                        サイトを見る
-                        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                        </svg>
-                      </div>
-                    )}
+      {/* ══ 12. Before/After ══ */}
+      <section data-scene={scene()} style={{ padding: "100px 40px", background: "#fff" }}>
+        <div style={{ maxWidth: 1080, margin: "0 auto" }}>
+          <div className="rv" style={{ textAlign: "center" }}><SectionLabel>After</SectionLabel>
+          <h2 style={{ ...hf, fontSize: "clamp(26px, 3.2vw, 38px)", lineHeight: 1.6 }}>「また入力作業か…」が、<br />なくなる。</h2></div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 50, alignItems: "center", marginTop: 50 }} className="show-grid">
+            <img className="rv" src="/photos/after-relaxed.jpg" alt="" style={{ width: "100%", borderRadius: 22, boxShadow: "0 18px 44px rgba(30,58,95,0.14)" }} />
+            <div className="rv">
+              <p style={{ fontSize: 14.5, lineHeight: 2.2, color: MUTED }}>
+                空いた時間は、お客様との会話に。新しい商品づくりに。本当にやりたかった仕事に使ってください。それがAIエージェント導入のいちばんの効果です。
+              </p>
+              <div style={{ display: "flex", gap: 16, marginTop: 30 }}>
+                {[
+                  { n: 80, s: "%", l: "作業時間を削減（最大）" },
+                  { n: 4, s: "週間", l: "で導入スタート（2〜）" },
+                  { n: 10, s: "時間〜", l: "毎月の直接サポート" },
+                ].map((k) => (
+                  <div key={k.l} style={{ flex: 1, background: BG_ALT, borderRadius: 18, padding: "20px 14px", textAlign: "center" }}>
+                    <p style={{ ...hf, fontSize: 28, color: BLUE }}><Counter to={k.n} suffix={k.s} /></p>
+                    <p style={{ fontSize: 10.5, fontWeight: 700, color: MUTED, marginTop: 5, lineHeight: 1.6 }}>{k.l}</p>
                   </div>
-                </>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══ 中間CTA ══ */}
+      <section style={{ padding: "56px 40px", background: "linear-gradient(90deg,#3b82d6,#2c66c4)" }}>
+        <div style={{ maxWidth: 940, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "center", gap: 30, flexWrap: "wrap" }}>
+          <p style={{ ...hf, fontSize: 19, color: "#fff", lineHeight: 1.7 }}>「うちの業務でもできる？」——まずは聞いてみてください。</p>
+          <a href="/contact" className="cta" style={{ ...hf, fontSize: 14.5, color: BLUE_DEEP, background: "#fff", textDecoration: "none", padding: "15px 38px", borderRadius: 100, boxShadow: "0 10px 26px rgba(10,40,90,0.3)", flexShrink: 0 }}>無料相談してみる →</a>
+        </div>
+      </section>
+
+      {/* ══ 13. 実績 ══ */}
+      <section data-scene={scene()} style={{ padding: "100px 40px", background: BG_ALT }}>
+        <div style={{ maxWidth: 1080, margin: "0 auto", textAlign: "center" }}>
+          <div className="rv"><SectionLabel>Works</SectionLabel>
+          <h2 style={{ ...hf, fontSize: "clamp(26px, 3.2vw, 38px)", lineHeight: 1.6 }}>つくってきたもの。</h2>
+          <p style={{ fontSize: 14, color: MUTED, marginTop: 12 }}>企画からデザイン・開発・運用まで、すべて自社で行っています。</p></div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 22, marginTop: 48, textAlign: "left" }} className="works-grid">
+            {WORKS.map((w, i) => {
+              const card = (
+                <div className="rv workcard" style={{ background: "#fff", borderRadius: 22, border: "1.5px solid #e8f0f9", overflow: "hidden", height: "100%", transitionDelay: `${i * 0.05}s` }}>
+                  <div style={{ height: 210, background: "linear-gradient(160deg,#eef6ff,#fafcff)", display: "flex", alignItems: "center", justifyContent: "center", padding: 18 }}>
+                    <img src={w.img} alt="" style={{ maxHeight: 190, maxWidth: "94%", filter: "drop-shadow(0 10px 24px rgba(30,58,95,0.12))" }} />
+                  </div>
+                  <div style={{ padding: "20px 24px 24px" }}>
+                    <p style={{ fontSize: 11, fontWeight: 800, color: BLUE }}>{w.tag}</p>
+                    <p style={{ ...hf, fontSize: 17, marginTop: 5, color: NAVY }}>{w.title}</p>
+                    <p style={{ fontSize: 12.5, color: MUTED, lineHeight: 1.9, marginTop: 7 }}>{w.desc}</p>
+                  </div>
+                </div>
               );
-              const cardStyle: React.CSSProperties = { ...sr2, transitionDelay: `${i * 0.08}s`,
-                borderRadius: 20, overflow: "hidden", background: "#fff",
-                border: "1.5px solid #f1f5f9", transition: "all 0.25s", display: "block", textDecoration: "none",
-              };
-              return w.href ? (
-                <a key={i} href={w.href} target="_blank" rel="noopener noreferrer" className="sr2" style={cardStyle}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = w.color; e.currentTarget.style.boxShadow = `0 12px 40px ${w.color}15`; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = "#f1f5f9"; e.currentTarget.style.boxShadow = "none"; }}
-                >{inner}</a>
-              ) : (
-                <div key={i} className="sr2" style={cardStyle}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = w.color; e.currentTarget.style.boxShadow = `0 12px 40px ${w.color}15`; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = "#f1f5f9"; e.currentTarget.style.boxShadow = "none"; }}
-                >{inner}</div>
-              );
+              return w.href ? <a key={w.title} href={w.href} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}>{card}</a> : <div key={w.title}>{card}</div>;
             })}
           </div>
         </div>
       </section>
 
-      {/* ── 04. Use Cases ── */}
-      <section style={{ padding: isMobile ? "80px 20px" : "120px 48px", background: "#f8fafc" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-          <div className="sr2" style={{ ...sr2, marginBottom: 56, textAlign: "center" }}>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.25em", color: accent, textTransform: "uppercase", marginBottom: 12 }}>Use Cases</div>
-            <h2 style={{ fontSize: "clamp(24px, 4vw, 40px)", fontWeight: 900, letterSpacing: "-0.03em", color: "#0f172a", lineHeight: 1.3 }}>
-              業種ごとの活用イメージ
-            </h2>
-          </div>
-          <div className="al-usecases-grid" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 16 }}>
-            {useCases.map((d, i) => (
-              <div key={i} className="sr2" style={{ ...sr2, transitionDelay: `${i * 0.08}s`,
-                padding: "28px 20px", borderRadius: 16, background: "#fff",
-                border: "1.5px solid #f1f5f9", textAlign: "center",
-              }}>
-                <div style={{ fontSize: 15, fontWeight: 800, color: "#0f172a", marginBottom: 12 }}>{d.industry}</div>
-                <div style={{ fontSize: 11, color: "#94a3b8", lineHeight: 1.7, marginBottom: 16, minHeight: 40 }}>{d.challenge}</div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                  {d.uses.map((u, j) => (
-                    <div key={j} style={{ fontSize: 10, fontWeight: 600, padding: "5px 8px", borderRadius: 6,
-                      background: accentLight, color: accent }}>{u}</div>
-                  ))}
-                </div>
-              </div>
-            ))}
+      {/* ══ 14. 自社サービス ══ */}
+      <section data-scene={scene()} style={{ padding: "100px 40px", background: "#fff" }}>
+        <div style={{ maxWidth: 1080, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1.1fr", gap: 60, alignItems: "center" }} className="show-grid">
+          <img className="rv" src="/photos/hero-owner.jpg" alt="" style={{ width: "100%", borderRadius: 22, boxShadow: "0 18px 44px rgba(30,58,95,0.14)" }} />
+          <div className="rv">
+            <SectionLabel>Our products</SectionLabel>
+            <h2 style={{ ...hf, fontSize: "clamp(24px, 2.8vw, 33px)", lineHeight: 1.55 }}>頼まれたものだけを<br />作る会社ではありません。</h2>
+            <p style={{ fontSize: 14, lineHeight: 2.1, color: MUTED, marginTop: 16 }}>
+              組織分析AI「LENDS AI」をはじめ、自社サービスの開発・運営も続けています。自分たちで作って、自分たちで毎日使って、自分たちで育てている。だから「現場で本当に使えるもの」の作り方を知っています。
+            </p>
+            <a href="https://www.lens-ai.jp" target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13.5, fontWeight: 800, color: BLUE, textDecoration: "none", marginTop: 18 }}>
+              LENDS AI を見てみる
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.6}><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
+            </a>
           </div>
         </div>
       </section>
 
-      {/* ── 05. Benefits ── */}
-      <section style={{ padding: isMobile ? "80px 20px" : "120px 48px", background: "#fff" }}>
-        <div style={{ maxWidth: 1000, margin: "0 auto" }}>
-          <div className="sr2" style={{ ...sr2, marginBottom: 56, textAlign: "center" }}>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.25em", color: accent, textTransform: "uppercase", marginBottom: 12 }}>Benefits</div>
-            <h2 style={{ fontSize: "clamp(24px, 4vw, 40px)", fontWeight: 900, letterSpacing: "-0.03em", color: "#0f172a", lineHeight: 1.3 }}>
-              Before → Afterで変わること。
-            </h2>
+      {/* ══ 15. 進め方 ══ */}
+      <section data-scene={scene()} style={{ padding: "100px 40px", background: BG_ALT }}>
+        <div style={{ maxWidth: 1080, margin: "0 auto", display: "grid", gridTemplateColumns: "1.1fr 1fr", gap: 60, alignItems: "center" }} className="show-grid">
+          <div className="rv">
+            <SectionLabel>Process</SectionLabel>
+            <h2 style={{ ...hf, fontSize: "clamp(24px, 2.8vw, 33px)", lineHeight: 1.55 }}>小さく始めて、<br />大きく育てる。</h2>
+            <div style={{ display: "flex", flexDirection: "column", gap: 14, marginTop: 26 }}>
+              {[
+                ["01", "無料相談", "業務内容を伺い、「自動化できる業務の診断リスト」をその場でお渡しします"],
+                ["02", "小さく試す", "効果が出やすい業務ひとつから、2〜4週間で開発してお試しいただきます"],
+                ["03", "広げる", "効果を確認しながら、自動化の範囲を少しずつ広げていきます"],
+              ].map(([n, t, b]) => (
+                <div key={n} style={{ display: "flex", gap: 16, alignItems: "flex-start", background: "#fff", borderRadius: 18, padding: "18px 22px", border: "1.5px solid #e8f0f9" }}>
+                  <span style={{ ...hf, width: 42, height: 42, borderRadius: "50%", background: BLUE, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{n}</span>
+                  <div><p style={{ ...hf, fontSize: 15.5 }}>{t}</p><p style={{ fontSize: 12.5, color: MUTED, lineHeight: 1.9, marginTop: 4 }}>{b}</p></div>
+                </div>
+              ))}
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 24 }}>
+              <div className="chara"><img src="/chars/prop-grow.png" alt="NYOKI" style={{ height: 132 }} /></div>
+              <p style={{ ...hf, fontSize: 12.5, color: BLUE_DEEP }}>学習AIのNYOKIです。使うほど御社の仕事を覚えます！</p>
+            </div>
           </div>
-          <div className="al-benefits-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
-            {benefits.map((b, i) => (
-              <div key={i} className="sr2" style={{ ...sr2, transitionDelay: `${i * 0.1}s`,
-                padding: "32px 24px", borderRadius: 20, background: "#f8fafc",
-                border: "1.5px solid #f1f5f9", textAlign: "center",
-              }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: "#0f172a", marginBottom: 20 }}>{b.label}</div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 20 }}>
-                  <div style={{ fontSize: 11, color: "#94a3b8", padding: "8px 12px", borderRadius: 8, background: "#fff", border: "1px solid #e2e8f0" }}>
-                    <span style={{ fontWeight: 700 }}>BEFORE</span>　{b.before}
+          <img className="rv" src="/photos/support-meeting.jpg" alt="" style={{ width: "100%", borderRadius: 22, boxShadow: "0 18px 44px rgba(30,58,95,0.14)" }} />
+        </div>
+      </section>
+
+      {/* ══ 16. 費用 ══ */}
+      <section data-scene={scene()} style={{ padding: "100px 40px", background: "#fff" }}>
+        <div style={{ maxWidth: 1020, margin: "0 auto" }}>
+          <div className="rv" style={{ textAlign: "center" }}><SectionLabel>Cost</SectionLabel>
+          <h2 style={{ ...hf, fontSize: "clamp(26px, 3.2vw, 38px)", lineHeight: 1.6 }}>「AI導入って、高そう…」<br />いいえ、<span style={{ color: BLUE }}>小さく安く</span>始められます。</h2></div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1.1fr", gap: 22, marginTop: 66, alignItems: "stretch" }} className="show-grid">
+            <div className="rv" style={{ background: BG_ALT, borderRadius: 22, padding: "30px 28px" }}>
+              <p style={{ fontSize: 12, fontWeight: 800, color: "#94a3b8" }}>たとえば、新しく人を雇うと…</p>
+              <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 9 }}>
+                {["求人広告費と採用の手間がかかる", "月給＋社会保険料が毎月発生", "仕事を覚えるまで数ヶ月", "辞めてしまうリスクがある"].map((t) => (
+                  <p key={t} style={{ fontSize: 13, color: MUTED }}>・{t}</p>
+                ))}
+              </div>
+              <p style={{ ...hf, fontSize: 24, color: "#94a3b8", marginTop: 18 }}>月20万円〜<span style={{ fontSize: 13 }}>＋教育コスト</span></p>
+            </div>
+            <div className="rv" style={{ background: "#fff", borderRadius: 22, padding: "30px 28px", border: `2.5px solid ${BLUE}`, boxShadow: "0 18px 46px rgba(59,130,214,0.15)", position: "relative" }}>
+              <div className="chara" style={{ position: "absolute", right: 12, top: -84 }}>
+                <img src="/chars/prop-piggy.png" alt="" style={{ height: 148, animation: "bob 3.6s ease-in-out infinite" }} />
+              </div>
+              <p style={{ fontSize: 12, fontWeight: 800, color: BLUE }}>AIエージェントなら</p>
+              <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 10 }}>
+                {["初期費用を抑えた月額制で始められる", "24時間365日、休まず働く", "教育不要。辞めない", "効果が出る業務ひとつからでOK"].map((t) => (
+                  <div key={t} style={{ display: "flex", alignItems: "center", gap: 9, fontSize: 13, fontWeight: 700 }}>
+                    <span style={{ width: 19, height: 19, borderRadius: "50%", background: BLUE, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+                    </span>{t}
                   </div>
-                  <div style={{ fontSize: 16, color: accent }}>↓</div>
-                  <div style={{ fontSize: 11, color: "#059669", padding: "8px 12px", borderRadius: 8, background: "#f0fdf4", border: "1px solid #bbf7d0" }}>
-                    <span style={{ fontWeight: 700 }}>AFTER</span>　{b.after}
-                  </div>
-                </div>
-                <div style={{ fontSize: "clamp(32px, 4vw, 44px)", fontWeight: 900, color: accent, letterSpacing: "-0.03em", lineHeight: 1 }}>
-                  <Counter to={parseInt(b.metric)} suffix="%" />
-                </div>
-                <div style={{ fontSize: 11, color: "#64748b", fontWeight: 600, marginTop: 4 }}>{b.metricLabel}</div>
+                ))}
               </div>
-            ))}
+              <p style={{ ...hf, fontSize: 27, color: BLUE, marginTop: 18 }}>月数万円台〜<span style={{ fontSize: 12, color: MUTED }}>※業務内容により個別見積り</span></p>
+            </div>
           </div>
+          <p className="rv" style={{ fontSize: 12.5, color: MUTED, textAlign: "center", marginTop: 22, lineHeight: 1.9 }}>IT導入補助金など、各種補助金の対象になる場合もあります。対象かどうかも無料相談でご案内します。</p>
         </div>
       </section>
 
-      {/* ── 06. Process ── */}
-      <section style={{ padding: isMobile ? "80px 20px" : "120px 48px", background: "#f8fafc" }}>
-        <div style={{ maxWidth: 1000, margin: "0 auto" }}>
-          <div className="sr2" style={{ ...sr2, marginBottom: 56, textAlign: "center" }}>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.25em", color: accent, textTransform: "uppercase", marginBottom: 12 }}>Process</div>
-            <h2 style={{ fontSize: "clamp(24px, 4vw, 40px)", fontWeight: 900, letterSpacing: "-0.03em", color: "#0f172a", lineHeight: 1.3 }}>
-              小さく始めて、大きく育てる
-            </h2>
-          </div>
-          <div className="al-process-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
-            {processSteps.map((p, i) => (
-              <div key={i} className="sr2" style={{ ...sr2, transitionDelay: `${i * 0.08}s`,
-                padding: "28px 24px", borderRadius: 16, background: "#fff",
-                border: "1.5px solid #f1f5f9", display: "flex", alignItems: "flex-start", gap: 16,
+      {/* ══ 17. プラン ══ */}
+      <section data-scene={scene()} style={{ padding: "100px 40px", background: BG_ALT }}>
+        <div style={{ maxWidth: 1020, margin: "0 auto", textAlign: "center" }}>
+          <div className="rv"><SectionLabel>Pricing</SectionLabel>
+          <h2 style={{ ...hf, fontSize: "clamp(26px, 3.2vw, 38px)", lineHeight: 1.6 }}>御社に合う形で。</h2>
+          <p style={{ fontSize: 14, color: MUTED, marginTop: 12 }}>費用は対象業務や機能範囲に応じて個別にお見積もり。全プラン月10時間以上の直接サポート付き。</p></div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20, marginTop: 48 }} className="team-grid">
+            {PLANS.map((p, i) => (
+              <div key={p.label} className="rv workcard" style={{
+                background: "#fff", borderRadius: 22, padding: "34px 24px 30px", position: "relative",
+                border: p.popular ? `2.5px solid ${BLUE}` : "1.5px solid #e8f0f9",
+                boxShadow: p.popular ? "0 18px 46px rgba(59,130,214,0.15)" : "none",
+                transitionDelay: `${i * 0.05}s`,
               }}>
-                <div style={{
-                  width: 40, height: 40, borderRadius: "50%",
-                  background: `linear-gradient(135deg, ${accent}, #8b5cf6)`,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 13, fontWeight: 800, color: "#fff", flexShrink: 0,
-                }}>{p.step}</div>
-                <div>
-                  <div style={{ fontSize: 15, fontWeight: 800, color: "#0f172a", marginBottom: 4 }}>{p.title}</div>
-                  <div style={{ fontSize: 12, color: "#64748b", lineHeight: 1.7 }}>{p.body}</div>
-                </div>
+                {p.popular && <span style={{ ...hf, position: "absolute", top: -13, left: "50%", transform: "translateX(-50%)", fontSize: 11, background: "#ff9718", color: "#fff", borderRadius: 100, padding: "5px 18px", boxShadow: "0 4px 12px rgba(255,151,24,0.4)" }}>いちばん人気</span>}
+                <p style={{ fontSize: 11, fontWeight: 800, color: BLUE, letterSpacing: "0.15em" }}>{p.label}</p>
+                <p style={{ ...hf, fontSize: 19, marginTop: 7 }}>{p.name}</p>
+                <p style={{ fontSize: 12.5, color: MUTED, lineHeight: 1.9, marginTop: 9 }}>{p.desc}</p>
               </div>
             ))}
-          </div>
-          <div className="sr2" style={{ ...sr2, marginTop: 24, fontSize: 13, color: accent, fontWeight: 700, textAlign: "center" }}>
-            慣れるまで専任担当が伴走。現場で本当に使えるシステムに育てます。
           </div>
         </div>
       </section>
 
-      {/* ── 07. Pricing ── */}
-      <section style={{ padding: isMobile ? "80px 20px" : "120px 48px", background: "#fff" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-          <div className="sr2" style={{ ...sr2, marginBottom: 24, textAlign: "center" }}>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.25em", color: accent, textTransform: "uppercase", marginBottom: 12 }}>Pricing</div>
-            <h2 style={{ fontSize: "clamp(24px, 4vw, 40px)", fontWeight: 900, letterSpacing: "-0.03em", color: "#0f172a", lineHeight: 1.3 }}>
-              3つの導入プラン
-            </h2>
-            <p style={{ fontSize: 14, color: "#64748b", marginTop: 12 }}>貴社の状況に合わせて、最適なプランをご提案します。</p>
-          </div>
-
-          <div className="al-pricing-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
-            {plans.map((p, i) => (
-              <div key={i} className="sr2" style={{ ...sr2, transitionDelay: `${i * 0.08}s`,
-                padding: "36px 28px", borderRadius: 20,
-                background: p.popular ? "#fafafe" : "#fff",
-                border: p.popular ? `2px solid ${accent}` : "1.5px solid #f1f5f9",
-                position: "relative", textAlign: "center",
-              }}>
-                {p.popular && <div style={{ position: "absolute", top: -1, left: "50%", transform: "translateX(-50%) translateY(-50%)",
-                  fontSize: 10, fontWeight: 700, padding: "4px 18px", borderRadius: 100,
-                  background: accent, color: "#fff", letterSpacing: "0.1em" }}>RECOMMENDED</div>}
-                <div style={{ fontSize: 11, fontWeight: 700, color: accent, letterSpacing: "0.15em", marginBottom: 8 }}>{p.planLabel}</div>
-                <div style={{ fontSize: 17, fontWeight: 800, color: "#0f172a", marginBottom: 8 }}>{p.name}</div>
-                <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 24, lineHeight: 1.6, minHeight: 36 }}>{p.desc}</div>
-
-                <div style={{ display: "flex", flexDirection: "column", gap: 10, textAlign: "left", marginBottom: 24 }}>
-                  {p.features.map((f, j) => (
-                    <div key={j} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "#475569", lineHeight: 1.5 }}>
-                      <span style={{ color: accent, flexShrink: 0, marginTop: 1 }}>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                        </svg>
-                      </span>
-                      {f}
-                    </div>
-                  ))}
+      {/* ══ 18. FAQ ══ */}
+      <section data-scene={scene()} style={{ padding: "100px 40px", background: "#fff" }}>
+        <div style={{ maxWidth: 880, margin: "0 auto" }}>
+          <div className="rv" style={{ textAlign: "center" }}><SectionLabel>FAQ</SectionLabel>
+          <h2 style={{ ...hf, fontSize: "clamp(26px, 3.2vw, 38px)", lineHeight: 1.6 }}>ご心配ごとには、<br />先にお答えします。</h2></div>
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 30, marginTop: 46 }}>
+            <div className="chara" style={{ flexShrink: 0, textAlign: "center" }}>
+              <img src="/chars/cloud.png" alt="COO" style={{ height: 150, animation: "bob 3.4s ease-in-out infinite" }} />
+              <p style={{ ...hf, fontSize: 12, marginTop: 8 }}>会話AI<br />COO</p>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 14, flex: 1 }}>
+              {FAQS.map((f, i) => (
+                <div key={f.q} className="rv" style={{ background: BG_ALT, borderRadius: 18, padding: "20px 24px", transitionDelay: `${i * 0.04}s` }}>
+                  <p style={{ ...hf, fontSize: 14.5 }}>Q. {f.q}</p>
+                  <p style={{ fontSize: 13, color: MUTED, lineHeight: 2, marginTop: 7 }}>A. {f.a}</p>
                 </div>
-
-                <a href="/contact" style={{
-                  display: "inline-flex", alignItems: "center", gap: 6,
-                  fontSize: 13, fontWeight: 700, color: p.popular ? "#fff" : accent,
-                  background: p.popular ? accent : accentLight,
-                  padding: "10px 24px", borderRadius: 100, textDecoration: "none",
-                  transition: "all 0.2s",
-                }}
-                  onMouseEnter={e => { if (!p.popular) { e.currentTarget.style.background = `${accent}20`; } }}
-                  onMouseLeave={e => { if (!p.popular) { e.currentTarget.style.background = accentLight; } }}
-                >
-                  詳しく相談する
-                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                  </svg>
-                </a>
-              </div>
-            ))}
-          </div>
-          <div className="sr2" style={{ ...sr2, marginTop: 24, fontSize: 12, color: "#94a3b8", textAlign: "center", lineHeight: 1.8 }}>
-            ※ 費用は対象業務や機能範囲に応じて個別にお見積もりいたします。<br />
-            ※ 全プラン共通で月10時間以上の直接サポート付き。慣れるまで専任担当が伴走します。
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ── FAQ ── */}
-      <section style={{ padding: isMobile ? "80px 20px" : "120px 48px", background: "#f8fafc" }}>
+      {/* ══ 19. 最終CTA ══ */}
+      <section data-scene={scene()} style={{ padding: "110px 40px 90px", background: "linear-gradient(180deg,#f4f9fe, #e9f3fd)", textAlign: "center" }}>
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
-          <div className="sr2" style={{ ...sr2, marginBottom: 48, textAlign: "center" }}>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.25em", color: accent, textTransform: "uppercase", marginBottom: 12 }}>FAQ</div>
-            <h2 style={{ fontSize: "clamp(24px, 4vw, 40px)", fontWeight: 900, letterSpacing: "-0.03em", color: "#0f172a", lineHeight: 1.3 }}>
-              よくいただくご質問
-            </h2>
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(2, 1fr)", gap: 16 }}>
-            {FAQS.map((f, i) => (
-              <div key={i} className="sr2" style={{ ...sr2, transitionDelay: `${i * 0.06}s`, padding: "28px 24px", borderRadius: 16, background: "#fff", border: "1.5px solid #f1f5f9" }}>
-                <div style={{ display: "flex", gap: 10, marginBottom: 10 }}>
-                  <span style={{ color: accent, fontWeight: 900, fontSize: 16, flexShrink: 0 }}>Q.</span>
-                  <span style={{ fontSize: 15, fontWeight: 800, color: "#0f172a", lineHeight: 1.5 }}>{f.q}</span>
-                </div>
-                <div style={{ display: "flex", gap: 10 }}>
-                  <span style={{ color: "#94a3b8", fontWeight: 900, fontSize: 16, flexShrink: 0 }}>A.</span>
-                  <span style={{ fontSize: 13, color: "#64748b", lineHeight: 1.8 }}>{f.a}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 08. CTA ── */}
-      <section style={{
-        padding: isMobile ? "80px 20px" : "120px 48px",
-        background: `linear-gradient(135deg, ${accentLight} 0%, #fff 100%)`,
-        position: "relative",
-      }}>
-        <div className="sr2" style={{ ...sr2, maxWidth: 640, margin: "0 auto", textAlign: "center" }}>
-          <h2 style={{ fontSize: "clamp(26px, 4.5vw, 44px)", fontWeight: 900, letterSpacing: "-0.04em", color: "#0f172a", lineHeight: 1.3, marginBottom: 16 }}>
-            まずは、御社の業務を<br />聞かせてください。
-          </h2>
-          <p style={{ fontSize: 15, color: "#64748b", lineHeight: 1.9, marginBottom: 40 }}>
-            初回ご相談は無料。「自動化できる業務の診断リスト」をその場でお渡しします。
+          <h2 className="rv" style={{ ...hf, fontSize: "clamp(28px, 3.6vw, 44px)", lineHeight: 1.6 }}>どの仕事から、<br />任せてみますか？</h2>
+          <p className="rv" style={{ fontSize: 14.5, color: MUTED, lineHeight: 2.1, marginTop: 16 }}>
+            初回のご相談は無料です。「自動化できる業務の診断リスト」をその場でお渡しします。<br />しつこい営業は、ぼくらの得意分野ではありません。
           </p>
-
-          <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-            <a href="/contact" style={{
-              display: "inline-flex", alignItems: "center", gap: 8, fontSize: 15, fontWeight: 700,
-              color: "#fff", background: accent, padding: "16px 36px", borderRadius: 100,
-              textDecoration: "none", transition: "all 0.3s",
-              boxShadow: "0 8px 32px rgba(99,102,241,0.25)",
-            }}
-              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 12px 40px rgba(99,102,241,0.35)"; }}
-              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 8px 32px rgba(99,102,241,0.25)"; }}
-            >
-              無料相談を申し込む
-              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-              </svg>
-            </a>
-            <a href="/demo" style={{
-              display: "inline-flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 600,
-              color: "#475569", background: "#fff", padding: "16px 32px", borderRadius: 100,
-              textDecoration: "none", border: "1.5px solid #e2e8f0", transition: "all 0.3s",
-            }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = accent; e.currentTarget.style.color = accent; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = "#e2e8f0"; e.currentTarget.style.color = "#475569"; }}
-            >
-              デモを体験する
-            </a>
-          </div>
-
-          <div style={{ marginTop: 48, display: "flex", gap: 32, justifyContent: "center", flexWrap: "wrap" }}>
-            {[
-              ["ito.t@80grp.com", "EMAIL"],
-              ["050-8896-5889", "PHONE"],
-              ["rng-labs.com", "WEBSITE"],
-            ].map(([val, label]) => (
-              <div key={label} style={{ textAlign: "center" }}>
-                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", color: "#94a3b8", marginBottom: 4 }}>{label}</div>
-                <div style={{ fontSize: 13, color: "#475569", fontWeight: 600 }}>{val}</div>
+          <div className="rv lineup-row" style={{ display: "flex", alignItems: "flex-end", justifyContent: "center", gap: 16, marginTop: 46 }}>
+            {LINEUP.map(([src, h], j) => (
+              <div key={src} className="chara">
+                <img src={src} alt="" style={{ height: h, animation: `bob 3.4s ease-in-out ${j * 0.3}s infinite` }} />
               </div>
             ))}
           </div>
+          <div className="rv" style={{ marginTop: 46, display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
+            <CTA big />
+            <a href="/demo" className="cta" style={{ ...hf, fontSize: 14.5, color: NAVY, background: "#fff", textDecoration: "none", padding: "18px 38px", borderRadius: 100, border: "1.5px solid #d8e4f0" }}>デモを体験する</a>
+          </div>
+          <p style={{ fontSize: 12, color: MUTED, marginTop: 40 }}>合同会社80 ｜ 愛知県名古屋市 ｜ ito.t@80grp.com ｜ 050-8896-5889</p>
         </div>
       </section>
 
-      {/* ── Footer ── */}
-      <footer style={{ background: "#f8fafc", borderTop: "1px solid #f1f5f9", padding: isMobile ? "36px 20px" : "48px 48px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div style={{ fontSize: 11, color: "#94a3b8", letterSpacing: "0.04em" }}>
-          &copy; 2026 合同会社80. All rights reserved.
+      {/* ── ガイド：エイト ── */}
+      <div style={{ position: "fixed", left: "clamp(8px, 3.5vw, 56px)", bottom: 14, zIndex: 90, display: "flex", flexDirection: "column", alignItems: "center", pointerEvents: "none" }}>
+        <div key={active} style={{
+          position: "relative", marginBottom: 12, maxWidth: 250,
+          background: "#fff", border: "1.5px solid #e3edf7", borderRadius: 16,
+          padding: "11px 16px", boxShadow: "0 10px 30px rgba(30,58,95,0.13)",
+          animation: "bubbleIn 0.45s cubic-bezier(0.34,1.56,0.64,1) both",
+        }}>
+          <p style={{ ...hf, fontSize: 12.5, lineHeight: 1.7 }}>{GUIDE_LINES[active] ?? GUIDE_LINES[0]}</p>
+          <span style={{ position: "absolute", left: "50%", bottom: -8, transform: "translateX(-50%) rotate(45deg)", width: 13, height: 13, background: "#fff", borderRight: "1.5px solid #e3edf7", borderBottom: "1.5px solid #e3edf7" }} />
         </div>
-        <a href="/"><img src="/7.png" alt="80" style={{ height: 36, display: "block", opacity: 0.5 }} /></a>
-      </footer>
+        <div style={{ animation: walking ? "walkBob 0.4s ease-in-out infinite" : "bob 3s ease-in-out infinite" }}>
+          <img src="/chars/ball.png" alt="EIGHT" style={{ height: 134, display: "block" }} />
+        </div>
+        <div style={{ width: 88, height: 12, borderRadius: "50%", background: "rgba(30,58,95,0.10)", marginTop: -4, filter: "blur(3px)", animation: walking ? "shadowWalk 0.4s ease-in-out infinite" : "shadowBob 3s ease-in-out infinite" }} />
+        <p style={{ ...hf, fontSize: 10.5, color: MUTED, marginTop: 5, background: "rgba(255,255,255,0.85)", borderRadius: 100, padding: "2px 12px" }}>案内係 EIGHT</p>
+      </div>
 
       <style>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.4; }
+        @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        @keyframes walkBob { 0%,100% { transform: translateY(0) rotate(2deg); } 50% { transform: translateY(-12px) rotate(-2deg); } }
+        @keyframes shadowBob { 0%,100% { transform: scaleX(1); opacity: 1; } 50% { transform: scaleX(0.86); opacity: 0.7; } }
+        @keyframes shadowWalk { 0%,100% { transform: scaleX(1); opacity: 1; } 50% { transform: scaleX(0.7); opacity: 0.5; } }
+        @keyframes bubbleIn { from { opacity: 0; transform: translateY(10px) scale(0.92); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes nudge { 0%,100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
+        @keyframes marqueeL { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        @keyframes flowMove { 0% { left: -4px; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { left: calc(100% - 14px); opacity: 0; } }
+        @keyframes marqueeR { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+        .chara { cursor: pointer; pointer-events: auto; }
+        .chara:hover img { animation: jelly 1.6s ease-in-out !important; }
+        @keyframes jelly {
+          0%, 100% { transform: scale(1, 1) translateY(0); }
+          25% { transform: scale(1.06, 0.94) translateY(2px); }
+          50% { transform: scale(0.95, 1.05) translateY(-7px); }
+          75% { transform: scale(1.03, 0.97) translateY(1px); }
         }
-        @keyframes blink {
-          0%, 100% { opacity: 0.2; }
-          50% { opacity: 1; }
+        .chara-card { transition: transform 0.5s cubic-bezier(0.34,1.2,0.64,1), box-shadow 0.5s; }
+        .chara-card:hover { transform: translateY(-6px); box-shadow: 0 20px 44px rgba(30,58,95,0.12); }
+        .workcard { transition: transform 0.4s, box-shadow 0.4s; display: block; }
+        .workcard:hover { transform: translateY(-5px); box-shadow: 0 20px 44px rgba(30,58,95,0.12); }
+        .cta { transition: transform 0.25s, box-shadow 0.25s; }
+        .cta:hover { transform: translateY(-2px); }
+        @supports (animation-timeline: view()) {
+          .rv { animation: rvIn 1ms linear both; animation-timeline: view(); animation-range: entry 5% entry 34%; }
         }
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(4px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @media (max-width: 768px) {
-          .al-services-grid { grid-template-columns: 1fr 1fr !important; }
-          .al-combos-grid { grid-template-columns: 1fr !important; }
-          .al-usecases-grid { grid-template-columns: 1fr 1fr !important; }
-          .al-benefits-grid { grid-template-columns: 1fr !important; }
-          .al-pricing-grid { grid-template-columns: 1fr !important; }
-          .al-process-grid { grid-template-columns: 1fr !important; }
-        }
-        @media (max-width: 480px) {
-          .al-services-grid { grid-template-columns: 1fr !important; }
-          .al-usecases-grid { grid-template-columns: 1fr !important; }
+        @keyframes rvIn { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 980px) {
+          .hero-grid, .show-grid { grid-template-columns: 1fr !important; direction: ltr !important; }
+          .flow-row { flex-direction: column !important; }
+          .lineup-row { flex-wrap: wrap !important; }
+          .flow-row > div { flex-direction: column !important; }
+          .pick-panel { flex-direction: column !important; text-align: center !important; }
+          .team-grid { grid-template-columns: repeat(2, 1fr) !important; }
+          .works-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
     </div>

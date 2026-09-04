@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-  const { message } = await req.json();
+  const { message, system } = await req.json();
 
   if (!message || typeof message !== "string" || message.length > 500) {
     return NextResponse.json({ error: "Invalid message" }, { status: 400 });
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         model: "gpt-4o-mini",
         messages: [
-          { role: "system", content: systemPrompt },
+          { role: "system", content: (typeof system === "string" && system) ? system : systemPrompt },
           { role: "user", content: message },
         ],
         max_tokens: 300,

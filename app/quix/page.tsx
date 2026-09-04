@@ -500,7 +500,7 @@ export default function QuixPage() {
       {/* ── Footer ── */}
       <footer style={{ background: "#020617", padding: isMobile ? "32px 20px" : "40px 64px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ fontSize: 11, color: "rgba(255,255,255,0.2)" }}>© 2025 合同会社80. All rights reserved.</div>
-        <a href="/"><img src="/8.png" alt="80" style={{ height: 40, display: "block", opacity: 0.3 }} /></a>
+        <a href="/"><img src="/logo-mark.png" alt="80" style={{ height: 56, display: "block", opacity: 0.3 }} /></a>
       </footer>
 
       <style>{`

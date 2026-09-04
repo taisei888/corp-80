@@ -384,7 +384,7 @@ export default function Home() {
         }}>
           <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}>
-            <img src={(isMobile && inHero) ? "/8.png" : "/7.png"} alt="80" style={{ height: 40, display: "block", transition: "opacity 0.3s" }} />
+            <img src="/logo-mark.png" alt="80" style={{ height: 56, display: "block", transition: "opacity 0.3s" }} />
           </button>
           <div className="mob-hide" style={{ display: "flex", gap: 36 }}>
             {([["ビジョン","vision"],["事業内容","business"],["プロダクト","product"]] as const).map(([l, id]) => (
@@ -1301,7 +1301,7 @@ export default function Home() {
               {/* Left — logo + tagline */}
               <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                 <div>
-                  <div style={{ marginBottom: 12 }}><img src="/8.png" alt="80" style={{ height: 48, display: "block" }} /></div>
+                  <div style={{ marginBottom: 12 }}><img src="/logo-mark.png" alt="80" style={{ height: 64, display: "block" }} /></div>
                   <div style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", lineHeight: 1.8 }}>
                     人の知覚を、<br />ソフトウェアで拡張する。
                   </div>
