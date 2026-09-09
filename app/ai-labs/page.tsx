@@ -134,10 +134,18 @@ const WORKS = [
   { tag: "自社ツール", title: "経費の自動読み取り", desc: "領収書をスキャンするだけで一覧データ化。自社でも毎日使っています。", img: "/mocks/keihi.png" },
 ];
 
-const PLANS = [
-  { label: "Plan A", name: "受注開発", desc: "御社専用にゼロから構築する開発型プラン", popular: false },
-  { label: "Plan B", name: "月額サブスク", desc: "初期費用を抑えて、月額ですぐ始めるプラン", popular: true },
-  { label: "Plan C", name: "買取予定サブスク", desc: "月額で始めて、将来は自社資産にできるプラン", popular: false },
+// パッケージ商品（月額・従量明記）。金額は税別
+const PACKAGES = [
+  { char: "/chars/drop.png", name: "議事録AI", by: "DROP", price: "24,800",
+    unit: "1チーム", includes: "録音 月30時間まで", over: "超過 800円／時間", popular: false },
+  { char: "/chars/prop-receipts.png", name: "書類読み取り", by: "DONA", price: "19,800",
+    unit: "1事業所", includes: "月500枚まで（領収書・請求書・手書き）", over: "超過 40円／枚", popular: true },
+  { char: "/chars/cloud.png", name: "AIチャットボット", by: "COO", price: "14,800",
+    unit: "1サイト", includes: "月1,000会話まで", over: "超過 3円／会話", popular: false },
+  { char: "/chars/prop-grow.png", name: "社内・社外FAQ", by: "NYOKI", price: "14,800",
+    unit: "1社", includes: "月1,000質問・学習100ファイルまで", over: "超過 3円／質問", popular: false },
+  { char: "/chars/prop-chart.png", name: "サーベイ・満足度調査", by: "EIGHT", price: "19,800",
+    unit: "1組織", includes: "月500回答まで＋AI分析レポート", over: "超過 20円／回答", popular: false },
 ];
 
 const FAQS = [
@@ -172,7 +180,7 @@ const GUIDE_LINES: Record<number, string> = {
   14: "自分たちのサービスも育ててます。",
   15: "NYOKIは使うほど賢くなるんだ。",
   16: "お金の話も、ちゃんとします。",
-  17: "プランは3つ。あとから変えられるよ。",
+  17: "料金は、ぜんぶ先に見せちゃうよ！",
   18: "COOはおしゃべりが上手なんだ。",
   19: "最後まで見てくれてありがとう！",
 };
@@ -753,27 +761,76 @@ export default function StoryPage() {
         </div>
       </section>
 
-      {/* ══ 17. プラン ══ */}
+      {/* ══ 17. 料金 ══ */}
       <section data-scene={scene()} className="sec" style={{ padding: "100px 40px", background: BG_ALT }}>
-        <div style={{ maxWidth: 1020, margin: "0 auto", textAlign: "center" }}>
-          <div className="rv"><SectionLabel>Pricing</SectionLabel>
-          <h2 style={{ ...hf, fontSize: "clamp(26px, 3.2vw, 38px)", lineHeight: 1.6 }}>御社に合う形で。</h2>
-          <p style={{ fontSize: 14, color: MUTED, marginTop: 12 }}>費用は対象業務や機能範囲に応じて個別にお見積もり。全プラン月10時間以上の直接サポート付き。</p></div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20, marginTop: 48 }} className="team-grid">
-            {PLANS.map((p, i) => (
-              <div key={p.label} className="rv workcard" style={{
-                background: "#fff", borderRadius: 22, padding: "34px 24px 30px", position: "relative",
-                border: p.popular ? `2.5px solid ${BLUE}` : "1.5px solid #e8f0f9",
-                boxShadow: p.popular ? "0 18px 46px rgba(59,130,214,0.15)" : "none",
-                transitionDelay: `${i * 0.05}s`,
+        <div style={{ maxWidth: 1060, margin: "0 auto" }}>
+          <div className="rv" style={{ textAlign: "center" }}><SectionLabel>Pricing</SectionLabel>
+          <h2 style={{ ...hf, fontSize: "clamp(26px, 3.2vw, 38px)", lineHeight: 1.6 }}>料金は、先に全部お見せします。</h2>
+          <p style={{ fontSize: 14, color: MUTED, marginTop: 12, lineHeight: 2 }}>ぼくらの仕事は、御社専用の受託開発がすべての土台。<br />よくあるご依頼は、月額のパッケージとしてすぐ始められます。</p></div>
+
+          {/* 受託開発（ベース） */}
+          <div className="rv" style={{ marginTop: 44, background: "#1e3a5f", borderRadius: 26, padding: isMobile ? "28px 22px" : "36px 42px", display: "flex", alignItems: "center", gap: isMobile ? 18 : 36, flexWrap: "wrap", position: "relative", overflow: "hidden" }}>
+            <div style={{ position: "absolute", inset: 0, opacity: 0.5, background: "radial-gradient(ellipse 420px 300px at 85% 20%, rgba(140,190,255,0.2), transparent 70%)" }} />
+            <div style={{ flex: 1, minWidth: 260, position: "relative" }}>
+              <p style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.2em", color: "#8cbeff" }}>BASE ── すべての土台</p>
+              <p style={{ ...hf, fontSize: "clamp(20px, 2.6vw, 27px)", color: "#fff", marginTop: 8 }}>御社専用AIエージェントの受託開発</p>
+              <p style={{ fontSize: 13, color: "rgba(255,255,255,0.75)", lineHeight: 2, marginTop: 10 }}>
+                業務の診断から設計・開発・運用まで、御社の仕事に合わせてゼロからつくります。月10時間以上の直接サポート付き。将来の買い取り（自社資産化）にも対応します。
+              </p>
+            </div>
+            <div style={{ textAlign: "center", position: "relative", flexShrink: 0 }}>
+              <p style={{ ...hf, fontSize: 26, color: "#fff" }}>要お見積もり</p>
+              <p style={{ fontSize: 11.5, color: "rgba(255,255,255,0.7)", marginTop: 4 }}>無料相談でその場で概算をご提示</p>
+              <a href="/contact" className="cta" style={{ ...hf, display: "inline-block", fontSize: 13.5, color: "#1e3a5f", background: "#fff", textDecoration: "none", padding: "13px 32px", borderRadius: 100, marginTop: 14 }}>見積もりを相談する</a>
+            </div>
+          </div>
+
+          {/* パッケージ（月額・従量明記） */}
+          <p className="rv" style={{ ...hf, fontSize: 16, color: NAVY, marginTop: 40, textAlign: "center" }}>
+            パッケージ商品（月額）── <span style={{ color: BLUE }}>使う量まで、先に明記します。</span>
+          </p>
+          <p className="rv" style={{ fontSize: 12.5, color: MUTED, textAlign: "center", marginTop: 8 }}>セットアップもサポートも込み。事務スタッフをひとり増やす<b style={{ color: NAVY }}>10分の1以下</b>のコストです。</p>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)", gap: 18, marginTop: 26 }}>
+            {PACKAGES.map((pk, i) => (
+              <div key={pk.name} className="rv workcard" style={{
+                background: "#fff", borderRadius: 22, padding: "24px 22px 22px", position: "relative",
+                border: pk.popular ? `2.5px solid ${BLUE}` : "1.5px solid #e8f0f9",
+                boxShadow: pk.popular ? "0 18px 46px rgba(59,130,214,0.15)" : "none",
+                transitionDelay: `${i * 0.04}s`, textAlign: "left",
               }}>
-                {p.popular && <span style={{ ...hf, position: "absolute", top: -13, left: "50%", transform: "translateX(-50%)", fontSize: 11, background: "#ff9718", color: "#fff", borderRadius: 100, padding: "5px 18px", boxShadow: "0 4px 12px rgba(255,151,24,0.4)" }}>いちばん人気</span>}
-                <p style={{ fontSize: 11, fontWeight: 800, color: BLUE, letterSpacing: "0.15em" }}>{p.label}</p>
-                <p style={{ ...hf, fontSize: 19, marginTop: 7 }}>{p.name}</p>
-                <p style={{ fontSize: 12.5, color: MUTED, lineHeight: 1.9, marginTop: 9 }}>{p.desc}</p>
+                {pk.popular && <span style={{ ...hf, position: "absolute", top: -12, right: 18, fontSize: 10.5, background: "#ff9718", color: "#fff", borderRadius: 100, padding: "4px 14px" }}>人気</span>}
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <img src={pk.char} alt="" style={{ height: 58, flexShrink: 0 }} />
+                  <div>
+                    <p style={{ ...hf, fontSize: 15.5, color: NAVY }}>{pk.name}</p>
+                    <p style={{ fontSize: 10.5, fontWeight: 800, color: BLUE }}>担当：{pk.by}</p>
+                  </div>
+                </div>
+                <p style={{ marginTop: 14 }}>
+                  <span style={{ ...hf, fontSize: 26, color: NAVY }}>月額 {pk.price}円</span>
+                  <span style={{ fontSize: 11.5, fontWeight: 700, color: MUTED }}>／{pk.unit}（税別）</span>
+                </p>
+                <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 6 }}>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: "#2c4a6b", background: BG_ALT, borderRadius: 10, padding: "8px 12px" }}>✓ {pk.includes}</p>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: "#2c4a6b", background: BG_ALT, borderRadius: 10, padding: "8px 12px" }}>✓ {pk.over}</p>
+                </div>
               </div>
             ))}
+            {/* 共通条件カード */}
+            <div className="rv" style={{ background: "#ecf4fd", borderRadius: 22, padding: "24px 22px", textAlign: "left", border: "1.5px dashed #b9d4f2" }}>
+              <p style={{ ...hf, fontSize: 14.5, color: NAVY }}>全パッケージ共通</p>
+              <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 8, fontSize: 12.5, fontWeight: 700, color: "#2c4a6b", lineHeight: 1.7 }}>
+                <p>・初期設定費 80,000円〜</p>
+                <p>・利用アカウント3名まで込み<br />　（追加 +1,500円／名・月）</p>
+                <p>・契約縛りなし・いつでも解約OK</p>
+                <p>・セットアップ・サポート込み</p>
+                <p>・組み合わせ導入で月額10%オフ</p>
+              </div>
+            </div>
           </div>
+          <p className="rv" style={{ fontSize: 12, color: MUTED, textAlign: "center", marginTop: 22, lineHeight: 1.9 }}>
+            パッケージに御社仕様のカスタマイズを加える場合は、受託開発としてお見積もりします。IT導入補助金のご案内も無料相談で。
+          </p>
         </div>
       </section>
 
