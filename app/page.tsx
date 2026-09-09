@@ -214,17 +214,6 @@ export default function Home() {
   const [navScrolled, setNavScrolled] = useState(false);
   const [inHero, setInHero] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
-  const [newsItems, setNewsItems] = useState<Array<{title:string;source:string;link:string;pubDate:string}>>([]);
-  const [newsLoading, setNewsLoading] = useState(true);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [typedText, setTypedText] = useState("");
-  const [typingDone, setTypingDone] = useState(false);
-  const [aiStatus, setAiStatus] = useState("> ニュースソースに接続中...");
-  const [translating, setTranslating] = useState(false);
-  const [translated, setTranslated] = useState("");
-  const [summarizing, setSummarizing] = useState(false);
-  const [aiSummary, setAiSummary] = useState("");
-
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
@@ -246,121 +235,6 @@ export default function Home() {
       io.disconnect();
     };
   }, []);
-
-  // Fetch real news
-  useEffect(() => {
-    setNewsLoading(true);
-    fetch("/api/news")
-      .then(r => r.json())
-      .then(d => setNewsItems(d.items || []))
-      .catch(() => setNewsItems([]))
-      .finally(() => setNewsLoading(false));
-  }, []);
-
-  // AI status messages during loading
-  useEffect(() => {
-    if (!newsLoading) {
-      setAiStatus(newsItems.length > 0 ? `> 完了。${newsItems.length}件のニュースを取得しました。` : "> ニュースを取得できませんでした。");
-      return;
-    }
-    const msgs = ["> ニュースソースに接続中...", "> ヘッドラインを抽出中...", "> AIが分析中..."];
-    let idx = 0;
-    setAiStatus(msgs[0]);
-    const timer = setInterval(() => { idx = (idx + 1) % msgs.length; setAiStatus(msgs[idx]); }, 1200);
-    return () => clearInterval(timer);
-  }, [newsLoading, newsItems.length]);
-
-  // Typewriter effect for current headline
-  useEffect(() => {
-    if (newsItems.length === 0 || newsLoading) return;
-    const headline = newsItems[activeIndex]?.title || "";
-    setTypedText("");
-    setTypingDone(false);
-    setTranslated("");
-    setAiSummary("");
-    let i = 0;
-    const timer = setInterval(() => {
-      i += 2;
-      if (i >= headline.length) { i = headline.length; clearInterval(timer); setTypedText(headline); setTypingDone(true); return; }
-      setTypedText(headline.slice(0, i));
-    }, 50);
-    return () => clearInterval(timer);
-  }, [activeIndex, newsItems, newsLoading]);
-
-  // Auto-advance to next headline (pause when AI result is showing)
-  useEffect(() => {
-    if (!typingDone || newsItems.length <= 1 || aiSummary || translated || summarizing || translating) return;
-    const timer = setTimeout(() => {
-      setActiveIndex(prev => (prev + 1) % newsItems.length);
-    }, 6000);
-    return () => clearTimeout(timer);
-  }, [typingDone, newsItems.length, activeIndex, aiSummary, translated, summarizing, translating]);
-
-  const handleTranslate = async () => {
-    if (translating || newsItems.length === 0) return;
-    setTranslating(true);
-    setTranslated("");
-    try {
-      const res = await fetch("/api/ai-chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          system: "Translate the following Japanese news headline to natural English. Return only the translation, nothing else.",
-          message: newsItems[activeIndex].title,
-        }),
-      });
-      const data = await res.json();
-      setTranslated(data.reply || "Translation failed.");
-    } catch {
-      setTranslated("Translation failed.");
-    } finally {
-      setTranslating(false);
-    }
-  };
-
-  const handleSummary = async () => {
-    if (summarizing || newsItems.length === 0) return;
-    setSummarizing(true);
-    setAiSummary("");
-    try {
-      const res = await fetch("/api/ai-chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          system: "あなたはニュースアナリストです。以下のニュース見出しについて、背景や意味を3行程度で簡潔に解説してください。日本語で回答してください。",
-          message: newsItems[activeIndex].title,
-        }),
-      });
-      const data = await res.json();
-      setAiSummary(data.reply || "解説を生成できませんでした。");
-    } catch {
-      setAiSummary("解説を生成できませんでした。");
-    } finally {
-      setSummarizing(false);
-    }
-  };
-
-  const handleDownload = () => {
-    if (newsItems.length === 0) return;
-    const today = new Date();
-    const fname = `news_${today.getFullYear()}${String(today.getMonth()+1).padStart(2,"0")}${String(today.getDate()).padStart(2,"0")}.txt`;
-    const lines = newsItems.map((n, i) => `${i+1}. ${n.title}\n   ${n.source} | ${n.link}`).join("\n\n");
-    const blob = new Blob([lines], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = fname; a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const timeAgo = (pubDate: string) => {
-    if (!pubDate) return "";
-    const diff = Date.now() - new Date(pubDate).getTime();
-    const mins = Math.floor(diff / 60000);
-    if (mins < 60) return `${mins}分前`;
-    const hrs = Math.floor(mins / 60);
-    if (hrs < 24) return `${hrs}時間前`;
-    return `${Math.floor(hrs / 24)}日前`;
-  };
 
   const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
@@ -410,11 +284,11 @@ export default function Home() {
           </a>
         </nav>
 
-        {/* ── News Hero ── */}
+        {/* ── Character Hero ── */}
         <section style={{
           minHeight: "100vh", display: "flex", flexDirection: "column",
           justifyContent: "center", alignItems: "center",
-          padding: isMobile ? "100px 20px 60px" : "120px 48px 80px",
+          padding: isMobile ? "100px 20px 170px" : "120px 48px 200px",
           background: "#fff", position: "relative", overflow: "hidden",
         }}>
           {/* Background grid */}
@@ -427,307 +301,90 @@ export default function Home() {
             }} />
           </div>
 
-          <div style={{ maxWidth: 800, width: "100%", position: "relative" }}>
-
-            {/* AI Status terminal line */}
+          <div style={{ maxWidth: 880, width: "100%", position: "relative", textAlign: "center" }}>
             <div style={{
+              display: "inline-flex", alignItems: "center", gap: 8,
+              padding: "6px 16px", borderRadius: 100,
+              border: "1px solid #e2e8f0",
+              fontSize: 11, fontWeight: 600, color: "#64748b",
+              letterSpacing: "0.08em", marginBottom: 28,
               fontFamily: "'SF Mono', 'Fira Code', Menlo, monospace",
-              fontSize: 11, color: newsLoading ? "#6366f1" : "#22c55e",
-              marginBottom: 20, textAlign: "center",
-              transition: "color 0.3s",
             }}>
-              {aiStatus}
-              {newsLoading && (
-                <span style={{ display: "inline-block", width: 6, height: 12, background: "#6366f1", marginLeft: 4, verticalAlign: "text-bottom", animation: "cursor-blink 1s step-end infinite" }} />
-              )}
-            </div>
-
-            {/* Title */}
-            <div style={{ textAlign: "center", marginBottom: isMobile ? 28 : 36 }}>
-              <div style={{
-                display: "inline-flex", alignItems: "center", gap: 8,
-                padding: "6px 16px", borderRadius: 100,
-                border: "1px solid #e2e8f0",
-                fontSize: 11, fontWeight: 600, color: "#64748b",
-                letterSpacing: "0.08em", marginBottom: 24,
-                fontFamily: "'SF Mono', 'Fira Code', Menlo, monospace",
-              }}>
-                <span style={{
-                  width: 6, height: 6, borderRadius: "50%", background: "#22c55e",
-                  boxShadow: "0 0 6px rgba(34,197,94,0.4)",
-                  animation: "pulse-dot 2s ease-in-out infinite",
-                }} />
-                {(() => { const d = new Date(); return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,"0")}.${String(d.getDate()).padStart(2,"0")}`; })()}
-              </div>
-              <h1 style={{
-                fontSize: isMobile ? "clamp(44px, 12vw, 60px)" : "clamp(64px, 7vw, 96px)",
-                fontWeight: 900, lineHeight: 1, letterSpacing: "-0.05em",
-                color: "#0f172a", marginBottom: 14,
-              }}>
-                Today&apos;s{!isMobile && " "}{isMobile && <br />}
-                <span style={{
-                  background: "linear-gradient(135deg, #6366f1, #8b5cf6, #6366f1)",
-                  backgroundSize: "200% 200%",
-                  animation: "shimmer 3s ease infinite",
-                  WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-                }}>News</span>
-              </h1>
-              <p style={{ fontSize: 12, color: "#94a3b8", fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase" }}>
-                AI &amp; Technology — 合同会社80
-              </p>
-            </div>
-
-            {/* ── Terminal Card ── */}
-            <div className="terminal-glow" style={{
-              borderRadius: 20, overflow: "hidden",
-              background: "#0f172a",
-              boxShadow: "0 12px 60px rgba(99,102,241,0.15), 0 0 0 1px rgba(99,102,241,0.15)",
-              marginBottom: 20, position: "relative",
-            }}>
-              {/* Animated border glow */}
-              <div style={{
-                position: "absolute", inset: -1, borderRadius: 21, zIndex: 0, pointerEvents: "none",
-                background: "conic-gradient(from 0deg, transparent 40%, rgba(99,102,241,0.4) 50%, transparent 60%)",
-                animation: "rotate-glow 4s linear infinite",
-                willChange: "transform",
+              <span style={{
+                width: 6, height: 6, borderRadius: "50%", background: "#22c55e",
+                boxShadow: "0 0 6px rgba(34,197,94,0.4)",
+                animation: "pulse-dot 2s ease-in-out infinite",
               }} />
-              <div style={{ position: "relative", zIndex: 1, background: "#0f172a", borderRadius: 19, overflow: "hidden" }}>
-
-                {/* Terminal header */}
-                <div style={{
-                  padding: "12px 20px",
-                  display: "flex", alignItems: "center", justifyContent: "space-between",
-                  background: "#1e293b",
-                  borderBottom: "1px solid rgba(255,255,255,0.06)",
-                }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <div style={{ display: "flex", gap: 6 }}>
-                      <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#ef4444" }} />
-                      <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#f59e0b" }} />
-                      <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#22c55e" }} />
-                    </div>
-                    <span style={{
-                      fontSize: 11, fontWeight: 500, color: "rgba(148,163,184,0.6)",
-                      fontFamily: "'SF Mono', 'Fira Code', Menlo, monospace", marginLeft: 6,
-                    }}>
-                      news.ai — headlines
-                    </span>
-                  </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    {!newsLoading && newsItems.length > 0 && (
-                      <span style={{
-                        fontSize: 10, fontWeight: 800, color: "#6366f1",
-                        fontFamily: "'SF Mono', 'Fira Code', Menlo, monospace",
-                        letterSpacing: "0.1em",
-                      }}>
-                        {String(activeIndex + 1).padStart(2, "0")}/{String(newsItems.length).padStart(2, "0")}
-                      </span>
-                    )}
-                    <span style={{
-                      fontSize: 9, fontWeight: 700, color: "#22c55e",
-                      letterSpacing: "0.12em", textTransform: "uppercase",
-                      padding: "3px 10px", borderRadius: 100,
-                      background: "rgba(34,197,94,0.1)",
-                      border: "1px solid rgba(34,197,94,0.2)",
-                      display: "flex", alignItems: "center", gap: 5,
-                    }}>
-                      <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#22c55e", animation: "pulse-dot 2s ease-in-out infinite" }} />
-                      LIVE
-                    </span>
-                  </div>
-                </div>
-
-                {/* Scan line effect */}
-                <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 2, background: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.01) 2px, rgba(255,255,255,0.01) 4px)" }} />
-
-                {/* Terminal body — fixed height */}
-                <div style={{ padding: isMobile ? "28px 20px 20px" : "36px 36px 28px", height: isMobile ? 180 : 200, display: "flex", flexDirection: "column", justifyContent: "center" }}>
-                  {newsLoading ? (
-                    <div style={{ display: "flex", flexDirection: "column", gap: 14, alignItems: "flex-start" }}>
-                      {[85, 65, 45].map((w, i) => (
-                        <div key={i} style={{
-                          height: 16, borderRadius: 4,
-                          background: "linear-gradient(90deg, rgba(99,102,241,0.1) 25%, rgba(99,102,241,0.2) 50%, rgba(99,102,241,0.1) 75%)",
-                          backgroundSize: "200% 100%",
-                          animation: "shimmer 1.8s ease-in-out infinite",
-                          animationDelay: `${i * 0.15}s`,
-                          width: `${w}%`,
-                        }} />
-                      ))}
-                    </div>
-                  ) : newsItems.length === 0 ? (
-                    <div style={{ color: "#64748b", fontSize: 14, textAlign: "center" }}>
-                      ニュースを取得できませんでした
-                    </div>
-                  ) : (
-                    <>
-                      {/* Headline — 3 lines max */}
-                      <h2 style={{
-                        fontSize: isMobile ? 20 : 26,
-                        fontWeight: 700, lineHeight: 1.65, letterSpacing: "-0.01em",
-                        color: "#f1f5f9", marginBottom: 16,
-                        overflow: "hidden",
-                        display: "-webkit-box",
-                        WebkitLineClamp: 3,
-                        WebkitBoxOrient: "vertical" as const,
-                      }}>
-                        {typedText}
-                        {!typingDone && (
-                          <span style={{
-                            display: "inline-block", width: 3, height: "0.85em",
-                            background: "#6366f1", marginLeft: 3, verticalAlign: "text-bottom",
-                            animation: "cursor-blink 1s step-end infinite",
-                          }} />
-                        )}
-                      </h2>
-
-                      {/* Source + time + link */}
-                      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-                        {newsItems[activeIndex]?.source && (
-                          <span style={{
-                            fontSize: 11, fontWeight: 600, color: "#a5b4fc",
-                            padding: "3px 10px", borderRadius: 100,
-                            background: "rgba(99,102,241,0.15)",
-                            border: "1px solid rgba(99,102,241,0.2)",
-                          }}>
-                            {newsItems[activeIndex].source}
-                          </span>
-                        )}
-                        {newsItems[activeIndex]?.pubDate && (
-                          <span style={{ fontSize: 11, color: "#64748b", fontFamily: "'SF Mono', 'Fira Code', Menlo, monospace" }}>
-                            {timeAgo(newsItems[activeIndex].pubDate)}
-                          </span>
-                        )}
-                        <a href={newsItems[activeIndex]?.link} target="_blank" rel="noopener noreferrer"
-                          style={{ fontSize: 11, color: "#6366f1", textDecoration: "none", fontWeight: 600, display: "flex", alignItems: "center", gap: 3, marginLeft: "auto" }}>
-                          記事を読む
-                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                            <path d="M7 17L17 7M17 7H7M17 7v10"/>
-                          </svg>
-                        </a>
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                {/* Dot indicators inside terminal */}
-                {!newsLoading && newsItems.length > 0 && (
-                  <div style={{
-                    padding: "0 36px 18px",
-                    display: "flex", gap: 6, justifyContent: "center",
-                  }}>
-                    {newsItems.map((_, i) => (
-                      <button key={i} onClick={() => setActiveIndex(i)}
-                        style={{
-                          width: activeIndex === i ? 24 : 8, height: 6,
-                          borderRadius: 100, border: "none", cursor: "pointer",
-                          background: activeIndex === i ? "#6366f1" : "rgba(255,255,255,0.1)",
-                          transition: "all 0.3s cubic-bezier(0.16,1,0.3,1)",
-                          padding: 0,
-                        }}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
+              AI AGENT STUDIO — 合同会社80
             </div>
-
-            {/* AI result panels */}
-            {translated && (
-              <div style={{
-                border: "1px solid #c7d2fe", borderRadius: 12,
-                padding: isMobile ? "16px 16px" : "20px 24px",
-                marginBottom: 12,
-                background: "linear-gradient(180deg, #fafbff, #f5f3ff)",
-                animation: "fade-up 0.4s ease both",
-              }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
-                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="#6366f1" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 21l5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 016-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 01-3.827-5.802" />
-                  </svg>
-                  <span style={{ fontSize: 10, fontWeight: 700, color: "#6366f1", letterSpacing: "0.12em" }}>ENGLISH TRANSLATION</span>
-                </div>
-                <div style={{ fontSize: isMobile ? 14 : 15, color: "#334155", lineHeight: 1.8 }}>{translated}</div>
-              </div>
-            )}
-
-            {aiSummary && (
-              <div style={{
-                border: "1px solid #bbf7d0", borderRadius: 12,
-                padding: isMobile ? "16px 16px" : "20px 24px",
-                marginBottom: 12,
-                background: "linear-gradient(180deg, #f0fdf4, #ecfdf5)",
-                animation: "fade-up 0.4s ease both",
-              }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
-                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="#16a34a" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
-                  </svg>
-                  <span style={{ fontSize: 10, fontWeight: 700, color: "#16a34a", letterSpacing: "0.12em" }}>AI ANALYSIS</span>
-                </div>
-                <div style={{ fontSize: isMobile ? 13 : 14, color: "#334155", lineHeight: 1.9, whiteSpace: "pre-wrap" }}>{aiSummary}</div>
-              </div>
-            )}
-
-            {/* Action buttons */}
-            {!newsLoading && newsItems.length > 0 && typingDone && (
-              <div style={{
-                display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap",
-                animation: "fade-up 0.5s ease both",
-              }}>
-                {/* AI Analysis */}
-                <button onClick={handleSummary} disabled={summarizing} style={{
-                  display: "flex", alignItems: "center", gap: 7,
-                  padding: "11px 20px", borderRadius: 10,
-                  border: "1.5px solid #6366f1", background: "#6366f1", color: "#fff",
-                  fontSize: 12, fontWeight: 700,
-                  cursor: summarizing ? "wait" : "pointer", transition: "all 0.25s", fontFamily: "inherit",
-                  opacity: summarizing ? 0.7 : 1,
-                }}
-                  onMouseEnter={e => { if(!summarizing){ e.currentTarget.style.background="#4f46e5"; e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow="0 6px 20px rgba(99,102,241,0.3)"; } }}
-                  onMouseLeave={e => { e.currentTarget.style.background="#6366f1"; e.currentTarget.style.transform=""; e.currentTarget.style.boxShadow="none"; }}
-                >
-                  <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
-                  </svg>
-                  {summarizing ? "分析中..." : aiSummary ? "再分析" : "AI解説"}
-                </button>
-
-                {/* Translate */}
-                <button onClick={handleTranslate} disabled={translating} style={{
-                  display: "flex", alignItems: "center", gap: 7,
-                  padding: "11px 20px", borderRadius: 10, border: "1.5px solid #e2e8f0",
-                  background: "#fff", color: translating ? "#94a3b8" : "#475569", fontSize: 12, fontWeight: 600,
-                  cursor: translating ? "wait" : "pointer", transition: "all 0.25s", fontFamily: "inherit",
-                }}
-                  onMouseEnter={e => { if(!translating){ e.currentTarget.style.borderColor="#6366f1"; e.currentTarget.style.color="#6366f1"; e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow="0 4px 12px rgba(99,102,241,0.1)"; } }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor="#e2e8f0"; e.currentTarget.style.color=translating?"#94a3b8":"#475569"; e.currentTarget.style.transform=""; e.currentTarget.style.boxShadow="none"; }}
-                >
-                  <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 21l5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 016-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 01-3.827-5.802" />
-                  </svg>
-                  {translating ? "翻訳中..." : translated ? "翻訳済み" : "英語翻訳"}
-                </button>
-
-                {/* Download */}
-                <button onClick={handleDownload} style={{
-                  display: "flex", alignItems: "center", gap: 7,
-                  padding: "11px 20px", borderRadius: 10, border: "1.5px solid #e2e8f0",
-                  background: "#fff", color: "#475569", fontSize: 12, fontWeight: 600,
-                  cursor: "pointer", transition: "all 0.25s", fontFamily: "inherit",
-                }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor="#0f172a"; e.currentTarget.style.color="#0f172a"; e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow="0 4px 12px rgba(0,0,0,0.08)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor="#e2e8f0"; e.currentTarget.style.color="#475569"; e.currentTarget.style.transform=""; e.currentTarget.style.boxShadow="none"; }}
-                >
-                  <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                  </svg>
-                  全件DL
-                </button>
-              </div>
-            )}
+            <h1 style={{
+              fontSize: isMobile ? "clamp(36px, 10.5vw, 52px)" : "clamp(52px, 6vw, 84px)",
+              fontWeight: 900, lineHeight: 1.15, letterSpacing: "-0.04em",
+              color: "#0f172a", marginBottom: 22,
+            }}>
+              御社専用の、<br />
+              <span style={{
+                background: "linear-gradient(135deg, #6366f1, #8b5cf6, #6366f1)",
+                backgroundSize: "200% 200%",
+                animation: "shimmer 3s ease infinite",
+                WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+              }}>AIエージェント</span>。
+            </h1>
+            <p style={{ fontSize: isMobile ? 14 : 16, color: "#64748b", lineHeight: 2, marginBottom: 36 }}>
+              議事録、書類の読み取り、電話、FAQ対応。<br />
+              白いなかまたちが、御社のめんどうな仕事を代わりに働きます。
+            </p>
+            <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+              <a href="/ai-labs" style={{
+                padding: "15px 32px", borderRadius: 12, border: "none",
+                background: "#0f172a", color: "#fff", fontSize: 14, fontWeight: 700,
+                textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8,
+                transition: "all 0.25s",
+              }}
+                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(15,23,42,0.25)"; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = "none"; }}>
+                AI LABを見る <span>→</span>
+              </a>
+              <a href="/demo" style={{
+                padding: "15px 32px", borderRadius: 12, border: "1.5px solid #e2e8f0",
+                background: "#fff", color: "#0f172a", fontSize: 14, fontWeight: 700,
+                textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8,
+                transition: "all 0.25s",
+              }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = "#6366f1"; e.currentTarget.style.color = "#6366f1"; e.currentTarget.style.transform = "translateY(-2px)"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = "#e2e8f0"; e.currentTarget.style.color = "#0f172a"; e.currentTarget.style.transform = ""; }}>
+                さわって体験する
+              </a>
+            </div>
           </div>
 
+          {/* ── Walking characters ── */}
+          <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: isMobile ? 130 : 180, pointerEvents: "none", zIndex: 2 }}>
+            <div style={{ position: "absolute", left: 0, right: 0, bottom: isMobile ? 30 : 40, height: 1.5,
+              background: "linear-gradient(90deg, transparent, #e2e8f0 12%, #e2e8f0 88%, transparent)" }} />
+            {([
+              { src: "/chars/longlegs.png", h: 112, dur: 36, delay: 0, bob: 0.55 },
+              { src: "/chars/ball.png", h: 80, dur: 29, delay: -9, bob: 0.48 },
+              { src: "/chars/drop.png", h: 66, dur: 42, delay: -22, bob: 0.62 },
+              { src: "/chars/cyclops.png", h: 74, dur: 32, delay: -15, bob: 0.5 },
+              { src: "/chars/donut.png", h: 64, dur: 39, delay: -30, bob: 0.58 },
+              { src: "/chars/star.png", h: 56, dur: 26, delay: -4, bob: 0.45 },
+              { src: "/chars/cloud.png", h: 60, dur: 46, delay: -36, bob: 0.66 },
+            ] as const).map((w, i) => (
+              <div key={i} style={{
+                position: "absolute", bottom: isMobile ? 32 : 42, left: 0,
+                animation: `walk-x ${w.dur}s linear infinite`,
+                animationDelay: `${w.delay}s`, willChange: "transform",
+              }}>
+                <img src={w.src} alt="" style={{
+                  height: isMobile ? w.h * 0.6 : w.h, display: "block",
+                  animation: `walk-bob ${w.bob}s ease-in-out infinite alternate`,
+                }} />
+                <div style={{ width: "55%", height: 7, margin: "3px auto 0", borderRadius: "50%",
+                  background: "rgba(15,23,42,0.1)", filter: "blur(2px)" }} />
+              </div>
+            ))}
+          </div>
         </section>
 
         {/* ── Hero (Desktop) ── */}
@@ -933,67 +590,32 @@ export default function Home() {
             {/* 2×2 grid */}
             <div className="mob-grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
 
-              {/* 01 — quix */}
+              {/* 01 — AI Lab */}
               <div className="sr" style={{ borderRadius: 20, overflow: "hidden", cursor: "pointer" }}
-                onClick={() => window.open("/quix", "_blank")}
-                onMouseEnter={e => { (e.currentTarget.querySelector(".biz-img") as HTMLElement).style.transform = "scale(1.03)"; }}
-                onMouseLeave={e => { (e.currentTarget.querySelector(".biz-img") as HTMLElement).style.transform = "scale(1)"; }}>
-                <div className="biz-img" style={{ height: 380, overflow: "hidden",
-                  transition: "transform 0.6s cubic-bezier(0.16,1,0.3,1)" }}>
-                  <img src="/1.jpg" alt="quix" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                </div>
-                <div style={{ padding: "22px 4px" }}>
-                  <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 8, fontWeight: 600 }}>01</div>
-                  <div style={{ fontSize: 22, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em" }}>quix — 社内AIナレッジ検索</div>
-                  <div style={{ fontSize: 14, color: "#64748b", marginTop: 6, lineHeight: 1.7 }}>チャット形式で社内のFAQ・規程・マニュアルを瞬時に回答。AIが蓄積された知識を自動整理し、問い合わせ工数を大幅削減します。</div>
-                </div>
-              </div>
-
-              {/* 02 — LENDS AI */}
-              <div className="sr" style={{ borderRadius: 20, overflow: "hidden", cursor: "pointer", transitionDelay: "0.08s" }}
-                onClick={() => window.open("https://www.lens-ai.jp", "_blank")}
-                onMouseEnter={e => { (e.currentTarget.querySelector(".biz-img") as HTMLElement).style.transform = "scale(1.03)"; }}
-                onMouseLeave={e => { (e.currentTarget.querySelector(".biz-img") as HTMLElement).style.transform = "scale(1)"; }}>
-                <div className="biz-img" style={{ height: 380, overflow: "hidden",
-                  transition: "transform 0.6s cubic-bezier(0.16,1,0.3,1)" }}>
-                  <img src="/2.jpg" alt="LENDS AI" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                </div>
-                <div style={{ padding: "22px 4px" }}>
-                  <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 8, fontWeight: 600 }}>02</div>
-                  <div style={{ fontSize: 22, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em" }}>LENDS AI — 組織診断AI</div>
-                  <div style={{ fontSize: 14, color: "#64748b", marginTop: 6, lineHeight: 1.7 }}>組織の状態をAIで可視化するSaaSプロダクト。人事課題の早期発見から採用・育成まで一気通貫で支援します。</div>
-                </div>
-              </div>
-
-              {/* 03 — AI Labs */}
-              <div className="sr" style={{ borderRadius: 20, overflow: "hidden", cursor: "pointer", transitionDelay: "0.16s" }}
                 onClick={() => window.open("/ai-labs", "_blank")}
                 onMouseEnter={e => { (e.currentTarget.querySelector(".biz-img") as HTMLElement).style.transform = "scale(1.03)"; }}
                 onMouseLeave={e => { (e.currentTarget.querySelector(".biz-img") as HTMLElement).style.transform = "scale(1)"; }}>
                 <div className="biz-img" style={{ height: 380, overflow: "hidden",
                   transition: "transform 0.6s cubic-bezier(0.16,1,0.3,1)" }}>
-                  <img src="/3.jpg" alt="AI Labs" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                  <img src="/3.jpg" alt="AI Lab" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                 </div>
                 <div style={{ padding: "22px 4px" }}>
-                  <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 8, fontWeight: 600 }}>03</div>
-                  <div style={{ fontSize: 22, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em" }}>AI Labs — 業務AI受託開発</div>
-                  <div style={{ fontSize: 14, color: "#64748b", marginTop: 6, lineHeight: 1.7 }}>LLM・RAG・業務自動化を軸としたAIシステムをオーダーメイドで開発。現場課題を技術で根本から解決します。</div>
+                  <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 8, fontWeight: 600 }}>01</div>
+                  <div style={{ fontSize: 22, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em" }}>AI LAB — 業務AIの受託開発</div>
+                  <div style={{ fontSize: 14, color: "#64748b", marginTop: 6, lineHeight: 1.7 }}>御社専用のAIエージェントをオーダーメイドで開発。議事録・書類読み取り・チャットボット・FAQ・サーベイ分析などのパッケージ商品もご用意しています。</div>
                 </div>
               </div>
 
-              {/* 04 — jGO */}
-              <div className="sr" style={{ borderRadius: 20, overflow: "hidden", cursor: "default", transitionDelay: "0.24s", opacity: 0.7 }}>
+              {/* 02 — 人材 */}
+              <div className="sr" style={{ borderRadius: 20, overflow: "hidden", transitionDelay: "0.08s" }}>
                 <div className="biz-img" style={{ height: 380, overflow: "hidden",
                   transition: "transform 0.6s cubic-bezier(0.16,1,0.3,1)" }}>
-                  <img src="/4.jpg" alt="jGO" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                  <img src="/4.jpg" alt="人材紹介" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                 </div>
                 <div style={{ padding: "22px 4px" }}>
-                  <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 8, fontWeight: 600 }}>04</div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                    <div style={{ fontSize: 22, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em" }}>jGO — 人材紹介</div>
-                    <span style={{ fontSize: 10, fontWeight: 700, padding: "3px 10px", borderRadius: 100, background: "#f1f5f9", color: "#94a3b8", letterSpacing: "0.06em" }}>Coming Soon</span>
-                  </div>
-                  <div style={{ fontSize: 14, color: "#64748b", marginTop: 6, lineHeight: 1.7 }}>グローバル視点で人材と企業をつなぐキャリア支援サービス。テクノロジーと人の知見で最適なマッチングを実現します。（有料職業紹介事業）</div>
+                  <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 8, fontWeight: 600 }}>02</div>
+                  <div style={{ fontSize: 22, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em" }}>人材紹介</div>
+                  <div style={{ fontSize: 14, color: "#64748b", marginTop: 6, lineHeight: 1.7 }}>企業と人材を丁寧につなぐキャリア支援サービス。テクノロジーと人の知見で最適なマッチングを実現します。（有料職業紹介事業　許可番号 23-ユ-303078）</div>
                 </div>
               </div>
 
@@ -1189,47 +811,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── News ── */}
-        <section id="news" className="mob-section" style={{ background: "#fff", padding: "120px 64px 140px" }}>
-          <div style={{ maxWidth: 1160, margin: "0 auto" }}>
-            <div className="sr" style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 64 }}>
-              <h2 style={{ fontSize: "clamp(48px, 7vw, 96px)", fontWeight: 900, letterSpacing: "-0.05em", color: "#0f172a", lineHeight: 1 }}>News</h2>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "#6366f1", letterSpacing: "0.1em", textTransform: "uppercase" }}>Latest Updates</div>
-            </div>
-
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              {[
-                { date: "2026.06", cat: "Research", title: "RAGパイプラインの精度向上に関する社内検証を実施", desc: "チャンク分割戦略とリランキングモデルの組み合わせにより、社内FAQ検索の回答精度を従来比で約25%改善。" },
-                { date: "2026.04", cat: "Research", title: "マルチモーダルLLMを活用した業務文書解析の研究開発", desc: "画像・表・PDFを含む業務文書をLLMで構造的に解析する手法を検証中。請求書・契約書の自動処理への応用を目指す。" },
-                { date: "2026.02", cat: "Research", title: "LLMエージェントによる業務フロー自動化の技術検証", desc: "複数ツールを跨いだタスクをAIエージェントが自律的に処理する仕組みのPoC開発に着手。" },
-                { date: "2025.12", cat: "Product",  title: "LENDS AI 新機能「採用アセスメント」正式リリース", desc: "心理・論理・コミュニケーション・敬語の4軸で候補者を自動評価する採用アセスメント機能を追加しました。" },
-                { date: "2025.10", cat: "Research", title: "小規模LLMのファインチューニングによる業務特化AI検証", desc: "オープンソースLLMを業務データで追加学習し、汎用モデルと比較してドメイン特化タスクの精度向上を確認。" },
-              ].map((item, i) => (
-                <div key={i} className="sr mob-news-item" style={{
-                  display: "grid", gridTemplateColumns: "120px 80px 1fr",
-                  gap: "0 40px", alignItems: "start",
-                  padding: "32px 0", borderTop: "1px solid #e2e8f0",
-                  transitionDelay: `${i * 0.06}s`, cursor: "pointer",
-                  transition: "opacity 0.2s",
-                }}
-                  onMouseEnter={e => (e.currentTarget.style.opacity = "0.6")}
-                  onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
-                >
-                  <div style={{ fontSize: 12, color: "#94a3b8", fontWeight: 600, letterSpacing: "0.06em", paddingTop: 4 }}>{item.date}</div>
-                  <div>
-                    <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 100,
-                      background: "#eef2ff", color: "#6366f1", letterSpacing: "0.06em" }}>{item.cat}</span>
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 16, fontWeight: 700, color: "#0f172a", marginBottom: 8, lineHeight: 1.5 }}>{item.title}</div>
-                    <div style={{ fontSize: 13, color: "#64748b", lineHeight: 1.8 }}>{item.desc}</div>
-                  </div>
-                </div>
-              ))}
-              <div style={{ borderTop: "1px solid #e2e8f0" }} />
-            </div>
-          </div>
-        </section>
 
         {/* ── Recruit ── */}
         <section id="recruit" className="mob-section" style={{ background: "#111827", padding: "120px 64px 140px" }}>
@@ -1352,7 +933,7 @@ export default function Home() {
                     <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.1)" }} />
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                    {[["ビジョン","vision"],["ニュース","news"],["採用","recruit"]].map(([l, id]) => (
+                    {[["ビジョン","vision"],["事業内容","business"],["採用","recruit"]].map(([l, id]) => (
                       <button key={l} onClick={() => document.getElementById(id)?.scrollIntoView({ behavior:"smooth" })}
                         style={{ background:"none", border:"none", cursor:"pointer", padding:0, textAlign:"left",
                           fontSize:13, color:"rgba(255,255,255,0.45)", fontFamily:"inherit", transition:"color 0.2s" }}
@@ -1415,6 +996,14 @@ export default function Home() {
         @media (max-width: 768px) {
           .mob-hide { display: none !important; }
 
+          @keyframes walk-x {
+            from { transform: translateX(-160px); }
+            to { transform: translateX(calc(100vw + 160px)); }
+          }
+          @keyframes walk-bob {
+            from { transform: translateY(0) rotate(-2deg); }
+            to { transform: translateY(-7px) rotate(2deg); }
+          }
           .mob-section {
             padding-left: 20px !important;
             padding-right: 20px !important;
