@@ -97,6 +97,37 @@ function DotCanvas() {
   return <canvas ref={ref} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }} />;
 }
 
+// ─── Count-up number（スクロールで出現したらカウントアップ） ───────────────────
+function CaseNum({ value }: { value: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [display, setDisplay] = useState(value);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const m = value.match(/^([+−-]?)(\d+)(.*)$/);
+    if (!m) return;
+    const [, sign, numStr, suffix] = m;
+    const target = parseInt(numStr, 10);
+    setDisplay(`${sign}0${suffix}`);
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      const t0 = performance.now();
+      const dur = 1300;
+      const tick = (t: number) => {
+        const p = Math.min(1, (t - t0) / dur);
+        const eased = 1 - Math.pow(1 - p, 3);
+        setDisplay(`${sign}${Math.round(target * eased)}${suffix}`);
+        if (p < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }, { threshold: 0.5 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [value]);
+  return <span ref={ref} className="case-num">{display}</span>;
+}
+
 // ─── Particle Text Canvas ─────────────────────────────────────────────────────
 function ParticleTextCanvas() {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -604,13 +635,13 @@ export default function Home() {
         </section>
 
 
-        {/* ── Case Studies ── */}
-        <section style={{ background: "#f8fafc", padding: "100px 0 120px", position: "relative", overflow: "hidden" }}>
+        {/* ── Case Studies — 成果ボード ── */}
+        <section className="mob-section" style={{ background: "#f8fafc", padding: "100px 64px 120px", position: "relative", overflow: "hidden" }}>
           <DotCanvas />
 
-          <div style={{ position: "relative", zIndex: 1 }}>
+          <div style={{ position: "relative", zIndex: 1, maxWidth: 1160, margin: "0 auto" }}>
             {/* Header */}
-            <div style={{ maxWidth: 1160, margin: "0 auto 64px", padding: "0 64px", display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
+            <div style={{ marginBottom: 56, display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
               <div>
                 <div className="sr" style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.3em", color: "#64748b", textTransform: "uppercase", marginBottom: 16 }}>Case Studies</div>
                 <h2 className="sr" style={{ fontSize: "clamp(32px, 4vw, 56px)", fontWeight: 900, color: "#0f172a", letterSpacing: "-0.04em", lineHeight: 1.05, transitionDelay: "0.08s" }}>
@@ -622,102 +653,27 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Ticker — row 1 */}
-            <div style={{ overflow: "hidden", marginBottom: 16 }}>
-              <div className="ticker-track" style={{ display: "flex", gap: 16, width: "max-content", padding: "0 16px" }}>
-                {((cards) => [...cards, ...cards])([
-                  { tag: "採用・HR",      title: "入社時テストのAI化",    metric: "−62%", metricLabel: "選考時間", accent: "#64748b", code: "assess.run()" },
-                  { tag: "予約管理",      title: "予約システムのAI化",    metric: "−78%", metricLabel: "対応工数", accent: "#94a3b8", code: "booking.auto()" },
-                  { tag: "バックオフィス", title: "会計ソフトのAI化",     metric: "−50%", metricLabel: "経理負荷", accent: "#0891b2", code: "ledger.ai()" },
-                  { tag: "業務効率",      title: "日報管理のAI化",       metric: "+40%", metricLabel: "提出率",   accent: "#059669", code: "report.gen()" },
-                ]).map((c, i) => (
-                  <div key={i} style={{
-                    width: 320, flexShrink: 0, borderRadius: 16,
-                    background: "#fff",
-                    border: "1px solid #e2e8f0",
-                    boxShadow: "0 2px 16px rgba(0,0,0,0.05)",
-                    padding: "28px 26px 24px",
-                    display: "flex", flexDirection: "column", gap: 0,
-                    transition: "transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s, border-color 0.3s",
-                    cursor: "pointer", position: "relative", overflow: "hidden",
-                  }}
-                    onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = `0 12px 40px ${c.accent}22`; e.currentTarget.style.borderColor = `${c.accent}50`; }}
-                    onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = "0 2px 16px rgba(0,0,0,0.05)"; e.currentTarget.style.borderColor = "#e2e8f0"; }}
-                  >
-                    {/* top accent bar */}
-                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg, ${c.accent}, ${c.accent}88)`, borderRadius: "16px 16px 0 0" }} />
-                    {/* terminal-style code snippet */}
-                    <div style={{ fontFamily: "'SF Mono', 'Fira Code', monospace", fontSize: 11, color: c.accent,
-                      background: `${c.accent}0e`, border: `1px solid ${c.accent}22`, borderRadius: 6,
-                      padding: "5px 10px", marginBottom: 20, display: "inline-block", letterSpacing: "0.02em" }}>
-                      $ {c.code}
-                    </div>
-                    {/* tag + arrow */}
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", color: c.accent,
-                        textTransform: "uppercase", padding: "3px 10px", borderRadius: 100,
-                        background: `${c.accent}12`, border: `1px solid ${c.accent}30` }}>{c.tag}</span>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="2">
-                        <path d="M7 17L17 7M17 7H7M17 7v10"/>
-                      </svg>
-                    </div>
-                    {/* title */}
-                    <div style={{ fontSize: 17, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em", lineHeight: 1.4, marginBottom: 20 }}>{c.title}</div>
-                    {/* metric */}
-                    <div style={{ marginTop: "auto", paddingTop: 16, borderTop: "1px solid #f1f5f9", display: "flex", alignItems: "baseline", gap: 8 }}>
-                      <div style={{ fontSize: 32, fontWeight: 900, color: c.accent, letterSpacing: "-0.03em", lineHeight: 1 }}>{c.metric}</div>
-                      <div style={{ fontSize: 12, color: "#64748b", fontWeight: 600 }}>{c.metricLabel}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Ticker — row 2 (reverse) */}
-            <div style={{ overflow: "hidden" }}>
-              <div style={{ display: "flex", gap: 16, width: "max-content", padding: "0 16px",
-                animation: "ticker 44s linear infinite reverse" }}>
-                {((cards) => [...cards, ...cards])([
-                  { tag: "DX推進",    title: "生成AIの社内導入",       metric: "+55%", metricLabel: "生産性",    accent: "#f59e0b", code: "deploy.ai()" },
-                  { tag: "Web",       title: "ホームページへのAI実装", metric: "+38%", metricLabel: "CV率",      accent: "#0ea5e9", code: "chat.embed()" },
-                  { tag: "マーケ",    title: "SEO対策のAI化",          metric: "+210%", metricLabel: "オーガニック流入", accent: "#ec4899", code: "seo.optimize()" },
-                  { tag: "コンテンツ", title: "自動ブログ更新AI",      metric: "−90%", metricLabel: "運用コスト", accent: "#94a3b8", code: "content.auto()" },
-                ]).map((c, i) => (
-                  <div key={i} style={{
-                    width: 320, flexShrink: 0, borderRadius: 16,
-                    background: "#fff",
-                    border: "1px solid #e2e8f0",
-                    boxShadow: "0 2px 16px rgba(0,0,0,0.05)",
-                    padding: "28px 26px 24px",
-                    display: "flex", flexDirection: "column", gap: 0,
-                    transition: "transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s, border-color 0.3s",
-                    cursor: "pointer", position: "relative", overflow: "hidden",
-                  }}
-                    onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = `0 12px 40px ${c.accent}22`; e.currentTarget.style.borderColor = `${c.accent}50`; }}
-                    onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = "0 2px 16px rgba(0,0,0,0.05)"; e.currentTarget.style.borderColor = "#e2e8f0"; }}
-                  >
-                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg, ${c.accent}, ${c.accent}88)`, borderRadius: "16px 16px 0 0" }} />
-                    <div style={{ fontFamily: "'SF Mono', 'Fira Code', monospace", fontSize: 11, color: c.accent,
-                      background: `${c.accent}0e`, border: `1px solid ${c.accent}22`, borderRadius: 6,
-                      padding: "5px 10px", marginBottom: 20, display: "inline-block", letterSpacing: "0.02em" }}>
-                      $ {c.code}
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", color: c.accent,
-                        textTransform: "uppercase", padding: "3px 10px", borderRadius: 100,
-                        background: `${c.accent}12`, border: `1px solid ${c.accent}30` }}>{c.tag}</span>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="2">
-                        <path d="M7 17L17 7M17 7H7M17 7v10"/>
-                      </svg>
-                    </div>
-                    <div style={{ fontSize: 17, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em", lineHeight: 1.4, marginBottom: 20 }}>{c.title}</div>
-                    <div style={{ marginTop: "auto", paddingTop: 16, borderTop: "1px solid #f1f5f9", display: "flex", alignItems: "baseline", gap: 8 }}>
-                      <div style={{ fontSize: 32, fontWeight: 900, color: c.accent, letterSpacing: "-0.03em", lineHeight: 1 }}>{c.metric}</div>
-                      <div style={{ fontSize: 12, color: "#64748b", fontWeight: 600 }}>{c.metricLabel}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+            {/* 成果ボード */}
+            <div className="sr" style={{ transitionDelay: "0.1s" }}>
+              {[
+                { tag: "業務効率",      title: "日報管理のAI化",         label: "提出率",           num: "+40%" },
+                { tag: "採用・HR",      title: "入社時テストのAI化",     label: "選考時間",         num: "−62%" },
+                { tag: "予約管理",      title: "予約システムのAI化",     label: "対応工数",         num: "−78%" },
+                { tag: "バックオフィス", title: "会計ソフトのAI化",      label: "経理負荷",         num: "−50%" },
+                { tag: "DX推進",        title: "生成AIの社内導入",       label: "生産性",           num: "+55%" },
+                { tag: "Web",           title: "ホームページへのAI実装", label: "CV率",             num: "+38%" },
+                { tag: "マーケ",        title: "SEO対策のAI化",          label: "オーガニック流入", num: "+210%" },
+                { tag: "コンテンツ",    title: "自動ブログ更新AI",       label: "運用コスト",       num: "−90%" },
+              ].map((c) => (
+                <div key={c.title} className="case-row">
+                  <span className="case-tag" style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", color: "#94a3b8", textTransform: "uppercase" }}>{c.tag}</span>
+                  <span className="case-title" style={{ fontSize: "clamp(16px, 1.8vw, 21px)", fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em", lineHeight: 1.4 }}>{c.title}</span>
+                  <span className="case-label" style={{ fontSize: 13, fontWeight: 600, color: "#64748b", textAlign: "right" }}>{c.label}</span>
+                  <span style={{ textAlign: "right", fontSize: "clamp(28px, 3.2vw, 42px)", fontWeight: 900, color: "#0f172a", letterSpacing: "-0.03em", lineHeight: 1 }}>
+                    <CaseNum value={c.num} />
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         </section>

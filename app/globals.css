@@ -71,6 +71,48 @@ body {
 .ticker-track {
   animation: ticker 38s linear infinite;
 }
+
+/* ── Case Studies 成果ボード ── */
+.case-row {
+  display: grid;
+  grid-template-columns: 132px 1fr 150px 150px;
+  align-items: baseline;
+  gap: 20px;
+  padding: 26px 20px;
+  border-top: 1px solid #e2e8f0;
+  border-radius: 12px;
+  transition: background 0.3s, box-shadow 0.3s;
+  cursor: default;
+}
+.case-row:last-of-type { border-bottom: 1px solid #e2e8f0; }
+.case-row:hover {
+  background: #fff;
+  box-shadow: 0 10px 32px rgba(15,23,42,0.07);
+}
+.case-row:hover + .case-row { border-top-color: transparent; }
+.case-num {
+  font-variant-numeric: tabular-nums;
+  transition: color 0.3s;
+}
+.case-row:hover .case-num {
+  background: linear-gradient(115deg, #475569 0%, #94a3b8 38%, #1e293b 62%, #64748b 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+@media (max-width: 768px) {
+  .case-row {
+    grid-template-columns: 1fr auto;
+    grid-template-areas: "tag tag" "title num" "label num";
+    row-gap: 6px;
+    padding: 20px 12px;
+  }
+  .case-row .case-tag { grid-area: tag; }
+  .case-row .case-title { grid-area: title; }
+  .case-row .case-label { grid-area: label; text-align: left !important; }
+  .case-row .case-num { grid-area: num; align-self: center; }
+}
 @keyframes dot-drift {
   0%   { background-position: 0 0; }
   100% { background-position: 36px 36px; }
