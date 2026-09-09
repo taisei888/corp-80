@@ -107,3 +107,12 @@ body {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
 }
+
+@keyframes walk-x {
+  from { transform: translateX(-160px); }
+  to { transform: translateX(calc(100vw + 160px)); }
+}
+@keyframes walk-bob {
+  from { transform: translateY(0) rotate(-2deg); }
+  to { transform: translateY(-7px) rotate(2deg); }
+}
