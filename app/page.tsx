@@ -562,43 +562,6 @@ export default function Home() {
               </div>
 
             </div>
-
-            {/* ── 制作実績 ── */}
-            <div className="sr" style={{ marginTop: 96 }}>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 18, marginBottom: 8 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.3em", color: "#64748b", textTransform: "uppercase" }}>Production</div>
-                <div style={{ flex: 1, height: 1, background: "#e2e8f0" }} />
-              </div>
-              <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", flexWrap: "wrap", gap: 8, marginBottom: 40 }}>
-                <h3 style={{ fontSize: "clamp(24px, 3vw, 38px)", fontWeight: 900, color: "#0f172a", letterSpacing: "-0.03em" }}>つくって、届けてきたもの。</h3>
-                <div style={{ fontSize: 12, color: "#94a3b8", fontWeight: 500 }}>企画・デザイン・開発まですべて自社。クリックで実際のサイトへ</div>
-              </div>
-            </div>
-            <div className="sr mob-grid-2" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20, transitionDelay: "0.08s" }}>
-              {[
-                { img: "/works/dota-saboten.jpg", url: "https://dota-saboten.vercel.app", tag: "ブランドサイト / EC", title: "DOTA SABOTEN", desc: "サボテン農園の公式サイト。スクロール演出と販売ページまで一体制作" },
-                { img: "/works/bansyoan.jpg", url: "https://bansyoan.com", tag: "店舗サイト / 予約", title: "日本料理 万笑庵", desc: "うなぎ店の公式・予約サイト。LINE通知や集客ダッシュボードも開発" },
-                { img: "/works/ito-ban.jpg", url: "https://ito-ban.vercel.app", tag: "コーポレート", title: "イトーバン", desc: "自動車鈑金工場のコーポレートサイト。職人の仕事を伝えるデザイン" },
-                { img: "/works/machinowa.jpg", url: "https://machinowa.vercel.app", tag: "自社プロダクト / アプリ", title: "まちのわ", desc: "老人クラブ向けコミュニティアプリ。見守り・AI会報づくりまで搭載" },
-                { img: "/works/lens-ai.jpg", url: "https://lens-ai.jp", tag: "自社プロダクト / SaaS", title: "LENS AI", desc: "営業支援ツール。コール管理・AI提案書・一斉メールをチームで" },
-              ].map((w) => (
-                <a key={w.title} href={w.url} target="_blank" rel="noreferrer"
-                  style={{ display: "block", textDecoration: "none", borderRadius: 16, overflow: "hidden",
-                    border: "1px solid #e2e8f0", background: "#fff",
-                    transition: "transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s" }}
-                  onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 16px 40px rgba(15,23,42,0.10)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = ""; }}>
-                  <div style={{ aspectRatio: "16/10", overflow: "hidden", borderBottom: "1px solid #f1f5f9" }}>
-                    <img src={w.img} alt={w.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", display: "block" }} />
-                  </div>
-                  <div style={{ padding: "16px 18px 18px" }}>
-                    <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", color: "#94a3b8", textTransform: "uppercase", marginBottom: 6 }}>{w.tag}</div>
-                    <div style={{ fontSize: 16, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.01em" }}>{w.title}</div>
-                    <div style={{ fontSize: 12.5, color: "#64748b", marginTop: 5, lineHeight: 1.7 }}>{w.desc}</div>
-                  </div>
-                </a>
-              ))}
-            </div>
           </div>
         </section>
 
