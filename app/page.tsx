@@ -128,6 +128,83 @@ function CaseNum({ value }: { value: string }) {
   return <span ref={ref} className="case-num">{display}</span>;
 }
 
+// ─── vivoo風 俯瞰ローミング（キャラがヒーロー内を歩き回る） ────────────────────
+function RoamField({ isMobile }: { isMobile: boolean }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const host = ref.current;
+    if (!host) return;
+    const SRCS = ["/chars/td-ball.png", "/chars/td-cyclops.png", "/chars/td-drop.png", "/chars/td-star.png", "/chars/td-donut.png", "/chars/td-cloud.png"];
+    const N = isMobile ? 4 : 6;
+    type Agent = { root: HTMLDivElement; img: HTMLImageElement; x: number; y: number; tx: number; ty: number; sp: number; pause: number; ph: number; rot: number; size: number };
+    const agents: Agent[] = [];
+    const inCenter = (x: number, y: number) => {
+      const W = host.offsetWidth, H = host.offsetHeight;
+      return x > W * 0.24 && x < W * 0.76 && y > H * 0.12 && y < H * 0.8;
+    };
+    const pickTarget = (a: Agent) => {
+      const W = host.offsetWidth, H = host.offsetHeight;
+      for (let i = 0; i < 24; i++) {
+        const x = 30 + Math.random() * (W - 60);
+        const y = 40 + Math.random() * (H - 80);
+        if (!inCenter(x, y)) { a.tx = x; a.ty = y; return; }
+      }
+    };
+    for (let i = 0; i < N; i++) {
+      const size = (isMobile ? 46 : 66) + Math.random() * (isMobile ? 20 : 38);
+      const root = document.createElement("div");
+      root.style.cssText = "position:absolute;left:0;top:0;will-change:transform;";
+      const sh = document.createElement("div");
+      sh.style.cssText = "position:absolute;left:8%;top:74%;width:92%;height:30%;border-radius:50%;background:rgba(15,23,42,0.14);filter:blur(5px);transform:translate(9px,7px);";
+      const img = document.createElement("img");
+      img.src = SRCS[i % SRCS.length];
+      img.alt = "";
+      img.style.cssText = `position:relative;width:${size}px;display:block;`;
+      root.appendChild(sh);
+      root.appendChild(img);
+      host.appendChild(root);
+      const a: Agent = { root, img, x: 0, y: 0, tx: 0, ty: 0, sp: 13 + Math.random() * 13, pause: Math.random() * 2000, ph: Math.random() * 10, rot: 0, size };
+      let guard = 0;
+      do {
+        a.x = 30 + Math.random() * (host.offsetWidth - 60);
+        a.y = 40 + Math.random() * (host.offsetHeight - 80);
+      } while (inCenter(a.x, a.y) && ++guard < 30);
+      pickTarget(a);
+      agents.push(a);
+    }
+    let raf = 0, last = performance.now();
+    const step = (now: number) => {
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now;
+      for (const a of agents) {
+        let moving = false;
+        if (a.pause > 0) a.pause -= dt * 1000;
+        else {
+          const dx = a.tx - a.x, dy = a.ty - a.y;
+          const d = Math.hypot(dx, dy) || 1;
+          if (d < 5) { a.pause = 900 + Math.random() * 2600; pickTarget(a); }
+          else {
+            a.x += (dx / d) * a.sp * dt;
+            a.y += (dy / d) * a.sp * dt;
+            const lean = Math.max(-9, Math.min(9, dx * 0.06));
+            a.rot += (lean - a.rot) * 0.06;
+            moving = true;
+          }
+        }
+        if (!moving) a.rot *= 0.94;
+        a.ph += dt * (moving ? 9 : 2);
+        const bob = Math.sin(a.ph) * (moving ? 2.6 : 0.8);
+        a.root.style.transform = `translate(${a.x - a.size / 2}px, ${a.y - a.size / 2}px) rotate(${a.rot}deg)`;
+        a.img.style.transform = `translateY(${bob}px)`;
+      }
+      raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => { cancelAnimationFrame(raf); agents.forEach((a) => a.root.remove()); };
+  }, [isMobile]);
+  return <div ref={ref} style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 2, overflow: "hidden" }} />;
+}
+
 // ─── Particle Text Canvas ─────────────────────────────────────────────────────
 function ParticleTextCanvas() {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -329,9 +406,24 @@ export default function Home() {
             <div style={{ position: "absolute", inset: 0,
               background: "radial-gradient(ellipse at center, transparent 20%, rgba(255,255,255,0.92) 65%)",
             }} />
+            {/* organic blobs (vivoo風) */}
+            <div style={{ position: "absolute", top: "-12%", right: "-8%", width: "min(46vw, 560px)", aspectRatio: "1",
+              background: "#e7edf4", borderRadius: "58% 42% 55% 45% / 50% 55% 45% 50%",
+              animation: "blob-morph 26s ease-in-out infinite alternate" }} />
+            <div style={{ position: "absolute", bottom: "-18%", left: "-10%", width: "min(42vw, 500px)", aspectRatio: "1",
+              background: "#eef2f6", borderRadius: "45% 55% 48% 52% / 58% 44% 56% 42%",
+              animation: "blob-morph 32s ease-in-out infinite alternate-reverse" }} />
+            <div style={{ position: "absolute", top: "24%", left: "-6%", width: "min(22vw, 260px)", aspectRatio: "1",
+              background: "#ece9e4", borderRadius: "52% 48% 44% 56% / 48% 56% 44% 52%",
+              animation: "blob-morph 22s ease-in-out infinite alternate", animationDelay: "-8s" }} />
+            <div style={{ position: "absolute", bottom: "6%", right: "10%", width: "min(18vw, 210px)", aspectRatio: "1",
+              background: "#e2e8f0", borderRadius: "48% 52% 56% 44% / 52% 44% 56% 48%",
+              animation: "blob-morph 28s ease-in-out infinite alternate-reverse", animationDelay: "-14s" }} />
           </div>
 
-          <div style={{ maxWidth: 880, width: "100%", position: "relative", textAlign: "center" }}>
+          <RoamField isMobile={isMobile} />
+
+          <div style={{ maxWidth: 880, width: "100%", position: "relative", textAlign: "center", zIndex: 3 }}>
             <div style={{
               display: "inline-flex", alignItems: "center", gap: 8,
               padding: "6px 16px", borderRadius: 100,
@@ -388,33 +480,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* ── Walking characters ── */}
-          <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: isMobile ? 130 : 180, pointerEvents: "none", zIndex: 2 }}>
-            <div style={{ position: "absolute", left: 0, right: 0, bottom: isMobile ? 30 : 40, height: 1.5,
-              background: "linear-gradient(90deg, transparent, #e2e8f0 12%, #e2e8f0 88%, transparent)" }} />
-            {([
-              { src: "/chars/longlegs.png", h: 112, dur: 36, delay: 0, bob: 0.55 },
-              { src: "/chars/ball.png", h: 80, dur: 29, delay: -9, bob: 0.48 },
-              { src: "/chars/drop.png", h: 66, dur: 42, delay: -22, bob: 0.62 },
-              { src: "/chars/cyclops.png", h: 74, dur: 32, delay: -15, bob: 0.5 },
-              { src: "/chars/donut.png", h: 64, dur: 39, delay: -30, bob: 0.58 },
-              { src: "/chars/star.png", h: 56, dur: 26, delay: -4, bob: 0.45 },
-              { src: "/chars/cloud.png", h: 60, dur: 46, delay: -36, bob: 0.66 },
-            ] as const).map((w, i) => (
-              <div key={i} style={{
-                position: "absolute", bottom: isMobile ? 32 : 42, left: 0,
-                animation: `walk-x ${w.dur}s linear infinite`,
-                animationDelay: `${w.delay}s`, willChange: "transform",
-              }}>
-                <img src={w.src} alt="" style={{
-                  height: isMobile ? w.h * 0.6 : w.h, display: "block",
-                  animation: `walk-bob ${w.bob}s ease-in-out infinite alternate`,
-                }} />
-                <div style={{ width: "55%", height: 7, margin: "3px auto 0", borderRadius: "50%",
-                  background: "rgba(15,23,42,0.1)", filter: "blur(2px)" }} />
-              </div>
-            ))}
-          </div>
         </section>
 
         {/* Fixed right-side scroll indicator */}
