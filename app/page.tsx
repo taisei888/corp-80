@@ -235,11 +235,18 @@ function MercuryField({ isMobile }: { isMobile: boolean }) {
     const uRes = gl.getUniformLocation(prog, "uRes");
     const uBalls = gl.getUniformLocation(prog, "uBalls");
 
-    // ── 物理（ワールド座標: y∈[-1,1]） ──
-    type Ball = { x: number; y: number; z: number; r: number; vx: number; vy: number; ph: number };
-    let balls: Ball[] = [];
+    // ── 物理：中央1塊（複数パーツがゆっくり公転し、sminで1つの液体に見える） ──
     let W = 0, H = 0, A = 1;
-    const mouse = { x: -99, y: -99, on: false };
+    const mouse = { x: 0, y: 0, on: false };
+    const S = isMobile ? 0.78 : 1;
+    const CY = 0.47; // 塊の中心（世界座標・見出しの上）
+    const parts = [
+      { r: 0.300 * S, or: 0.040 * S, sp: 0.17, ph: 0.0 },
+      { r: 0.190 * S, or: 0.150 * S, sp: -0.12, ph: 2.1 },
+      { r: 0.150 * S, or: 0.200 * S, sp: 0.085, ph: 4.4 },
+      { r: 0.115 * S, or: 0.250 * S, sp: -0.055, ph: 1.2 },
+      { r: 0.080 * S, or: 0.330 * S, sp: 0.042, ph: 5.3 },
+    ];
 
     const init = () => {
       const dpr = Math.min(devicePixelRatio, 2) * (isMobile ? 0.8 : 0.9);
@@ -247,17 +254,6 @@ function MercuryField({ isMobile }: { isMobile: boolean }) {
       canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
       gl.viewport(0, 0, canvas.width, canvas.height);
       A = W / H;
-      if (balls.length) return;
-      const SIZES = isMobile ? [0.30, 0.20, 0.15, 0.11, 0.08] : [0.34, 0.24, 0.19, 0.15, 0.12, 0.09, 0.07];
-      for (let i = 0; i < N; i++) {
-        const r = SIZES[i];
-        let x = 0, y = 0, g = 0;
-        do {
-          x = (Math.random() * 2 - 1) * (A - r);
-          y = (Math.random() * 2 - 1) * (1 - r) * 0.82;
-        } while (Math.abs(x) < A * 0.52 && Math.abs(y) < 0.62 && ++g < 50);
-        balls.push({ x, y, z: (Math.random() - 0.5) * 0.25, r, vx: (Math.random() - 0.5) * 0.05, vy: (Math.random() - 0.5) * 0.05, ph: Math.random() * 10 });
-      }
     };
 
     init();
@@ -276,65 +272,33 @@ function MercuryField({ isMobile }: { isMobile: boolean }) {
     document.addEventListener("mouseleave", onLeave);
 
     const arr = new Float32Array(MAXB * 4);
+    const sway = { x: 0, y: 0 };      // マウスへの穏やかな傾き
+    const reach = { x: 0, y: 0 };     // 小滴がカーソル方向へ伸びる
     let raf = 0, last = performance.now(), t = 0;
     const render = (now: number) => {
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now; t += dt;
 
-      for (const b of balls) {
-        // ゆっくり漂う＋呼吸
-        b.x += b.vx * dt;
-        b.y += b.vy * dt;
-        // マウスに引き寄せられて融合する（水銀らしさの核）
-        if (mouse.on && !isMobile) {
-          const dx = mouse.x - b.x, dy = mouse.y - b.y;
-          const d = Math.hypot(dx, dy);
-          const R = 0.9;
-          if (d < R && d > 0.001) {
-            const f = (1 - d / R) * 1.5 * dt;
-            b.vx += (dx / d) * f;
-            b.vy += (dy / d) * f;
-          }
-        }
-        // コピー領域からの押し出し（マウス操作中は弱める）
-        const ex = b.x / (A * 0.56), ey = b.y / 0.66;
-        const e2 = ex * ex + ey * ey;
-        if (e2 < 1) {
-          const el = Math.sqrt(e2) || 0.01;
-          const f = (1 - e2) * (mouse.on ? 0.25 : 1.1) * dt;
-          b.vx += (ex / el) * f;
-          b.vy += (ey / el) * f;
-        }
-        // 弱い相互反発（完全スタック防止・融合は許す）
-        for (const o of balls) {
-          if (o === b) continue;
-          const ox = b.x - o.x, oy = b.y - o.y;
-          const od = Math.hypot(ox, oy) || 0.01;
-          const min = (b.r + o.r) * 0.55;
-          if (od < min) {
-            const f = ((min - od) / min) * 0.5 * dt;
-            b.vx += (ox / od) * f;
-            b.vy += (oy / od) * f;
-          }
-        }
-        // 壁
-        const mx = A - b.r * 0.8, my = 1 - b.r * 0.8;
-        if (b.x < -mx) { b.x = -mx; b.vx = Math.abs(b.vx); }
-        if (b.x > mx) { b.x = mx; b.vx = -Math.abs(b.vx); }
-        if (b.y < -my) { b.y = -my; b.vy = Math.abs(b.vy); }
-        if (b.y > my * 0.86) { b.y = my * 0.86; b.vy = -Math.abs(b.vy); }
-        // 巡航速度へ減衰
-        const sp = Math.hypot(b.vx, b.vy);
-        if (sp > 0.06) { const k = 1 - Math.min(1, dt * 2.2); b.vx *= k; b.vy *= k; }
-      }
+      // シックに：追従はごく控えめ・ゆっくり戻る
+      const tx = mouse.on && !isMobile ? Math.max(-0.06, Math.min(0.06, (mouse.x - 0) * 0.08)) : 0;
+      const ty = mouse.on && !isMobile ? Math.max(-0.05, Math.min(0.05, (mouse.y - 0.47) * 0.06)) : 0;
+      sway.x += (tx - sway.x) * Math.min(1, dt * 1.2);
+      sway.y += (ty - sway.y) * Math.min(1, dt * 1.2);
+      const rx = mouse.on && !isMobile ? Math.max(-0.16, Math.min(0.16, (mouse.x - 0) * 0.22)) : 0;
+      const ry = mouse.on && !isMobile ? Math.max(-0.14, Math.min(0.14, (mouse.y - 0.47) * 0.18)) : 0;
+      reach.x += (rx - reach.x) * Math.min(1, dt * 1.6);
+      reach.y += (ry - reach.y) * Math.min(1, dt * 1.6);
 
       for (let i = 0; i < MAXB; i++) {
-        const b = balls[i];
-        if (b) {
-          arr[i * 4] = b.x;
-          arr[i * 4 + 1] = b.y + Math.sin(t * 0.6 + b.ph) * 0.018;
-          arr[i * 4 + 2] = b.z;
-          arr[i * 4 + 3] = b.r * (1 + Math.sin(t * 0.9 + b.ph * 2) * 0.03);
+        const pt = parts[i];
+        if (pt) {
+          const isDrop = i === parts.length - 1;
+          const ox = Math.cos(t * pt.sp * 2 + pt.ph) * pt.or + (isDrop ? reach.x : 0);
+          const oy = Math.sin(t * pt.sp * 1.6 + pt.ph) * pt.or * 0.72 + (isDrop ? reach.y : 0);
+          arr[i * 4] = sway.x + ox;
+          arr[i * 4 + 1] = CY + sway.y + oy + Math.sin(t * 0.5 + pt.ph) * 0.012;
+          arr[i * 4 + 2] = Math.sin(t * 0.26 + pt.ph * 1.7) * 0.10;
+          arr[i * 4 + 3] = pt.r * (1 + Math.sin(t * 0.7 + pt.ph * 2) * 0.035);
         } else {
           arr[i * 4 + 3] = 0;
         }
@@ -440,25 +404,11 @@ export default function Home() {
         {/* ── Character Hero ── */}
         <section style={{
           minHeight: "100vh", display: "flex", flexDirection: "column",
-          justifyContent: "center", alignItems: "center",
-          padding: isMobile ? "100px 20px 170px" : "120px 48px 200px",
+          justifyContent: "flex-start", alignItems: "center",
+          padding: isMobile ? "47vh 20px 110px" : "50vh 48px 140px",
           background: "#fff", position: "relative", overflow: "hidden",
         }}>
-          {/* Background grid */}
-          <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
-            <div style={{ position: "absolute", inset: 0, opacity: 0.035,
-              backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 59px, #94a3b8 59px, #94a3b8 60px), repeating-linear-gradient(90deg, transparent, transparent 59px, #94a3b8 59px, #94a3b8 60px)",
-            }} />
-            <div style={{ position: "absolute", inset: 0,
-              background: "radial-gradient(ellipse at center, transparent 20%, rgba(255,255,255,0.92) 65%)",
-            }} />
-          </div>
-
           <MercuryField isMobile={isMobile} />
-          {/* コピーの可読性を守る中央ウォッシュ（水銀球の上・文字の下） */}
-          <div style={{ position: "absolute", inset: 0, zIndex: 2, pointerEvents: "none",
-            background: "radial-gradient(ellipse 58% 46% at center 46%, rgba(255,255,255,0.88) 0%, rgba(255,255,255,0.55) 55%, transparent 100%)",
-          }} />
 
           <div style={{ maxWidth: 880, width: "100%", position: "relative", textAlign: "center", zIndex: 3 }}>
             <div style={{
