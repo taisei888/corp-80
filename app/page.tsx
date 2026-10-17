@@ -128,157 +128,222 @@ function CaseNum({ value }: { value: string }) {
   return <span ref={ref} className="case-num">{display}</span>;
 }
 
-// ─── Mercury Field（液体水銀の球がゆっくり漂い、カーソルから逃げる） ─────────────
+// ─── Mercury Field（WebGLレイマーチング液体金属：融合・分裂・クローム映り込み） ──
 function MercuryField({ isMobile }: { isMobile: boolean }) {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     const canvas = ref.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    const gl = canvas.getContext("webgl", { alpha: true, antialias: false, premultipliedAlpha: true });
+    if (!gl) return;
 
-    let W = 0, H = 0, raf = 0, t = 0;
-    const mouse = { x: -9999, y: -9999 };
-    type Ball = { x: number; y: number; r: number; vx: number; vy: number; ph: number };
+    const MAXB = 8;
+    const N = isMobile ? 5 : 7;
+
+    const VS = `
+      attribute vec2 aPos;
+      void main(){ gl_Position = vec4(aPos, 0.0, 1.0); }
+    `;
+    const FS = `
+      precision highp float;
+      uniform vec2 uRes;
+      uniform vec4 uBalls[${MAXB}];
+
+      float smin(float a, float b, float k){
+        float h = clamp(0.5 + 0.5*(b-a)/k, 0.0, 1.0);
+        return mix(b, a, h) - k*h*(1.0-h);
+      }
+      float map(vec3 p){
+        float d = 1e5;
+        for(int i=0;i<${MAXB};i++){
+          vec4 b = uBalls[i];
+          if(b.w > 0.0) d = smin(d, length(p - b.xyz) - b.w, 0.16);
+        }
+        return d;
+      }
+      vec3 calcN(vec3 p){
+        vec2 e = vec2(0.0025, 0.0);
+        return normalize(vec3(
+          map(p+e.xyy)-map(p-e.xyy),
+          map(p+e.yxy)-map(p-e.yxy),
+          map(p+e.yyx)-map(p-e.yyx)));
+      }
+      // スタジオ環境（上=白天板 / 中央=暗帯 / 下=淡い床バウンス）: ロゴのコントラストを再現
+      vec3 env(vec3 d){
+        float y = d.y;
+        vec3 c = mix(vec3(0.09,0.11,0.16), vec3(0.80,0.84,0.90), smoothstep(0.02, 0.5, y));
+        c = mix(c, vec3(1.04), smoothstep(0.5, 0.92, y));
+        c = mix(c, vec3(0.05,0.07,0.11), smoothstep(0.18, 0.02, abs(y+0.08)));
+        c = mix(c, vec3(0.58,0.63,0.72), smoothstep(0.35, 0.95, -y));
+        c *= 0.92 + 0.08 * d.x;
+        return c;
+      }
+      void main(){
+        float A = uRes.x / uRes.y;
+        vec2 uv = (gl_FragCoord.xy / uRes) * 2.0 - 1.0;
+        uv.x *= A;
+        vec3 ro = vec3(uv, -3.0);
+        vec3 rd = vec3(0.0, 0.0, 1.0);
+        float t = 0.0, d = 1e5, md = 1e5;
+        vec3 p = ro;
+        for(int i=0;i<72;i++){
+          p = ro + rd * t;
+          d = map(p);
+          md = min(md, d);
+          if(d < 0.0012 || t > 6.0) break;
+          t += d;
+        }
+        if(d < 0.0012){
+          vec3 n = calcN(p);
+          vec3 r = reflect(rd, n);
+          vec3 col = env(r);
+          float fres = pow(1.0 - abs(n.z), 2.4);
+          col += fres * vec3(0.22, 0.24, 0.28);
+          float spec = pow(max(dot(r, normalize(vec3(-0.45, 0.85, -0.45))), 0.0), 80.0);
+          col += spec * 1.1;
+          float spec2 = pow(max(dot(r, normalize(vec3(0.6, -0.5, -0.4))), 0.0), 50.0);
+          col += spec2 * 0.25;
+          col = clamp(col, 0.0, 1.0);
+          gl_FragColor = vec4(col, 1.0);
+        } else {
+          // シルエットを柔らかくするAAハロー
+          float a = 1.0 - smoothstep(0.0, 0.006, md);
+          gl_FragColor = vec4(vec3(0.35, 0.39, 0.46) * a, a * 0.85);
+        }
+      }
+    `;
+
+    const mk = (type: number, src: string) => {
+      const s = gl.createShader(type)!;
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      return s;
+    };
+    const prog = gl.createProgram()!;
+    gl.attachShader(prog, mk(gl.VERTEX_SHADER, VS));
+    gl.attachShader(prog, mk(gl.FRAGMENT_SHADER, FS));
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return;
+    gl.useProgram(prog);
+
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+    const loc = gl.getAttribLocation(prog, "aPos");
+    gl.enableVertexAttribArray(loc);
+    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+    const uRes = gl.getUniformLocation(prog, "uRes");
+    const uBalls = gl.getUniformLocation(prog, "uBalls");
+
+    // ── 物理（ワールド座標: y∈[-1,1]） ──
+    type Ball = { x: number; y: number; z: number; r: number; vx: number; vy: number; ph: number };
     let balls: Ball[] = [];
+    let W = 0, H = 0, A = 1;
+    const mouse = { x: -99, y: -99, on: false };
 
     const init = () => {
-      const dpr = Math.min(devicePixelRatio, 2);
+      const dpr = Math.min(devicePixelRatio, 2) * (isMobile ? 0.8 : 0.9);
       W = canvas.offsetWidth; H = canvas.offsetHeight;
-      canvas.width = W * dpr; canvas.height = H * dpr;
-      canvas.style.width = W + "px"; canvas.style.height = H + "px";
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      balls = [];
-      const N = isMobile ? 5 : 8;
-      const SIZES = isMobile ? [52, 34, 26, 20, 14] : [86, 60, 48, 38, 30, 24, 18, 14];
+      canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      A = W / H;
+      if (balls.length) return;
+      const SIZES = isMobile ? [0.30, 0.20, 0.15, 0.11, 0.08] : [0.34, 0.24, 0.19, 0.15, 0.12, 0.09, 0.07];
       for (let i = 0; i < N; i++) {
         const r = SIZES[i];
-        let x = 0, y = 0, guard = 0;
-        // 中央のコピー領域を避けて配置
+        let x = 0, y = 0, g = 0;
         do {
-          x = r + Math.random() * (W - r * 2);
-          y = 74 + r + Math.random() * (H - 74 - r * 3);
-        } while (x > W * 0.24 && x < W * 0.76 && y > H * 0.16 && y < H * 0.76 && ++guard < 40);
-        balls.push({ x, y, r, vx: (Math.random() - 0.5) * 14, vy: (Math.random() - 0.5) * 14, ph: Math.random() * 10 });
+          x = (Math.random() * 2 - 1) * (A - r);
+          y = (Math.random() * 2 - 1) * (1 - r) * 0.82;
+        } while (Math.abs(x) < A * 0.52 && Math.abs(y) < 0.62 && ++g < 50);
+        balls.push({ x, y, z: (Math.random() - 0.5) * 0.25, r, vx: (Math.random() - 0.5) * 0.05, vy: (Math.random() - 0.5) * 0.05, ph: Math.random() * 10 });
       }
-    };
-
-    const drawBall = (b: Ball, bobY: number) => {
-      const x = b.x, y = b.y + bobY, r = b.r;
-      // 落ち影
-      ctx.save();
-      ctx.translate(x, y + r * 0.92);
-      ctx.scale(1, 0.3);
-      const sh = ctx.createRadialGradient(0, 0, 0, 0, 0, r);
-      sh.addColorStop(0, "rgba(15,23,42,0.16)");
-      sh.addColorStop(1, "rgba(15,23,42,0)");
-      ctx.fillStyle = sh;
-      ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill();
-      ctx.restore();
-      // 本体（クロームの球）
-      const g = ctx.createRadialGradient(x - r * 0.35, y - r * 0.42, r * 0.08, x, y, r);
-      g.addColorStop(0, "#ffffff");
-      g.addColorStop(0.25, "#dde4ec");
-      g.addColorStop(0.55, "#94a3b8");
-      g.addColorStop(0.82, "#475569");
-      g.addColorStop(1, "#1e293b");
-      ctx.fillStyle = g;
-      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
-      // 地平線の映り込み（クロームらしさの要）
-      ctx.save();
-      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.clip();
-      const band = ctx.createLinearGradient(x, y - r * 0.08, x, y + r * 0.6);
-      band.addColorStop(0, "rgba(15,23,42,0)");
-      band.addColorStop(0.45, "rgba(30,41,59,0.42)");
-      band.addColorStop(1, "rgba(30,41,59,0)");
-      ctx.fillStyle = band;
-      ctx.fillRect(x - r, y - r * 0.08, r * 2, r * 0.75);
-      // 下側のリムライト
-      const rim = ctx.createRadialGradient(x, y + r * 0.72, r * 0.05, x, y + r * 0.62, r * 0.8);
-      rim.addColorStop(0, "rgba(226,232,240,0.5)");
-      rim.addColorStop(1, "rgba(226,232,240,0)");
-      ctx.fillStyle = rim;
-      ctx.beginPath(); ctx.arc(x, y + r * 0.55, r * 0.75, 0, Math.PI * 2); ctx.fill();
-      ctx.restore();
-      // スペキュラハイライト
-      ctx.save();
-      ctx.translate(x - r * 0.36, y - r * 0.46);
-      ctx.rotate(-0.5);
-      ctx.scale(1, 0.6);
-      const sp = ctx.createRadialGradient(0, 0, 0, 0, 0, r * 0.34);
-      sp.addColorStop(0, "rgba(255,255,255,0.95)");
-      sp.addColorStop(1, "rgba(255,255,255,0)");
-      ctx.fillStyle = sp;
-      ctx.beginPath(); ctx.arc(0, 0, r * 0.34, 0, Math.PI * 2); ctx.fill();
-      ctx.restore();
     };
 
     init();
     const onResize = () => init();
     const onMouse = (e: MouseEvent) => {
       const rc = canvas.getBoundingClientRect();
-      mouse.x = e.clientX - rc.left;
-      mouse.y = e.clientY - rc.top;
+      const inX = e.clientX - rc.left, inY = e.clientY - rc.top;
+      if (inX < 0 || inX > rc.width || inY < 0 || inY > rc.height) { mouse.on = false; return; }
+      mouse.x = ((inX / rc.width) * 2 - 1) * A;
+      mouse.y = -((inY / rc.height) * 2 - 1);
+      mouse.on = true;
     };
-    const onLeave = () => { mouse.x = -9999; mouse.y = -9999; };
+    const onLeave = () => { mouse.on = false; };
     window.addEventListener("resize", onResize);
     window.addEventListener("mousemove", onMouse);
     document.addEventListener("mouseleave", onLeave);
 
-    let last = performance.now();
+    const arr = new Float32Array(MAXB * 4);
+    let raf = 0, last = performance.now(), t = 0;
     const render = (now: number) => {
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now; t += dt;
-      ctx.clearRect(0, 0, W, H);
 
       for (const b of balls) {
-        // ゆっくり漂う
+        // ゆっくり漂う＋呼吸
         b.x += b.vx * dt;
         b.y += b.vy * dt;
-        // カーソルから逃げる
-        const dx = b.x - mouse.x, dy = b.y - mouse.y;
-        const d = Math.hypot(dx, dy);
-        const R = b.r + 110;
-        if (d < R && d > 0.01) {
-          const f = (1 - d / R) * 90 * dt;
-          b.vx += (dx / d) * f;
-          b.vy += (dy / d) * f;
+        // マウスに引き寄せられて融合する（水銀らしさの核）
+        if (mouse.on && !isMobile) {
+          const dx = mouse.x - b.x, dy = mouse.y - b.y;
+          const d = Math.hypot(dx, dy);
+          const R = 0.9;
+          if (d < R && d > 0.001) {
+            const f = (1 - d / R) * 1.5 * dt;
+            b.vx += (dx / d) * f;
+            b.vy += (dy / d) * f;
+          }
         }
-        // 互いに反発（重なりすぎ防止）
+        // コピー領域からの押し出し（マウス操作中は弱める）
+        const ex = b.x / (A * 0.56), ey = b.y / 0.66;
+        const e2 = ex * ex + ey * ey;
+        if (e2 < 1) {
+          const el = Math.sqrt(e2) || 0.01;
+          const f = (1 - e2) * (mouse.on ? 0.25 : 1.1) * dt;
+          b.vx += (ex / el) * f;
+          b.vy += (ey / el) * f;
+        }
+        // 弱い相互反発（完全スタック防止・融合は許す）
         for (const o of balls) {
           if (o === b) continue;
           const ox = b.x - o.x, oy = b.y - o.y;
-          const od = Math.hypot(ox, oy) || 1;
-          const min = (b.r + o.r) * 0.86;
+          const od = Math.hypot(ox, oy) || 0.01;
+          const min = (b.r + o.r) * 0.55;
           if (od < min) {
-            const f = ((min - od) / min) * 26 * dt;
+            const f = ((min - od) / min) * 0.5 * dt;
             b.vx += (ox / od) * f;
             b.vy += (oy / od) * f;
           }
         }
-        // 中央のコピー領域から押し出す
-        const ex = (b.x - W / 2) / (W * 0.3), ey = (b.y - H * 0.46) / (H * 0.3);
-        const e2 = ex * ex + ey * ey;
-        if (e2 < 1) {
-          const el = Math.sqrt(e2) || 0.01;
-          const f = (1 - e2) * 70 * dt;
-          b.vx += (ex / el) * f;
-          b.vy += (ey / el) * f;
-        }
-        // 壁で跳ね返る（上端はナビを避ける）
-        if (b.x < b.r) { b.x = b.r; b.vx = Math.abs(b.vx); }
-        if (b.x > W - b.r) { b.x = W - b.r; b.vx = -Math.abs(b.vx); }
-        if (b.y < 74 + b.r) { b.y = 74 + b.r; b.vy = Math.abs(b.vy); }
-        if (b.y > H - b.r * 1.6) { b.y = H - b.r * 1.6; b.vy = -Math.abs(b.vy); }
-        // 減速して漂う速度に戻る
+        // 壁
+        const mx = A - b.r * 0.8, my = 1 - b.r * 0.8;
+        if (b.x < -mx) { b.x = -mx; b.vx = Math.abs(b.vx); }
+        if (b.x > mx) { b.x = mx; b.vx = -Math.abs(b.vx); }
+        if (b.y < -my) { b.y = -my; b.vy = Math.abs(b.vy); }
+        if (b.y > my * 0.86) { b.y = my * 0.86; b.vy = -Math.abs(b.vy); }
+        // 巡航速度へ減衰
         const sp = Math.hypot(b.vx, b.vy);
-        const CRUISE = 11;
-        if (sp > CRUISE) { const k = 1 - Math.min(1, dt * 1.6); b.vx *= k; b.vy *= k; }
+        if (sp > 0.06) { const k = 1 - Math.min(1, dt * 2.2); b.vx *= k; b.vy *= k; }
       }
-      // 大きい球を奥に
-      const sorted = [...balls].sort((a, b2) => b2.r - a.r);
-      for (const b of sorted) drawBall(b, Math.sin(t * 0.7 + b.ph) * 3);
 
+      for (let i = 0; i < MAXB; i++) {
+        const b = balls[i];
+        if (b) {
+          arr[i * 4] = b.x;
+          arr[i * 4 + 1] = b.y + Math.sin(t * 0.6 + b.ph) * 0.018;
+          arr[i * 4 + 2] = b.z;
+          arr[i * 4 + 3] = b.r * (1 + Math.sin(t * 0.9 + b.ph * 2) * 0.03);
+        } else {
+          arr[i * 4 + 3] = 0;
+        }
+      }
+      gl.uniform2f(uRes, canvas.width, canvas.height);
+      gl.uniform4fv(uBalls, arr);
+      gl.clearColor(0, 0, 0, 0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
       raf = requestAnimationFrame(render);
     };
     raf = requestAnimationFrame(render);
@@ -291,7 +356,11 @@ function MercuryField({ isMobile }: { isMobile: boolean }) {
     };
   }, [isMobile]);
 
-  return <canvas ref={ref} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none", zIndex: 2 }} />;
+  return <canvas ref={ref} style={{
+    position: "absolute", inset: 0, width: "100%", height: "100%",
+    pointerEvents: "none", zIndex: 2,
+    filter: "drop-shadow(0 22px 28px rgba(15,23,42,0.16))",
+  }} />;
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -325,7 +394,7 @@ export default function Home() {
 
   return (
     <>
-      <div style={{ position: "relative", zIndex: 1 }}>
+      <div className="grain" style={{ position: "relative", zIndex: 1 }}>
 
         {/* ── Nav ── */}
         <nav style={{
@@ -422,8 +491,9 @@ export default function Home() {
             <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
               <a href="/ai-labs" style={{
                 padding: "15px 32px", borderRadius: 12, border: "none",
-                background: "#0f172a", color: "#fff", fontSize: 14, fontWeight: 700,
+                background: "linear-gradient(180deg, #273449 0%, #0f172a 55%)", color: "#fff", fontSize: 14, fontWeight: 700,
                 textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8,
+                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.18), 0 1px 2px rgba(15,23,42,0.2)",
                 transition: "all 0.25s",
               }}
                 onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(15,23,42,0.25)"; }}
@@ -431,7 +501,7 @@ export default function Home() {
                 AI LABを見る <span>→</span>
               </a>
               <a href="/demo" style={{
-                padding: "15px 32px", borderRadius: 12, border: "1.5px solid #e2e8f0",
+                padding: "15px 32px", borderRadius: 12, border: "1px solid #cbd5e1",
                 background: "#fff", color: "#0f172a", fontSize: 14, fontWeight: 700,
                 textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8,
                 transition: "all 0.25s",
@@ -561,7 +631,7 @@ export default function Home() {
             <div className="mob-grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
 
               {/* 01 — AI Lab */}
-              <div className="sr" style={{ borderRadius: 20, overflow: "hidden", cursor: "pointer" }}
+              <div className="sr work-card" style={{ borderRadius: 20, overflow: "hidden", cursor: "pointer", background: "#fff", border: "1px solid #e8edf3" }}
                 onClick={() => window.open("/ai-labs", "_blank")}
                 onMouseEnter={e => { (e.currentTarget.querySelector(".biz-img") as HTMLElement).style.transform = "scale(1.03)"; }}
                 onMouseLeave={e => { (e.currentTarget.querySelector(".biz-img") as HTMLElement).style.transform = "scale(1)"; }}>
@@ -569,7 +639,7 @@ export default function Home() {
                   transition: "transform 0.6s cubic-bezier(0.16,1,0.3,1)" }}>
                   <img src="/3.jpg" alt="AI Lab" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                 </div>
-                <div style={{ padding: "22px 4px" }}>
+                <div style={{ padding: "22px 24px 26px" }}>
                   <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 8, fontWeight: 600 }}>01</div>
                   <div style={{ fontSize: 22, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em" }}>AI LAB — 業務AIの受託開発</div>
                   <div style={{ fontSize: 14, color: "#64748b", marginTop: 6, lineHeight: 1.7 }}>御社専用のAIエージェントをオーダーメイドで開発。議事録・書類読み取り・チャットボット・FAQ・サーベイ分析などのパッケージ商品もご用意しています。</div>
@@ -577,12 +647,12 @@ export default function Home() {
               </div>
 
               {/* 02 — 人材 */}
-              <div className="sr" style={{ borderRadius: 20, overflow: "hidden", transitionDelay: "0.08s" }}>
+              <div className="sr work-card" style={{ borderRadius: 20, overflow: "hidden", transitionDelay: "0.08s", background: "#fff", border: "1px solid #e8edf3" }}>
                 <div className="biz-img" style={{ height: 380, overflow: "hidden",
                   transition: "transform 0.6s cubic-bezier(0.16,1,0.3,1)" }}>
                   <img src="/4.jpg" alt="人材紹介" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                 </div>
-                <div style={{ padding: "22px 4px" }}>
+                <div style={{ padding: "22px 24px 26px" }}>
                   <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 8, fontWeight: 600 }}>02</div>
                   <div style={{ fontSize: 22, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em" }}>人材紹介</div>
                   <div style={{ fontSize: 14, color: "#64748b", marginTop: 6, lineHeight: 1.7 }}>企業と人材を丁寧につなぐキャリア支援サービス。テクノロジーと人の知見で最適なマッチングを実現します。（有料職業紹介事業　許可番号 23-ユ-303078）</div>

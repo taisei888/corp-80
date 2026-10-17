@@ -113,6 +113,15 @@ body {
   .case-row .case-label { grid-area: label; text-align: left !important; }
   .case-row .case-num { grid-area: num; align-self: center; }
 }
+.work-card {
+  transition: box-shadow 0.4s ease, transform 0.4s ease,
+              opacity 0.95s cubic-bezier(0.16,1,0.3,1),
+              filter 0.95s ease;
+}
+.work-card:hover {
+  box-shadow: 0 18px 48px rgba(15,23,42,0.1);
+}
+
 @keyframes dot-drift {
   0%   { background-position: 0 0; }
   100% { background-position: 36px 36px; }
@@ -154,6 +163,16 @@ body {
 .metal-hairline {
   height: 1px;
   background: linear-gradient(90deg, transparent, #94a3b8 35%, #e2e8f0 50%, #94a3b8 65%, transparent);
+}
+/* フィルムグレイン（高級感の下支え・ごく薄く） */
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  opacity: 0.045;
 }
 
 @keyframes cursor-blink {
