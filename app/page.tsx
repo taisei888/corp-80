@@ -439,7 +439,7 @@ export default function Home() {
               }} />
               AI AGENT STUDIO — 合同会社80
             </div>
-            <h1 style={{
+            <h1 className="hero-title" style={{
               fontSize: isMobile ? "clamp(48px, 14vw, 68px)" : "clamp(64px, 7.5vw, 108px)",
               fontWeight: 900, lineHeight: 1.02, letterSpacing: "-0.05em",
               color: "#0f172a", marginBottom: 24,
@@ -452,7 +452,7 @@ export default function Home() {
                 WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
               }}>NEXT.</span>
             </h1>
-            <p style={{ fontSize: isMobile ? 14 : 16, color: "#64748b", lineHeight: 2, marginBottom: 36 }}>
+            <p className="hero-lead" style={{ fontSize: isMobile ? 14 : 16, color: "#64748b", lineHeight: 2, marginBottom: 36 }}>
               テクノロジーで「次」をつくる。<br />
               御社専用のAIエージェントが、めんどうな仕事を代わりに働きます。
             </p>
@@ -927,6 +927,8 @@ export default function Home() {
 
       <style>{`
         @media (max-width: 768px) {
+          .hero-title { font-size: clamp(38px, 11.5vw, 54px) !important; }
+          .hero-lead { font-size: 13px !important; }
           .mob-hide { display: none !important; }
 
           .mob-section {
