@@ -132,6 +132,30 @@ body {
   border-color: #6366f1; color: #6366f1; background: rgba(238,242,255,0.8);
 }
 
+/* ── 水銀メタリック（ロゴと同系のクローム質感） ── */
+.metal-text {
+  background: linear-gradient(115deg, #e8edf3 0%, #9aa7b8 22%, #2e3a4d 48%, #8fa0b5 72%, #dfe6ee 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: shimmer 7s ease infinite;
+}
+.metal-text-dark {
+  background: linear-gradient(115deg, #f8fafc 0%, #8b99ad 28%, #e2e8f0 50%, #64748b 74%, #f1f5f9 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: shimmer 7s ease infinite;
+}
+.metal-hairline {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #94a3b8 35%, #e2e8f0 50%, #94a3b8 65%, transparent);
+}
+
 @keyframes cursor-blink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }

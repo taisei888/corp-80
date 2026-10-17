@@ -128,85 +128,8 @@ function CaseNum({ value }: { value: string }) {
   return <span ref={ref} className="case-num">{display}</span>;
 }
 
-// ─── vivoo風 俯瞰ローミング（キャラがヒーロー内を歩き回る） ────────────────────
-function RoamField({ isMobile }: { isMobile: boolean }) {
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const host = ref.current;
-    if (!host) return;
-    const SRCS = ["/chars/td-ball.png", "/chars/td-cyclops.png", "/chars/td-drop.png", "/chars/td-star.png", "/chars/td-donut.png", "/chars/td-cloud.png"];
-    const N = isMobile ? 4 : 6;
-    type Agent = { root: HTMLDivElement; img: HTMLImageElement; x: number; y: number; tx: number; ty: number; sp: number; pause: number; ph: number; rot: number; size: number };
-    const agents: Agent[] = [];
-    const inCenter = (x: number, y: number) => {
-      const W = host.offsetWidth, H = host.offsetHeight;
-      return x > W * 0.24 && x < W * 0.76 && y > H * 0.12 && y < H * 0.8;
-    };
-    const pickTarget = (a: Agent) => {
-      const W = host.offsetWidth, H = host.offsetHeight;
-      for (let i = 0; i < 24; i++) {
-        const x = 30 + Math.random() * (W - 60);
-        const y = 40 + Math.random() * (H - 80);
-        if (!inCenter(x, y)) { a.tx = x; a.ty = y; return; }
-      }
-    };
-    for (let i = 0; i < N; i++) {
-      const size = (isMobile ? 46 : 66) + Math.random() * (isMobile ? 20 : 38);
-      const root = document.createElement("div");
-      root.style.cssText = "position:absolute;left:0;top:0;will-change:transform;";
-      const sh = document.createElement("div");
-      sh.style.cssText = "position:absolute;left:8%;top:74%;width:92%;height:30%;border-radius:50%;background:rgba(15,23,42,0.14);filter:blur(5px);transform:translate(9px,7px);";
-      const img = document.createElement("img");
-      img.src = SRCS[i % SRCS.length];
-      img.alt = "";
-      img.style.cssText = `position:relative;width:${size}px;display:block;`;
-      root.appendChild(sh);
-      root.appendChild(img);
-      host.appendChild(root);
-      const a: Agent = { root, img, x: 0, y: 0, tx: 0, ty: 0, sp: 13 + Math.random() * 13, pause: Math.random() * 2000, ph: Math.random() * 10, rot: 0, size };
-      let guard = 0;
-      do {
-        a.x = 30 + Math.random() * (host.offsetWidth - 60);
-        a.y = 40 + Math.random() * (host.offsetHeight - 80);
-      } while (inCenter(a.x, a.y) && ++guard < 30);
-      pickTarget(a);
-      agents.push(a);
-    }
-    let raf = 0, last = performance.now();
-    const step = (now: number) => {
-      const dt = Math.min(0.05, (now - last) / 1000);
-      last = now;
-      for (const a of agents) {
-        let moving = false;
-        if (a.pause > 0) a.pause -= dt * 1000;
-        else {
-          const dx = a.tx - a.x, dy = a.ty - a.y;
-          const d = Math.hypot(dx, dy) || 1;
-          if (d < 5) { a.pause = 900 + Math.random() * 2600; pickTarget(a); }
-          else {
-            a.x += (dx / d) * a.sp * dt;
-            a.y += (dy / d) * a.sp * dt;
-            const lean = Math.max(-9, Math.min(9, dx * 0.06));
-            a.rot += (lean - a.rot) * 0.06;
-            moving = true;
-          }
-        }
-        if (!moving) a.rot *= 0.94;
-        a.ph += dt * (moving ? 9 : 2);
-        const bob = Math.sin(a.ph) * (moving ? 2.6 : 0.8);
-        a.root.style.transform = `translate(${a.x - a.size / 2}px, ${a.y - a.size / 2}px) rotate(${a.rot}deg)`;
-        a.img.style.transform = `translateY(${bob}px)`;
-      }
-      raf = requestAnimationFrame(step);
-    };
-    raf = requestAnimationFrame(step);
-    return () => { cancelAnimationFrame(raf); agents.forEach((a) => a.root.remove()); };
-  }, [isMobile]);
-  return <div ref={ref} style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 2, overflow: "hidden" }} />;
-}
-
-// ─── Particle Text Canvas ─────────────────────────────────────────────────────
-function ParticleTextCanvas() {
+// ─── Mercury Field（液体水銀の球がゆっくり漂い、カーソルから逃げる） ─────────────
+function MercuryField({ isMobile }: { isMobile: boolean }) {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     const canvas = ref.current;
@@ -214,94 +137,148 @@ function ParticleTextCanvas() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    interface P { x:number; y:number; tx:number; ty:number; vx:number; vy:number; sz:number; col:string; }
-    let W = 0, H = 0, pts: P[] = [], raf = 0;
+    let W = 0, H = 0, raf = 0, t = 0;
     const mouse = { x: -9999, y: -9999 };
-    const COLS = ["#1e293b","#1e293b","#3730a3","#475569","#1e293b","#1e293b","#312e81"];
-
-    const build = (): P[] => {
-      const off = document.createElement("canvas");
-      off.width = W; off.height = H;
-      const oc = off.getContext("2d")!;
-
-      // auto-size to fill viewport
-      const L1 = "Build what's", L2 = "NEXT.";
-      let fs = 10;
-      oc.font = `900 ${fs}px -apple-system, BlinkMacSystemFont, sans-serif`;
-      while (oc.measureText(L1).width < W * 0.80) {
-        fs += 2;
-        oc.font = `900 ${fs}px -apple-system, BlinkMacSystemFont, sans-serif`;
-      }
-      const lh = fs * 1.08;
-      const cy = H * 0.40;
-      oc.fillStyle = "#000";
-      oc.textAlign = "center";
-      oc.textBaseline = "alphabetic";
-      oc.fillText(L1, W / 2, cy);
-      oc.fillText(L2, W / 2, cy + lh);
-
-      const data = oc.getImageData(0, 0, W, H).data;
-      const gap = 4, out: P[] = [];
-      for (let y = 0; y < H; y += gap) {
-        for (let x = 0; x < W; x += gap) {
-          if (data[(y * W + x) * 4 + 3] > 128) {
-            out.push({
-              tx: x, ty: y,
-              x: Math.random() * W,
-              y: Math.random() * H,
-              vx: 0, vy: 0,
-              sz: 1.3 + Math.random() * 1.3,
-              col: COLS[Math.floor(Math.random() * COLS.length)],
-            });
-          }
-        }
-      }
-      return out;
-    };
+    type Ball = { x: number; y: number; r: number; vx: number; vy: number; ph: number };
+    let balls: Ball[] = [];
 
     const init = () => {
       const dpr = Math.min(devicePixelRatio, 2);
-      W = window.innerWidth; H = window.innerHeight;
+      W = canvas.offsetWidth; H = canvas.offsetHeight;
       canvas.width = W * dpr; canvas.height = H * dpr;
       canvas.style.width = W + "px"; canvas.style.height = H + "px";
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      pts = build();
+      balls = [];
+      const N = isMobile ? 5 : 8;
+      const SIZES = isMobile ? [52, 34, 26, 20, 14] : [86, 60, 48, 38, 30, 24, 18, 14];
+      for (let i = 0; i < N; i++) {
+        const r = SIZES[i];
+        let x = 0, y = 0, guard = 0;
+        // 中央のコピー領域を避けて配置
+        do {
+          x = r + Math.random() * (W - r * 2);
+          y = 74 + r + Math.random() * (H - 74 - r * 3);
+        } while (x > W * 0.24 && x < W * 0.76 && y > H * 0.16 && y < H * 0.76 && ++guard < 40);
+        balls.push({ x, y, r, vx: (Math.random() - 0.5) * 14, vy: (Math.random() - 0.5) * 14, ph: Math.random() * 10 });
+      }
+    };
+
+    const drawBall = (b: Ball, bobY: number) => {
+      const x = b.x, y = b.y + bobY, r = b.r;
+      // 落ち影
+      ctx.save();
+      ctx.translate(x, y + r * 0.92);
+      ctx.scale(1, 0.3);
+      const sh = ctx.createRadialGradient(0, 0, 0, 0, 0, r);
+      sh.addColorStop(0, "rgba(15,23,42,0.16)");
+      sh.addColorStop(1, "rgba(15,23,42,0)");
+      ctx.fillStyle = sh;
+      ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+      // 本体（クロームの球）
+      const g = ctx.createRadialGradient(x - r * 0.35, y - r * 0.42, r * 0.08, x, y, r);
+      g.addColorStop(0, "#ffffff");
+      g.addColorStop(0.25, "#dde4ec");
+      g.addColorStop(0.55, "#94a3b8");
+      g.addColorStop(0.82, "#475569");
+      g.addColorStop(1, "#1e293b");
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+      // 地平線の映り込み（クロームらしさの要）
+      ctx.save();
+      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.clip();
+      const band = ctx.createLinearGradient(x, y - r * 0.08, x, y + r * 0.6);
+      band.addColorStop(0, "rgba(15,23,42,0)");
+      band.addColorStop(0.45, "rgba(30,41,59,0.42)");
+      band.addColorStop(1, "rgba(30,41,59,0)");
+      ctx.fillStyle = band;
+      ctx.fillRect(x - r, y - r * 0.08, r * 2, r * 0.75);
+      // 下側のリムライト
+      const rim = ctx.createRadialGradient(x, y + r * 0.72, r * 0.05, x, y + r * 0.62, r * 0.8);
+      rim.addColorStop(0, "rgba(226,232,240,0.5)");
+      rim.addColorStop(1, "rgba(226,232,240,0)");
+      ctx.fillStyle = rim;
+      ctx.beginPath(); ctx.arc(x, y + r * 0.55, r * 0.75, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+      // スペキュラハイライト
+      ctx.save();
+      ctx.translate(x - r * 0.36, y - r * 0.46);
+      ctx.rotate(-0.5);
+      ctx.scale(1, 0.6);
+      const sp = ctx.createRadialGradient(0, 0, 0, 0, 0, r * 0.34);
+      sp.addColorStop(0, "rgba(255,255,255,0.95)");
+      sp.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.fillStyle = sp;
+      ctx.beginPath(); ctx.arc(0, 0, r * 0.34, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
     };
 
     init();
     const onResize = () => init();
-    const onMove = (e: MouseEvent) => { mouse.x = e.clientX; mouse.y = e.clientY; };
+    const onMouse = (e: MouseEvent) => {
+      const rc = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - rc.left;
+      mouse.y = e.clientY - rc.top;
+    };
     const onLeave = () => { mouse.x = -9999; mouse.y = -9999; };
     window.addEventListener("resize", onResize);
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("mouseleave", onLeave);
+    window.addEventListener("mousemove", onMouse);
+    document.addEventListener("mouseleave", onLeave);
 
-    const REPEL = 150;
-    const render = () => {
+    let last = performance.now();
+    const render = (now: number) => {
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now; t += dt;
       ctx.clearRect(0, 0, W, H);
-      for (const p of pts) {
-        const dx = mouse.x - p.x, dy = mouse.y - p.y;
-        const d2 = dx * dx + dy * dy;
-        if (d2 < REPEL * REPEL) {
-          const d = Math.sqrt(d2) || 1;
-          const f = (1 - d / REPEL) * 16;
-          p.vx -= (dx / d) * f;
-          p.vy -= (dy / d) * f;
-        }
-        // spring back to target
-        p.vx += (p.tx - p.x) * 0.052;
-        p.vy += (p.ty - p.y) * 0.052;
-        // damping
-        p.vx *= 0.84; p.vy *= 0.84;
-        p.x += p.vx; p.y += p.vy;
 
-        ctx.fillStyle = p.col;
-        ctx.globalAlpha = 0.80;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.sz, 0, Math.PI * 2);
-        ctx.fill();
+      for (const b of balls) {
+        // ゆっくり漂う
+        b.x += b.vx * dt;
+        b.y += b.vy * dt;
+        // カーソルから逃げる
+        const dx = b.x - mouse.x, dy = b.y - mouse.y;
+        const d = Math.hypot(dx, dy);
+        const R = b.r + 110;
+        if (d < R && d > 0.01) {
+          const f = (1 - d / R) * 90 * dt;
+          b.vx += (dx / d) * f;
+          b.vy += (dy / d) * f;
+        }
+        // 互いに反発（重なりすぎ防止）
+        for (const o of balls) {
+          if (o === b) continue;
+          const ox = b.x - o.x, oy = b.y - o.y;
+          const od = Math.hypot(ox, oy) || 1;
+          const min = (b.r + o.r) * 0.86;
+          if (od < min) {
+            const f = ((min - od) / min) * 26 * dt;
+            b.vx += (ox / od) * f;
+            b.vy += (oy / od) * f;
+          }
+        }
+        // 中央のコピー領域から押し出す
+        const ex = (b.x - W / 2) / (W * 0.3), ey = (b.y - H * 0.46) / (H * 0.3);
+        const e2 = ex * ex + ey * ey;
+        if (e2 < 1) {
+          const el = Math.sqrt(e2) || 0.01;
+          const f = (1 - e2) * 70 * dt;
+          b.vx += (ex / el) * f;
+          b.vy += (ey / el) * f;
+        }
+        // 壁で跳ね返る（上端はナビを避ける）
+        if (b.x < b.r) { b.x = b.r; b.vx = Math.abs(b.vx); }
+        if (b.x > W - b.r) { b.x = W - b.r; b.vx = -Math.abs(b.vx); }
+        if (b.y < 74 + b.r) { b.y = 74 + b.r; b.vy = Math.abs(b.vy); }
+        if (b.y > H - b.r * 1.6) { b.y = H - b.r * 1.6; b.vy = -Math.abs(b.vy); }
+        // 減速して漂う速度に戻る
+        const sp = Math.hypot(b.vx, b.vy);
+        const CRUISE = 11;
+        if (sp > CRUISE) { const k = 1 - Math.min(1, dt * 1.6); b.vx *= k; b.vy *= k; }
       }
-      ctx.globalAlpha = 1;
+      // 大きい球を奥に
+      const sorted = [...balls].sort((a, b2) => b2.r - a.r);
+      for (const b of sorted) drawBall(b, Math.sin(t * 0.7 + b.ph) * 3);
+
       raf = requestAnimationFrame(render);
     };
     raf = requestAnimationFrame(render);
@@ -309,12 +286,12 @@ function ParticleTextCanvas() {
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", onResize);
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mouseleave", onLeave);
+      window.removeEventListener("mousemove", onMouse);
+      document.removeEventListener("mouseleave", onLeave);
     };
-  }, []);
+  }, [isMobile]);
 
-  return <canvas ref={ref} style={{ position: "fixed", inset: 0, zIndex: 0, display: "block", background: "#f8fafc" }} />;
+  return <canvas ref={ref} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none", zIndex: 2 }} />;
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -406,22 +383,13 @@ export default function Home() {
             <div style={{ position: "absolute", inset: 0,
               background: "radial-gradient(ellipse at center, transparent 20%, rgba(255,255,255,0.92) 65%)",
             }} />
-            {/* organic blobs (vivoo風) */}
-            <div style={{ position: "absolute", top: "-12%", right: "-8%", width: "min(46vw, 560px)", aspectRatio: "1",
-              background: "#e7edf4", borderRadius: "58% 42% 55% 45% / 50% 55% 45% 50%",
-              animation: "blob-morph 26s ease-in-out infinite alternate" }} />
-            <div style={{ position: "absolute", bottom: "-18%", left: "-10%", width: "min(42vw, 500px)", aspectRatio: "1",
-              background: "#eef2f6", borderRadius: "45% 55% 48% 52% / 58% 44% 56% 42%",
-              animation: "blob-morph 32s ease-in-out infinite alternate-reverse" }} />
-            <div style={{ position: "absolute", top: "24%", left: "-6%", width: "min(22vw, 260px)", aspectRatio: "1",
-              background: "#ece9e4", borderRadius: "52% 48% 44% 56% / 48% 56% 44% 52%",
-              animation: "blob-morph 22s ease-in-out infinite alternate", animationDelay: "-8s" }} />
-            <div style={{ position: "absolute", bottom: "6%", right: "10%", width: "min(18vw, 210px)", aspectRatio: "1",
-              background: "#e2e8f0", borderRadius: "48% 52% 56% 44% / 52% 44% 56% 48%",
-              animation: "blob-morph 28s ease-in-out infinite alternate-reverse", animationDelay: "-14s" }} />
           </div>
 
-          <RoamField isMobile={isMobile} />
+          <MercuryField isMobile={isMobile} />
+          {/* コピーの可読性を守る中央ウォッシュ（水銀球の上・文字の下） */}
+          <div style={{ position: "absolute", inset: 0, zIndex: 2, pointerEvents: "none",
+            background: "radial-gradient(ellipse 58% 46% at center 46%, rgba(255,255,255,0.88) 0%, rgba(255,255,255,0.55) 55%, transparent 100%)",
+          }} />
 
           <div style={{ maxWidth: 880, width: "100%", position: "relative", textAlign: "center", zIndex: 3 }}>
             <div style={{
@@ -440,20 +408,15 @@ export default function Home() {
               AI AGENT STUDIO — 合同会社80
             </div>
             <h1 className="hero-title" style={{
-              fontSize: isMobile ? "clamp(48px, 14vw, 68px)" : "clamp(64px, 7.5vw, 108px)",
-              fontWeight: 900, lineHeight: 1.02, letterSpacing: "-0.05em",
+              fontSize: isMobile ? "clamp(28px, 8vw, 38px)" : "clamp(42px, 4.6vw, 64px)",
+              fontWeight: 900, lineHeight: 1.42, letterSpacing: "-0.02em",
               color: "#0f172a", marginBottom: 24,
             }}>
-              Build{isMobile ? <br /> : " "}what&apos;s{" "}
-              <span style={{
-                background: "linear-gradient(120deg, #e2e8f0 0%, #94a3b8 25%, #334155 50%, #94a3b8 75%, #e2e8f0 100%)",
-                backgroundSize: "200% 200%",
-                animation: "shimmer 4s ease infinite",
-                WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-              }}>NEXT.</span>
+              人の知覚を、<br />
+              ソフトウェアで<span className="metal-text">拡張</span>する。
             </h1>
             <p className="hero-lead" style={{ fontSize: isMobile ? 14 : 16, color: "#64748b", lineHeight: 2, marginBottom: 36 }}>
-              テクノロジーで「次」をつくる。<br />
+              名古屋のAI開発会社、合同会社80。<br />
               御社専用のAIエージェントが、めんどうな仕事を代わりに働きます。
             </p>
             <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
@@ -546,7 +509,7 @@ export default function Home() {
                 <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.22em", color: "#64748b", textTransform: "uppercase", marginBottom: 24 }}>
                   私たちのビジョン
                 </div>
-                <div style={{ fontSize: "clamp(56px, 7vw, 96px)", fontWeight: 900, lineHeight: 1.0, letterSpacing: "-0.04em", color: "#0f172a" }}>
+                <div className="metal-text" style={{ fontSize: "clamp(56px, 7vw, 96px)", fontWeight: 900, lineHeight: 1.0, letterSpacing: "-0.04em" }}>
                   Our<br />Vision
                 </div>
               </div>
@@ -592,7 +555,7 @@ export default function Home() {
         <section id="business" className="mob-section" style={{ background: "#fff", padding: "120px 64px 140px" }}>
           <div style={{ maxWidth: 1160, margin: "0 auto" }}>
             <div className="sr" style={{ textAlign: "center", marginBottom: 72 }}>
-              <h2 style={{ fontSize: "clamp(64px, 10vw, 130px)", fontWeight: 900, letterSpacing: "-0.05em", color: "#0f172a", lineHeight: 1 }}>Works</h2>
+              <h2 className="metal-text" style={{ fontSize: "clamp(64px, 10vw, 130px)", fontWeight: 900, letterSpacing: "-0.05em", lineHeight: 1 }}>Works</h2>
             </div>
             {/* 2×2 grid */}
             <div className="mob-grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
@@ -674,10 +637,11 @@ export default function Home() {
               <div className="sr" style={{ display: "flex", flexDirection: "column", gap: 16, transitionDelay: "0.12s" }}>
 
                 {/* Card 1 */}
-                <div style={{ borderRadius: 20, overflow: "hidden", background: "linear-gradient(135deg, #0f172a, #1e1b4b)", padding: "40px 36px", position: "relative" }}>
-                  <div style={{ position: "absolute", top: -20, right: -20, width: 160, height: 160, borderRadius: "50%", border: "1px solid rgba(100,116,139,0.2)" }} />
-                  <div style={{ position: "absolute", top: 10, right: 60, fontSize: 9, fontWeight: 700, letterSpacing: "0.15em", color: "rgba(165,180,252,0.5)", textTransform: "uppercase" }}>LANGUAGE MODEL</div>
-                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", color: "rgba(165,180,252,0.6)", textTransform: "uppercase", marginBottom: 16 }}>自動化 & 生成</div>
+                <div style={{ borderRadius: 20, overflow: "hidden", background: "linear-gradient(135deg, #0f172a 0%, #1e293b 55%, #40506a 100%)", padding: "40px 36px", position: "relative" }}>
+                  <div style={{ position: "absolute", inset: 0, background: "linear-gradient(120deg, transparent 32%, rgba(255,255,255,0.07) 46%, transparent 60%)", pointerEvents: "none" }} />
+                  <div style={{ position: "absolute", top: -20, right: -20, width: 160, height: 160, borderRadius: "50%", border: "1px solid rgba(148,163,184,0.25)" }} />
+                  <div style={{ position: "absolute", top: 10, right: 60, fontSize: 9, fontWeight: 700, letterSpacing: "0.15em", color: "rgba(203,213,225,0.5)", textTransform: "uppercase" }}>LANGUAGE MODEL</div>
+                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", color: "rgba(203,213,225,0.6)", textTransform: "uppercase", marginBottom: 16 }}>自動化 & 生成</div>
                   <div style={{ fontSize: 22, fontWeight: 800, color: "#fff", marginBottom: 14, lineHeight: 1.4 }}>ドキュメント・<br />コミュニケーションをAIで。</div>
                   <div style={{ fontSize: 13, color: "rgba(203,213,225,0.8)", lineHeight: 1.8 }}>
                     報告書・提案書・メールの自動生成。社内FAQへの即答。AIが"書く・答える"を肩代わりします。
@@ -685,10 +649,11 @@ export default function Home() {
                 </div>
 
                 {/* Card 2 */}
-                <div style={{ borderRadius: 20, overflow: "hidden", background: "linear-gradient(135deg, #1a1025, #312e81)", padding: "40px 36px", position: "relative" }}>
+                <div style={{ borderRadius: 20, overflow: "hidden", background: "linear-gradient(135deg, #334155 0%, #1e293b 45%, #0f172a 100%)", padding: "40px 36px", position: "relative" }}>
+                  <div style={{ position: "absolute", inset: 0, background: "linear-gradient(120deg, transparent 38%, rgba(255,255,255,0.06) 52%, transparent 66%)", pointerEvents: "none" }} />
                   <div style={{ position: "absolute", bottom: -30, right: -30, width: 180, height: 180, borderRadius: "50%", border: "1px solid rgba(148,163,184,0.2)" }} />
-                  <div style={{ position: "absolute", bottom: 40, right: 36, fontSize: 9, fontWeight: 700, letterSpacing: "0.15em", color: "rgba(196,181,253,0.5)", textTransform: "uppercase" }}>DATA SCIENCE</div>
-                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", color: "rgba(196,181,253,0.6)", textTransform: "uppercase", marginBottom: 16 }}>分析 & 洞察</div>
+                  <div style={{ position: "absolute", bottom: 40, right: 36, fontSize: 9, fontWeight: 700, letterSpacing: "0.15em", color: "rgba(203,213,225,0.5)", textTransform: "uppercase" }}>DATA SCIENCE</div>
+                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", color: "rgba(203,213,225,0.6)", textTransform: "uppercase", marginBottom: 16 }}>分析 & 洞察</div>
                   <div style={{ fontSize: 22, fontWeight: 800, color: "#fff", marginBottom: 14, lineHeight: 1.4 }}>データから、<br />意思決定を変える。</div>
                   <div style={{ fontSize: 13, color: "rgba(203,213,225,0.8)", lineHeight: 1.8 }}>
                     売上予測・異常検知・顧客分析。膨大なデータを即座に解釈し、ビジネスの判断を支えます。
@@ -746,12 +711,13 @@ export default function Home() {
 
 
         {/* ── Recruit ── */}
-        <section id="recruit" className="mob-section" style={{ background: "#111827", padding: "120px 64px 140px" }}>
+        <section id="recruit" className="mob-section" style={{ background: "#0f172a", padding: "120px 64px 140px", position: "relative" }}>
+          <div className="metal-hairline" style={{ position: "absolute", top: 0, left: 0, right: 0, opacity: 0.5 }} />
           <div style={{ maxWidth: 1160, margin: "0 auto" }}>
 
             {/* Title */}
             <div className="sr mob-recruit-header" style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 80 }}>
-              <h2 style={{ fontSize: "clamp(48px, 7vw, 96px)", fontWeight: 900, letterSpacing: "-0.05em", color: "#f8fafc", lineHeight: 1 }}>Recruit</h2>
+              <h2 className="metal-text-dark" style={{ fontSize: "clamp(48px, 7vw, 96px)", fontWeight: 900, letterSpacing: "-0.05em", lineHeight: 1 }}>Recruit</h2>
               <a href="mailto:ito.t@80grp.com"
                 style={{ display: "inline-flex", alignItems: "center", gap: 10,
                   padding: "12px 28px", borderRadius: 6,
@@ -808,7 +774,7 @@ export default function Home() {
         </section>
 
         {/* ── Footer ── */}
-        <footer style={{ background: "#13151f", padding: "80px 64px 0" }}>
+        <footer style={{ background: "#0b1220", padding: "80px 64px 0" }}>
           <div style={{ maxWidth: 1160, margin: "0 auto" }}>
             <div className="mob-grid-footer" style={{ display: "grid", gridTemplateColumns: "220px 1fr 200px", gap: 64, paddingBottom: 80, borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
 
@@ -927,7 +893,7 @@ export default function Home() {
 
       <style>{`
         @media (max-width: 768px) {
-          .hero-title { font-size: clamp(38px, 11.5vw, 54px) !important; }
+          .hero-title { font-size: clamp(27px, 7.8vw, 38px) !important; }
           .hero-lead { font-size: 13px !important; }
           .mob-hide { display: none !important; }
 
