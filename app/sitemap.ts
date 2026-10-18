@@ -6,6 +6,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: base, lastModified: new Date(), changeFrequency: "weekly", priority: 1.0 },
     { url: `${base}/columns`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.9 },
+    { url: `${base}/moshimoshi`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.9 },
     ...ARTICLES.map((a) => ({
       url: `${base}/columns/${a.slug}`,
       lastModified: new Date(a.date),
