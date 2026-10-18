@@ -215,6 +215,13 @@ export default function AiLabsPage() {
     return () => window.removeEventListener("resize", c);
   }, []);
   useEffect(() => { setFlat(new URLSearchParams(window.location.search).has("flat")); }, []);
+  // QA用: ?qy=1234 で指定位置へスクロール固定（スクショ検証用・通常閲覧には無影響）
+  useEffect(() => {
+    const qy = Number(new URLSearchParams(window.location.search).get("qy") || 0);
+    if (!qy) return;
+    const t = setInterval(() => window.scrollTo(0, qy), 250);
+    return () => clearInterval(t);
+  }, []);
   useEffect(() => {
     const onScroll = () => {
       setScrolled(window.scrollY > 30);
@@ -297,7 +304,7 @@ export default function AiLabsPage() {
           </div>
         </div>
         {isMobile && (
-          <div style={{ textAlign: "center", marginTop: 22 }}>
+          <div style={{ textAlign: "center", marginTop: 22, position: "relative", zIndex: 1 }}>
             <CTA />
           </div>
         )}
@@ -373,8 +380,8 @@ export default function AiLabsPage() {
       <section className="sec" style={{ padding: "100px 40px", background: "#fff", borderTop: `2px solid ${BLACK}` }}>
         <div style={{ maxWidth: 1000, margin: "0 auto" }}>
           <Big en="TEAMWORK" jp="ひとつの仕事を、受けわたして完了させる" />
-          <div style={{ textAlign: "center", marginBottom: 40 }}>
-            <img className="rv" src="/ailab/robo-team.webp" alt="" style={{ height: isMobile ? 84 : 120 }} />
+          <div style={{ marginBottom: 40 }}>
+            <img className="rv" src="/ailab/robo-team.webp" alt="" style={{ height: isMobile ? 84 : 120, display: "block", margin: "0 auto" }} />
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
             {FLOWS.map((f, fi) => (
@@ -451,7 +458,7 @@ export default function AiLabsPage() {
         <div style={{ marginTop: 40, display: "flex", flexDirection: "column", gap: 12 }}>
           {[0, 1].map((row) => (
             <div key={row} style={{ display: "flex", gap: 12, width: "max-content", animation: `${row === 0 ? "marqueeL" : "marqueeR"} 46s linear infinite` }}>
-              {[...CAPABILITIES, ...CAPABILITIES].map((c, j) => (
+              {(row === 0 ? [...CAPABILITIES, ...CAPABILITIES] : [...CAPABILITIES.slice(8), ...CAPABILITIES.slice(0, 8), ...CAPABILITIES.slice(8), ...CAPABILITIES.slice(0, 8)]).map((c, j) => (
                 <span key={j} style={{ fontSize: 13, fontWeight: 800, color: BLACK, background: j % 2 === 0 ? "#fff" : YELLOW, border: `2px solid ${BLACK}`, borderRadius: 100, padding: "10px 22px", whiteSpace: "nowrap" }}>{c}</span>
               ))}
             </div>
@@ -763,7 +770,7 @@ export default function AiLabsPage() {
       {/* ══ 19. 最終CTA ══ */}
       <section className="sec" style={{ padding: "100px 40px 90px", background: YELLOW, borderTop: `2px solid ${BLACK}`, textAlign: "center" }}>
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
-          <img className="rv" src="/ailab/robo-team.webp" alt="" style={{ height: isMobile ? 90 : 130, marginBottom: 20 }} />
+          <img className="rv" src="/ailab/robo-team.webp" alt="" style={{ height: isMobile ? 90 : 130, margin: "0 auto 20px", display: "block" }} />
           <h2 className="rv" style={{ ...hf, fontSize: "clamp(28px, 3.6vw, 44px)", lineHeight: 1.6 }}>どの仕事から、<br />任せてみますか？</h2>
           <p className="rv" style={{ fontSize: 14.5, fontWeight: 600, lineHeight: 2.1, marginTop: 16 }}>
             初回のご相談は無料です。「自動化できる業務の診断リスト」をその場でお渡しします。<br />しつこい営業は、私たちの得意分野ではありません。
