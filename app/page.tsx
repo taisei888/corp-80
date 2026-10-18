@@ -818,7 +818,7 @@ export default function Home() {
                     <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.1)" }} />
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                    {[["quix","/quix"],["LENDS AI","https://www.lens-ai.jp"],["AI Labs","/ai-labs"],["jGO",null]].map(([l, href]) => (
+                    {[["quix","/quix"],["LENDS AI","https://www.lens-ai.jp"],["AI Labs","/ai-labs"],["コラム・導入事例","/columns"],["jGO",null]].map(([l, href]) => (
                       href ? (
                         <a key={l as string} href={href as string} target={href.startsWith("http") ? "_blank" : undefined} rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
                           style={{ fontSize:13, color:"rgba(255,255,255,0.45)", textDecoration:"none", transition:"color 0.2s" }}

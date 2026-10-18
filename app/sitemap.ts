@@ -1,9 +1,17 @@
 import type { MetadataRoute } from "next";
+import { ARTICLES } from "../lib/articles";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = "https://www.rng-labs.com";
   return [
     { url: base, lastModified: new Date(), changeFrequency: "weekly", priority: 1.0 },
+    { url: `${base}/columns`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.9 },
+    ...ARTICLES.map((a) => ({
+      url: `${base}/columns/${a.slug}`,
+      lastModified: new Date(a.date),
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    })),
     { url: `${base}/company`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
     { url: `${base}/quix`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
     { url: `${base}/ai-labs`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
