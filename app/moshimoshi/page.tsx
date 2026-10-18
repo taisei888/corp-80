@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 // ─── palette（白×黄×黒：みんなの銀行系） ───
 const C = {
@@ -62,6 +62,13 @@ function Marker({ children }: { children: React.ReactNode }) {
 
 export default function MoshimoshiPage() {
   useReveal();
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 30);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
     <div style={{ background: C.white, color: C.black, overflowX: "clip", fontFamily: "inherit" }}>
@@ -70,7 +77,10 @@ export default function MoshimoshiPage() {
       <nav style={{
         position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "14px 20px",
+        padding: scrolled ? "10px 20px" : "14px 20px",
+        background: scrolled ? "rgba(255,255,255,0.97)" : "transparent",
+        borderBottom: scrolled ? "2px solid #111111" : "2px solid transparent",
+        transition: "background 0.25s, border-color 0.25s, padding 0.25s",
       }}>
         <div style={{
           display: "flex", alignItems: "center", gap: 9,
