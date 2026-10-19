@@ -1,6 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Shippori_Mincho } from "next/font/google";
+
+const mincho = Shippori_Mincho({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+});
 
 // ─── Dot Grid Canvas ──────────────────────────────────────────────────────────
 function DotCanvas() {
@@ -128,210 +135,13 @@ function CaseNum({ value }: { value: string }) {
   return <span ref={ref} className="case-num">{display}</span>;
 }
 
-// ─── Mercury Field（WebGLレイマーチング液体金属：融合・分裂・クローム映り込み） ──
-function MercuryField({ isMobile }: { isMobile: boolean }) {
-  const ref = useRef<HTMLCanvasElement>(null);
-  useEffect(() => {
-    const canvas = ref.current;
-    if (!canvas) return;
-    const gl = canvas.getContext("webgl", { alpha: true, antialias: false, premultipliedAlpha: true });
-    if (!gl) return;
-
-    const MAXB = 8;
-    const N = isMobile ? 5 : 7;
-
-    const VS = `
-      attribute vec2 aPos;
-      void main(){ gl_Position = vec4(aPos, 0.0, 1.0); }
-    `;
-    const FS = `
-      precision highp float;
-      uniform vec2 uRes;
-      uniform vec4 uBalls[${MAXB}];
-
-      float smin(float a, float b, float k){
-        float h = clamp(0.5 + 0.5*(b-a)/k, 0.0, 1.0);
-        return mix(b, a, h) - k*h*(1.0-h);
-      }
-      float map(vec3 p){
-        float d = 1e5;
-        for(int i=0;i<${MAXB};i++){
-          vec4 b = uBalls[i];
-          if(b.w > 0.0) d = smin(d, length(p - b.xyz) - b.w, 0.16);
-        }
-        return d;
-      }
-      vec3 calcN(vec3 p){
-        vec2 e = vec2(0.0025, 0.0);
-        return normalize(vec3(
-          map(p+e.xyy)-map(p-e.xyy),
-          map(p+e.yxy)-map(p-e.yxy),
-          map(p+e.yyx)-map(p-e.yyx)));
-      }
-      // スタジオ環境（上=白天板 / 中央=暗帯 / 下=淡い床バウンス）: ロゴのコントラストを再現
-      vec3 env(vec3 d){
-        float y = d.y;
-        vec3 c = mix(vec3(0.09,0.11,0.16), vec3(0.80,0.84,0.90), smoothstep(0.02, 0.5, y));
-        c = mix(c, vec3(1.04), smoothstep(0.5, 0.92, y));
-        c = mix(c, vec3(0.05,0.07,0.11), smoothstep(0.18, 0.02, abs(y+0.08)));
-        c = mix(c, vec3(0.58,0.63,0.72), smoothstep(0.35, 0.95, -y));
-        c *= 0.92 + 0.08 * d.x;
-        return c;
-      }
-      void main(){
-        float A = uRes.x / uRes.y;
-        vec2 uv = (gl_FragCoord.xy / uRes) * 2.0 - 1.0;
-        uv.x *= A;
-        vec3 ro = vec3(uv, -3.0);
-        vec3 rd = vec3(0.0, 0.0, 1.0);
-        float t = 0.0, d = 1e5, md = 1e5;
-        vec3 p = ro;
-        for(int i=0;i<72;i++){
-          p = ro + rd * t;
-          d = map(p);
-          md = min(md, d);
-          if(d < 0.0012 || t > 6.0) break;
-          t += d;
-        }
-        if(d < 0.0012){
-          vec3 n = calcN(p);
-          vec3 r = reflect(rd, n);
-          vec3 col = env(r);
-          float fres = pow(1.0 - abs(n.z), 2.4);
-          col += fres * vec3(0.22, 0.24, 0.28);
-          float spec = pow(max(dot(r, normalize(vec3(-0.45, 0.85, -0.45))), 0.0), 80.0);
-          col += spec * 1.1;
-          float spec2 = pow(max(dot(r, normalize(vec3(0.6, -0.5, -0.4))), 0.0), 50.0);
-          col += spec2 * 0.25;
-          col = clamp(col, 0.0, 1.0);
-          gl_FragColor = vec4(col, 1.0);
-        } else {
-          // シルエットを柔らかくするAAハロー
-          float a = 1.0 - smoothstep(0.0, 0.006, md);
-          gl_FragColor = vec4(vec3(0.35, 0.39, 0.46) * a, a * 0.85);
-        }
-      }
-    `;
-
-    const mk = (type: number, src: string) => {
-      const s = gl.createShader(type)!;
-      gl.shaderSource(s, src);
-      gl.compileShader(s);
-      return s;
-    };
-    const prog = gl.createProgram()!;
-    gl.attachShader(prog, mk(gl.VERTEX_SHADER, VS));
-    gl.attachShader(prog, mk(gl.FRAGMENT_SHADER, FS));
-    gl.linkProgram(prog);
-    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return;
-    gl.useProgram(prog);
-
-    const buf = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-    const loc = gl.getAttribLocation(prog, "aPos");
-    gl.enableVertexAttribArray(loc);
-    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-    const uRes = gl.getUniformLocation(prog, "uRes");
-    const uBalls = gl.getUniformLocation(prog, "uBalls");
-
-    // ── 物理：中央1塊（複数パーツがゆっくり公転し、sminで1つの液体に見える） ──
-    let W = 0, H = 0, A = 1;
-    const mouse = { x: 0, y: 0, on: false };
-    const S = isMobile ? 0.78 : 1;
-    const CY = 0.47; // 塊の中心（世界座標・見出しの上）
-    const parts = [
-      { r: 0.300 * S, or: 0.040 * S, sp: 0.17, ph: 0.0 },
-      { r: 0.190 * S, or: 0.150 * S, sp: -0.12, ph: 2.1 },
-      { r: 0.150 * S, or: 0.200 * S, sp: 0.085, ph: 4.4 },
-      { r: 0.115 * S, or: 0.250 * S, sp: -0.055, ph: 1.2 },
-      { r: 0.080 * S, or: 0.330 * S, sp: 0.042, ph: 5.3 },
-    ];
-
-    const init = () => {
-      const dpr = Math.min(devicePixelRatio, 2) * (isMobile ? 0.8 : 0.9);
-      W = canvas.offsetWidth; H = canvas.offsetHeight;
-      canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
-      gl.viewport(0, 0, canvas.width, canvas.height);
-      A = W / H;
-    };
-
-    init();
-    const onResize = () => init();
-    const onMouse = (e: MouseEvent) => {
-      const rc = canvas.getBoundingClientRect();
-      const inX = e.clientX - rc.left, inY = e.clientY - rc.top;
-      if (inX < 0 || inX > rc.width || inY < 0 || inY > rc.height) { mouse.on = false; return; }
-      mouse.x = ((inX / rc.width) * 2 - 1) * A;
-      mouse.y = -((inY / rc.height) * 2 - 1);
-      mouse.on = true;
-    };
-    const onLeave = () => { mouse.on = false; };
-    window.addEventListener("resize", onResize);
-    window.addEventListener("mousemove", onMouse);
-    document.addEventListener("mouseleave", onLeave);
-
-    const arr = new Float32Array(MAXB * 4);
-    const sway = { x: 0, y: 0 };      // マウスへの穏やかな傾き
-    const reach = { x: 0, y: 0 };     // 小滴がカーソル方向へ伸びる
-    let raf = 0, last = performance.now(), t = 0;
-    const render = (now: number) => {
-      const dt = Math.min(0.05, (now - last) / 1000);
-      last = now; t += dt;
-
-      // シックに：追従はごく控えめ・ゆっくり戻る
-      const tx = mouse.on && !isMobile ? Math.max(-0.06, Math.min(0.06, (mouse.x - 0) * 0.08)) : 0;
-      const ty = mouse.on && !isMobile ? Math.max(-0.05, Math.min(0.05, (mouse.y - 0.47) * 0.06)) : 0;
-      sway.x += (tx - sway.x) * Math.min(1, dt * 1.2);
-      sway.y += (ty - sway.y) * Math.min(1, dt * 1.2);
-      const rx = mouse.on && !isMobile ? Math.max(-0.16, Math.min(0.16, (mouse.x - 0) * 0.22)) : 0;
-      const ry = mouse.on && !isMobile ? Math.max(-0.14, Math.min(0.14, (mouse.y - 0.47) * 0.18)) : 0;
-      reach.x += (rx - reach.x) * Math.min(1, dt * 1.6);
-      reach.y += (ry - reach.y) * Math.min(1, dt * 1.6);
-
-      for (let i = 0; i < MAXB; i++) {
-        const pt = parts[i];
-        if (pt) {
-          const isDrop = i === parts.length - 1;
-          const ox = Math.cos(t * pt.sp * 2 + pt.ph) * pt.or + (isDrop ? reach.x : 0);
-          const oy = Math.sin(t * pt.sp * 1.6 + pt.ph) * pt.or * 0.72 + (isDrop ? reach.y : 0);
-          arr[i * 4] = sway.x + ox;
-          arr[i * 4 + 1] = CY + sway.y + oy + Math.sin(t * 0.5 + pt.ph) * 0.012;
-          arr[i * 4 + 2] = Math.sin(t * 0.26 + pt.ph * 1.7) * 0.10;
-          arr[i * 4 + 3] = pt.r * (1 + Math.sin(t * 0.7 + pt.ph * 2) * 0.035);
-        } else {
-          arr[i * 4 + 3] = 0;
-        }
-      }
-      gl.uniform2f(uRes, canvas.width, canvas.height);
-      gl.uniform4fv(uBalls, arr);
-      gl.clearColor(0, 0, 0, 0);
-      gl.clear(gl.COLOR_BUFFER_BIT);
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
-      raf = requestAnimationFrame(render);
-    };
-    raf = requestAnimationFrame(render);
-
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("resize", onResize);
-      window.removeEventListener("mousemove", onMouse);
-      document.removeEventListener("mouseleave", onLeave);
-    };
-  }, [isMobile]);
-
-  return <canvas ref={ref} style={{
-    position: "absolute", inset: 0, width: "100%", height: "100%",
-    pointerEvents: "none", zIndex: 2,
-    filter: "drop-shadow(0 22px 28px rgba(15,23,42,0.16))",
-  }} />;
-}
-
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function Home() {
   const [navScrolled, setNavScrolled] = useState(false);
   const [inHero, setInHero] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+  const [flat, setFlat] = useState(false);
+  useEffect(() => { setFlat(new URLSearchParams(window.location.search).has("flat")); }, []);
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
@@ -401,68 +211,93 @@ export default function Home() {
           </a>
         </nav>
 
-        {/* ── Character Hero ── */}
+        {/* ── Hero（明朝×余白×モーション） ── */}
         <section style={{
-          minHeight: "100vh", display: "flex", flexDirection: "column",
-          justifyContent: "flex-start", alignItems: "center",
-          padding: isMobile ? "47vh 20px 110px" : "50vh 48px 140px",
+          minHeight: flat ? undefined : "100vh", display: "flex", alignItems: "center",
+          padding: isMobile ? "110px 24px 120px" : "120px 64px 100px",
           background: "#fff", position: "relative", overflow: "hidden",
         }}>
-          <MercuryField isMobile={isMobile} />
+          {/* 背景：アウトラインの「80」がゆっくり浮遊 */}
+          <div aria-hidden className="serif hero-eighty" style={{
+            position: "absolute",
+            right: isMobile ? "-8vw" : "2vw",
+            bottom: isMobile ? 140 : "-6vh",
+            fontSize: isMobile ? "min(64vw, 360px)" : "min(38vw, 620px)",
+            fontWeight: 500, lineHeight: 1, letterSpacing: "-0.05em",
+            color: "transparent", WebkitTextStroke: "1px #dce3eb",
+            userSelect: "none", pointerEvents: "none", zIndex: 1,
+          }}>80</div>
 
-          <div style={{ maxWidth: 880, width: "100%", position: "relative", textAlign: "center", zIndex: 3 }}>
-            <div style={{
-              display: "inline-flex", alignItems: "center", gap: 8,
-              padding: "6px 16px", borderRadius: 100,
-              border: "1px solid #e2e8f0",
-              fontSize: 11, fontWeight: 600, color: "#64748b",
-              letterSpacing: "0.08em", marginBottom: 28,
-              fontFamily: "'SF Mono', 'Fira Code', Menlo, monospace",
-            }}>
-              <span style={{
-                width: 6, height: 6, borderRadius: "50%", background: "#94a3b8",
-                boxShadow: "0 0 6px rgba(148,163,184,0.5)",
-                animation: "pulse-dot 2s ease-in-out infinite",
-              }} />
-              AI AGENT STUDIO — 合同会社80
+          {/* 縦書きアクセント */}
+          <div className="mob-hide hero-fade" style={{
+            position: "absolute", top: 130, right: 52, writingMode: "vertical-rl",
+            fontSize: 11, letterSpacing: "0.42em", color: "#94a3b8", fontWeight: 600,
+            animationDelay: "1.4s",
+          }}>AI AGENT STUDIO — NAGOYA</div>
+
+          <div style={{ maxWidth: 1160, margin: "0 auto", width: "100%", position: "relative", zIndex: 2 }}>
+            {/* 肩書き＋罫線ドロー */}
+            <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: isMobile ? 28 : 36 }}>
+              <div className="hero-rule" style={{ width: 56, height: 1, background: "#0f172a", transformOrigin: "left" }} />
+              <div className="hero-fade" style={{ fontSize: 12, letterSpacing: "0.24em", color: "#475569", fontWeight: 600, animationDelay: "0.5s" }}>
+                合同会社80 — AIエージェント開発
+              </div>
             </div>
-            <h1 className="hero-title" style={{
-              fontSize: isMobile ? "clamp(28px, 8vw, 38px)" : "clamp(42px, 4.6vw, 64px)",
-              fontWeight: 900, lineHeight: 1.42, letterSpacing: "-0.02em",
-              color: "#0f172a", marginBottom: 24,
+
+            {/* 見出し：1文字ずつ下から立ち上がる */}
+            <h1 className="serif hero-title" style={{
+              fontSize: isMobile ? "clamp(34px, 9.6vw, 44px)" : "clamp(48px, 5.6vw, 80px)",
+              fontWeight: 700, lineHeight: 1.6, letterSpacing: "0.04em",
+              color: "#0f172a", marginBottom: isMobile ? 26 : 34,
             }}>
-              人の知覚を、<br />
-              ソフトウェアで<span className="metal-text">拡張</span>する。
+              {["人の知覚を、", "ソフトウェアで拡張する。"].map((line, li) => (
+                <span key={li} style={{ display: "block", overflow: "hidden", paddingBottom: "0.08em", marginBottom: "-0.08em" }}>
+                  {[...line].map((ch, ci) => (
+                    <span key={ci} className="ch" style={{ animationDelay: `${0.15 + li * 0.5 + ci * 0.05}s` }}>{ch}</span>
+                  ))}
+                </span>
+              ))}
             </h1>
-            <p className="hero-lead" style={{ fontSize: isMobile ? 14 : 16, color: "#64748b", lineHeight: 2, marginBottom: 36 }}>
+
+            <p className="hero-lead hero-fade" style={{
+              fontSize: isMobile ? 14 : 16, color: "#64748b", lineHeight: 2.2,
+              marginBottom: isMobile ? 40 : 52, animationDelay: "1.15s",
+            }}>
               名古屋のAI開発会社、合同会社80。<br />
-              御社専用のAIエージェントが、めんどうな仕事を代わりに働きます。
+              貴社専用のAIエージェントが、めんどうな仕事を代わりに働きます。
             </p>
-            <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-              <a href="/ai-labs" style={{
-                padding: "15px 32px", borderRadius: 12, border: "none",
-                background: "linear-gradient(180deg, #273449 0%, #0f172a 55%)", color: "#fff", fontSize: 14, fontWeight: 700,
-                textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8,
-                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.18), 0 1px 2px rgba(15,23,42,0.2)",
-                transition: "all 0.25s",
-              }}
-                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(15,23,42,0.25)"; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = "none"; }}>
-                AI LABを見る <span>→</span>
+
+            <div className="hero-fade" style={{ display: "flex", gap: isMobile ? 20 : 36, alignItems: "center", flexWrap: "wrap", animationDelay: "1.35s" }}>
+              <a href="/ai-labs" className="serif hero-cta"
+                style={{
+                  padding: isMobile ? "15px 30px" : "17px 40px",
+                  background: "#0f172a", color: "#fff",
+                  fontSize: 14, fontWeight: 600, letterSpacing: "0.14em",
+                  textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 14,
+                }}>
+                AI LABを見る
+                <span className="hero-cta-arrow" aria-hidden>→</span>
               </a>
-              <a href="/demo" style={{
-                padding: "15px 32px", borderRadius: 12, border: "1px solid #cbd5e1",
-                background: "#fff", color: "#0f172a", fontSize: 14, fontWeight: 700,
-                textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8,
-                transition: "all 0.25s",
-              }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = "#64748b"; e.currentTarget.style.color = "#64748b"; e.currentTarget.style.transform = "translateY(-2px)"; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = "#e2e8f0"; e.currentTarget.style.color = "#0f172a"; e.currentTarget.style.transform = ""; }}>
-                さわって体験する
+              <a href="/demo" className="u-link serif" style={{
+                fontSize: 14, fontWeight: 600, letterSpacing: "0.12em",
+                color: "#0f172a", textDecoration: "none", paddingBottom: 6,
+              }}>
+                さわって体験する →
               </a>
             </div>
           </div>
 
+          {/* 下端：流れるテキスト */}
+          <div style={{ position: "absolute", left: 0, right: 0, bottom: 24, overflow: "hidden", whiteSpace: "nowrap", zIndex: 1 }}>
+            <div className="hero-marquee serif" style={{ display: "inline-block", fontSize: 12, letterSpacing: "0.34em", color: "#c3cdd8" }}>
+              {Array.from({ length: 2 }).map((_, i) => (
+                <span key={i} style={{ paddingRight: "4em" }}>
+                  AIエージェント開発　／　業務自動化　／　Webシステム　／　人材紹介　／　名古屋　─　NAGOYA, JAPAN　・
+                  AIエージェント開発　／　業務自動化　／　Webシステム　／　人材紹介　／　名古屋　─　NAGOYA, JAPAN　・
+                </span>
+              ))}
+            </div>
+          </div>
         </section>
 
         {/* Fixed right-side scroll indicator */}
@@ -500,8 +335,8 @@ export default function Home() {
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.22em", color: "#64748b", textTransform: "uppercase", marginBottom: 32 }}>
                 Our Mission
               </div>
-              <h2 style={{
-                fontSize: "clamp(28px, 4vw, 52px)", fontWeight: 900,
+              <h2 className="serif" style={{
+                fontSize: "clamp(28px, 4vw, 52px)", fontWeight: 700,
                 lineHeight: 1.5, letterSpacing: "-0.03em", color: "#0f172a",
                 marginBottom: 32,
               }}>
@@ -529,14 +364,14 @@ export default function Home() {
                 <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.22em", color: "#64748b", textTransform: "uppercase", marginBottom: 24 }}>
                   私たちのビジョン
                 </div>
-                <div className="metal-text" style={{ fontSize: "clamp(56px, 7vw, 96px)", fontWeight: 900, lineHeight: 1.0, letterSpacing: "-0.04em" }}>
+                <div className="serif serif-outline" style={{ fontSize: "clamp(56px, 7vw, 96px)", fontWeight: 500, lineHeight: 1.0, letterSpacing: "-0.01em" }}>
                   Our<br />Vision
                 </div>
               </div>
 
               {/* Right: Japanese headline + body */}
               <div className="sr" style={{ transitionDelay: "0.1s" }}>
-                <h2 style={{ fontSize: "clamp(26px, 3.2vw, 44px)", fontWeight: 800, lineHeight: 1.45, letterSpacing: "-0.02em", color: "#0f172a", marginBottom: 40 }}>
+                <h2 className="serif" style={{ fontSize: "clamp(26px, 3.2vw, 44px)", fontWeight: 700, lineHeight: 1.45, letterSpacing: "-0.02em", color: "#0f172a", marginBottom: 40 }}>
                   人間らしさとテクノロジーが、<br />共存する社会へ。
                 </h2>
                 <p style={{ fontSize: 16, color: "#475569", lineHeight: 2.0, marginBottom: 28 }}>
@@ -575,7 +410,7 @@ export default function Home() {
         <section id="business" className="mob-section" style={{ background: "#fff", padding: "120px 64px 140px" }}>
           <div style={{ maxWidth: 1160, margin: "0 auto" }}>
             <div className="sr" style={{ textAlign: "center", marginBottom: 72 }}>
-              <h2 className="metal-text" style={{ fontSize: "clamp(64px, 10vw, 130px)", fontWeight: 900, letterSpacing: "-0.05em", lineHeight: 1 }}>Works</h2>
+              <h2 className="serif serif-outline" style={{ fontSize: "clamp(64px, 10vw, 130px)", fontWeight: 500, letterSpacing: "-0.01em", lineHeight: 1 }}>Works</h2>
             </div>
             {/* 2×2 grid */}
             <div className="mob-grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
@@ -591,7 +426,7 @@ export default function Home() {
                 </div>
                 <div style={{ padding: "22px 24px 26px" }}>
                   <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 8, fontWeight: 600 }}>01</div>
-                  <div style={{ fontSize: 22, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em" }}>AI LAB — 業務AIの受託開発</div>
+                  <div className="serif" style={{ fontSize: 22, fontWeight: 700, color: "#0f172a", letterSpacing: "0.02em" }}>AI LAB — 業務AIの受託開発</div>
                   <div style={{ fontSize: 14, color: "#64748b", marginTop: 6, lineHeight: 1.7 }}>御社専用のAIエージェントをオーダーメイドで開発。議事録・書類読み取り・チャットボット・FAQ・サーベイ分析などのパッケージ商品もご用意しています。</div>
                 </div>
               </div>
@@ -604,7 +439,7 @@ export default function Home() {
                 </div>
                 <div style={{ padding: "22px 24px 26px" }}>
                   <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 8, fontWeight: 600 }}>02</div>
-                  <div style={{ fontSize: 22, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em" }}>人材紹介</div>
+                  <div className="serif" style={{ fontSize: 22, fontWeight: 700, color: "#0f172a", letterSpacing: "0.02em" }}>人材紹介</div>
                   <div style={{ fontSize: 14, color: "#64748b", marginTop: 6, lineHeight: 1.7 }}>企業と人材を丁寧につなぐキャリア支援サービス。テクノロジーと人の知見で最適なマッチングを実現します。（有料職業紹介事業　許可番号 23-ユ-303078）</div>
                 </div>
               </div>
@@ -624,7 +459,7 @@ export default function Home() {
                 <div style={{ width: 24, height: 1, background: "#64748b" }} />
                 <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.22em", color: "#64748b", textTransform: "uppercase" }}>AI CAPABILITIES</div>
               </div>
-              <h2 style={{ fontSize: "clamp(28px, 3.5vw, 48px)", fontWeight: 800, lineHeight: 1.5, color: "#0f172a", maxWidth: 560 }}>
+              <h2 className="serif" style={{ fontSize: "clamp(28px, 3.5vw, 48px)", fontWeight: 700, lineHeight: 1.6, color: "#0f172a", maxWidth: 560 }}>
                 AIは今、ビジネスの<br />何を変えられるのか。
               </h2>
             </div>
@@ -634,7 +469,7 @@ export default function Home() {
 
               {/* Left: description */}
               <div className="sr">
-                <p style={{ fontSize: "clamp(18px, 2vw, 24px)", fontWeight: 700, lineHeight: 1.7, color: "#0f172a", marginBottom: 32 }}>
+                <p className="serif" style={{ fontSize: "clamp(18px, 2vw, 24px)", fontWeight: 600, lineHeight: 1.9, color: "#0f172a", marginBottom: 32 }}>
                   私たちは、AIを使って<br />できることを増やし続けている。
                 </p>
                 <p style={{ fontSize: 15, color: "#64748b", lineHeight: 2.0, marginBottom: 24 }}>
@@ -695,7 +530,7 @@ export default function Home() {
             <div style={{ marginBottom: 56, display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
               <div>
                 <div className="sr" style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.3em", color: "#64748b", textTransform: "uppercase", marginBottom: 16 }}>Case Studies</div>
-                <h2 className="sr" style={{ fontSize: "clamp(32px, 4vw, 56px)", fontWeight: 900, color: "#0f172a", letterSpacing: "-0.04em", lineHeight: 1.05, transitionDelay: "0.08s" }}>
+                <h2 className="sr serif" style={{ fontSize: "clamp(32px, 4vw, 56px)", fontWeight: 700, color: "#0f172a", letterSpacing: "0.02em", lineHeight: 1.3, transitionDelay: "0.08s" }}>
                   AIを、現場に<br />届けてきた。
                 </h2>
               </div>
@@ -737,7 +572,7 @@ export default function Home() {
 
             {/* Title */}
             <div className="sr mob-recruit-header" style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 80 }}>
-              <h2 className="metal-text-dark" style={{ fontSize: "clamp(48px, 7vw, 96px)", fontWeight: 900, letterSpacing: "-0.05em", lineHeight: 1 }}>Recruit</h2>
+              <h2 className="serif serif-outline-dark" style={{ fontSize: "clamp(48px, 7vw, 96px)", fontWeight: 500, letterSpacing: "-0.01em", lineHeight: 1 }}>Recruit</h2>
               <a href="mailto:ito.t@80grp.com"
                 style={{ display: "inline-flex", alignItems: "center", gap: 10,
                   padding: "12px 28px", borderRadius: 6,
@@ -912,8 +747,73 @@ export default function Home() {
       </div>
 
       <style>{`
+        .serif { font-family: ${mincho.style.fontFamily}, "Hiragino Mincho ProN", "Yu Mincho", serif; }
+
+        /* アウトライン文字（旧メタル文字の置き換え） */
+        .serif-outline { -webkit-text-stroke: 1.2px #b9c4d1; color: transparent; }
+        .serif-outline-dark { -webkit-text-stroke: 1px rgba(255,255,255,0.34); color: transparent; }
+
+        /* ヒーロー：1文字ずつ立ち上がる */
+        .ch {
+          display: inline-block;
+          transform: translateY(112%);
+          animation: ch-up 0.9s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+        }
+        @keyframes ch-up { to { transform: translateY(0); } }
+
+        /* ヒーロー：ふわっと出る要素 */
+        .hero-fade {
+          opacity: 0;
+          transform: translateY(14px);
+          animation: hero-fade 1s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+        }
+        @keyframes hero-fade { to { opacity: 1; transform: translateY(0); } }
+
+        /* ヒーロー：罫線が左から引かれる */
+        .hero-rule {
+          transform: scaleX(0);
+          animation: rule-draw 1s cubic-bezier(0.19, 1, 0.22, 1) 0.3s forwards;
+        }
+        @keyframes rule-draw { to { transform: scaleX(1); } }
+
+        /* ヒーロー：背景の80がゆっくり漂う */
+        .hero-eighty {
+          opacity: 0;
+          animation: eighty-in 1.6s ease 0.8s forwards, eighty-float 9s ease-in-out 2.4s infinite alternate;
+        }
+        @keyframes eighty-in { to { opacity: 1; } }
+        @keyframes eighty-float {
+          from { transform: translateY(0); }
+          to { transform: translateY(-26px); }
+        }
+
+        /* ヒーロー：下端マーキー */
+        .hero-marquee { animation: marquee-x 36s linear infinite; }
+        @keyframes marquee-x { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+        /* CTA */
+        .hero-cta { transition: letter-spacing 0.4s cubic-bezier(0.19,1,0.22,1), background 0.3s; }
+        .hero-cta:hover { letter-spacing: 0.22em; background: #1e293b !important; }
+        .hero-cta-arrow { display: inline-block; transition: transform 0.4s cubic-bezier(0.19,1,0.22,1); }
+        .hero-cta:hover .hero-cta-arrow { transform: translateX(6px); }
+        .u-link {
+          background-image: linear-gradient(#0f172a, #0f172a);
+          background-repeat: no-repeat;
+          background-size: 0% 1px;
+          background-position: left bottom;
+          transition: background-size 0.5s cubic-bezier(0.19,1,0.22,1);
+        }
+        .u-link:hover { background-size: 100% 1px; }
+
+        @media (prefers-reduced-motion: reduce) {
+          .ch, .hero-fade, .hero-rule, .hero-eighty, .hero-marquee {
+            animation: none !important;
+            transform: none !important;
+            opacity: 1 !important;
+          }
+        }
+
         @media (max-width: 768px) {
-          .hero-title { font-size: clamp(27px, 7.8vw, 38px) !important; }
           .hero-lead { font-size: 13px !important; }
           .mob-hide { display: none !important; }
 
