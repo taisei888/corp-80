@@ -8,11 +8,26 @@ export const metadata: Metadata = {
   title: TITLE,
   description: DESC,
   alternates: { canonical: "https://www.rng-labs.com/tsukijime" },
+  keywords: [
+    "請求書 統一フォーマット",
+    "建設業 請求書 管理",
+    "出来高管理 システム",
+    "請求書 受け取り クラウド",
+    "下請け 請求書 電子化",
+    "月締め 効率化",
+  ],
   openGraph: {
     title: TITLE,
     description: DESC,
     url: "https://www.rng-labs.com/tsukijime",
     type: "website",
+    images: [{ url: "/tsukijime/hero-inbox.webp", width: 1024, height: 1024, alt: "ツキジメ｜請求書が、そろって届く。" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESC,
+    images: ["/tsukijime/hero-inbox.webp"],
   },
 };
 
